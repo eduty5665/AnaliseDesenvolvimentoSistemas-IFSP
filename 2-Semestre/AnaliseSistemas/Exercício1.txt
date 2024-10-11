@@ -1,0 +1,39 @@
+Clinica Odontologica
+* RF00CadastroCliente
+* RF01CobrançaFatura
+* RF02LoginCliente
+* RF03AlterarHorario
+* RF04CancelamentoAtendimento
+
+•RNF00Responsividade
+•RNF01HistoricoCliente
+•RNF02RelatórioProduto(Estoque/Catalogados)
+
+•RN00Agendamento
+
+Papelaria
+* RF00CadastroProduto
+* RF01GerenciamentoEstoque
+* RF02AlterarProduto
+* RF03ExcluirProduto
+* RF04BaixaEstoqueVenda
+
+•RNF00Responsividade
+•RNF01RelatorioVendas
+•RNF02PainelADM
+
+•RN00Pagamento
+
+
+Agencia de Turismo
+* RF00CadastroCliente
+* RF01Login
+* RF02AlterarHorario
+* RF03Pagamento
+* RF04CancelamentoViagem
+
+•RNF00Responsividade
+•RNF01ConfirmaçõesEmail
+•RNF02PromoçõesVauchers
+
+•RN00Reserva de Vagas
