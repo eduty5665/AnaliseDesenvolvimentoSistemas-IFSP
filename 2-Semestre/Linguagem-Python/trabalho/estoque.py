@@ -2,6 +2,10 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import sqlite3
 
+#Eduardo Lucas Lemes Januário
+#Sistema de Controle de Estoque
+
+
 # FUNÇÕES Do BANCO DE DADOS
 
 # Função para conectar ao banco de dados e criar a tabela
