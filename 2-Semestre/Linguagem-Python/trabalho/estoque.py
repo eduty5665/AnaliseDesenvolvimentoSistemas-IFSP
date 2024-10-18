@@ -94,6 +94,53 @@ def delete_produto_bd(codigo):
 
 # FUNÇÕES DA INTERFACE
 
+#Função para selecionar o menu com base no acesso
+def configurar_abas():
+    nivel_acesso = cod_acess_entry.get()
+    
+    # Exibe apenas as abas permitidas
+    if nivel_acesso == '01':  # Usuário com acesso limitado
+        notebook.add(aba_buscar, text="Menu Usuário")
+        notebook.forget(aba_acesso)
+    elif nivel_acesso == '02':  # Administrador com acesso total
+        notebook.add(aba_menu, text="Menu Admin")
+        notebook.forget(aba_acesso)
+
+#Função botão add da busca
+def chama_add():
+    notebook.add(aba_adicionar, text="Adicionar Produto")
+    notebook.forget(aba_buscar)
+
+#Função botão busca do menu-admin
+def chama_buscar_admin():
+    notebook.add(aba_buscar, text="Buscar Produto")
+    notebook.forget(aba_menu)
+
+#Função botão edit do menu-admin
+def chama_edit_admin():
+    notebook.add(aba_edit, text="Editar Produto")
+    notebook.forget(aba_menu)
+
+#Função botão fechar da aba add
+def exit_add():
+    notebook.forget(aba_adicionar)
+    notebook.add(aba_acesso, text="Acesso")
+
+#Função botão fechar da aba busca
+def exit_busca():
+    notebook.forget(aba_buscar)
+    notebook.add(aba_acesso, text="Acesso")
+
+#Função botão fechar da menu
+def exit_menu():
+    notebook.forget(aba_menu)
+    notebook.add(aba_acesso, text="Acesso")
+
+#Função botão fechar da aba edit
+def exit_edit():
+    notebook.forget(aba_edit)
+    notebook.add(aba_acesso, text="Acesso")
+
 # Função para obter dados da interface e adicionar produto ao estoque
 def adicionar_produto_interface():
     codigo = cod_entry.get()
@@ -114,8 +161,8 @@ def adicionar_produto_interface():
     qtd_entry.delete(0, tk.END)
     preco_entry.delete(0, tk.END)
 
-# Função para buscar e exibir produto
-def pesquisar_produto_interface():
+# Função para buscar e exibir produto da aba busca
+def busca_produto_interface_busca():
     codigo = cod_busca_entry.get()
     produto = buscar_produto_bd(codigo)
 
@@ -138,18 +185,42 @@ def pesquisar_produto_interface():
     else:
         messagebox.showerror("Erro", f"Produto com código {codigo} não encontrado.")
 
-    # Muda os campos da interface para modo edição
-    nome_busca_entry.config(state='normal')
-    qtd_busca_entry.config(state='normal')
-    preco_busca_entry.config(state='normal')
+#Função para buscar e exibir produto da aba edit
+def busca_produto_interface_edit():
+    codigo = cod_edit_entry.get()
+    produto = buscar_produto_bd(codigo)
+
+    if produto:
+        # Exibir os dados do produto na interface de busca
+        nome_edit_entry.config(state='normal')  # Permite edição
+        nome_edit_entry.delete(0, tk.END)
+        nome_edit_entry.insert(0, produto[1])  # Nome
+        nome_edit_entry.config(state='readonly')  # Modo somente leitura
+        
+        qtd_edit_entry.config(state='normal')
+        qtd_edit_entry.delete(0, tk.END)
+        qtd_edit_entry.insert(0, produto[2])  # Quantidade
+        qtd_edit_entry.config(state='readonly')
+        
+        preco_edit_entry.config(state='normal')
+        preco_edit_entry.delete(0, tk.END)
+        preco_edit_entry.insert(0, produto[3])  # Preço
+        preco_edit_entry.config(state='readonly')
+    else:
+        messagebox.showerror("Erro", f"Produto com código {codigo} não encontrado.")
+
+    nome_edit_entry.config(state='normal')  # Permite edição
+    qtd_edit_entry.config(state='normal')
+    preco_edit_entry.config(state='normal')
+
 
 # Função para buscar e atualizar o produto
 def editar_produto_interface():
-    codigo = cod_busca_entry.get()
-    nome = nome_busca_entry.get()
+    codigo = cod_edit_entry.get()
+    nome = nome_edit_entry.get()
     try:
-        quantidade = int(qtd_busca_entry.get())
-        preco = float(preco_busca_entry.get())
+        quantidade = int(qtd_edit_entry.get())
+        preco = float(preco_edit_entry.get())
     except ValueError:
         messagebox.showerror("Erro", "Quantidade e preço devem ser números válidos.")
         return
@@ -168,19 +239,19 @@ def editar_produto_interface():
 
 # Função para buscar e excluir o produto
 def deletar_produto_interface():
-    codigo = cod_busca_entry.get()
+    codigo = cod_edit_entry.get()
 
     # Jogando dados pra função delete BD
     delete_produto_bd(codigo)
 
     # Limpa os campos da interface
-    cod_busca_entry.delete(0, tk.END)
-    nome_busca_entry.config(state='normal')
-    nome_busca_entry.delete(0, tk.END)
-    qtd_busca_entry.config(state='normal')
-    qtd_busca_entry.delete(0, tk.END)
-    preco_busca_entry.config(state='normal')
-    preco_busca_entry.delete(0, tk.END)
+    cod_edit_entry.delete(0, tk.END)
+    nome_edit_entry.config(state='normal')
+    nome_edit_entry.delete(0, tk.END)
+    qtd_edit_entry.config(state='normal')
+    qtd_edit_entry.delete(0, tk.END)
+    preco_edit_entry.config(state='normal')
+    preco_edit_entry.delete(0, tk.END)
 
 # INTERFACE
 
@@ -192,11 +263,83 @@ tela.title("Controle de Estoque")
 notebook = ttk.Notebook(tela)
 notebook.pack(pady=10, expand=True)
 
+# Aba de Acesso
+aba_acesso = ttk.Frame(notebook)
+notebook.add(aba_acesso, text="Acesso")
+
+# Elementos da aba de acesso
+title_label = tk.Label(aba_acesso, text="Acesso ao Sistema ")
+title_label.grid(row=0, column=1, padx=10, pady=10)
+user_label = tk.Label(aba_acesso, text="01 - usuário ")
+user_label.grid(row=1, column=0, padx=10, pady=10)
+adm_label = tk.Label(aba_acesso, text="02 - ADM ")
+adm_label.grid(row=1, column=2, padx=10, pady=10)
+
+cod_acess_label = tk.Label(aba_acesso, text="Código do Acesso: ")
+cod_acess_label.grid(row=2, column=0, padx=10, pady=6)
+cod_acess_entry = tk.Entry(aba_acesso)
+cod_acess_entry.grid(row=3, column=1, padx=10, pady=6)
+
+# Botão para acesso edit produto
+botao_acess = tk.Button(aba_acesso, text="Acessar", command=configurar_abas)
+botao_acess.grid(row=4, column=2, columnspan=1, pady=10)
+
+# Aba de Menu - Admin
+aba_menu = ttk.Frame(notebook)
+notebook.add(aba_menu, text="Menu - Admin")
+
+# Elementos da aba de adicionar
+botao_busca_menu_admin = tk.Button(aba_menu, text="Buscar Produto", command=chama_buscar_admin)
+botao_busca_menu_admin.grid(row=0, column=0, columnspan=2, pady=10)
+botao_edit_menu_admin = tk.Button(aba_menu, text="Editar Produto", command=chama_edit_admin)
+botao_edit_menu_admin.grid(row=0, column=4, columnspan=2, pady=10)
+
+botao_fechar_busca = tk.Button(aba_menu, text="fechar", command=exit_menu)
+botao_fechar_busca.grid(row=1, column=2, columnspan=2, pady=10)
+
+# Aba de Buscar Produto
+aba_buscar = ttk.Frame(notebook)
+notebook.add(aba_buscar, text="Buscar Produto")
+
+# Elementos da aba de buscar
+# Botão para buscar produto
+botao_fechar_busca = tk.Button(aba_buscar, text="X", command=exit_busca)
+botao_fechar_busca.grid(row=0, column=3, columnspan=2, pady=10)
+cod_busca_label = tk.Label(aba_buscar, text="Código do Produto: ")
+cod_busca_label.grid(row=0, column=0, padx=10, pady=6)
+cod_busca_entry = tk.Entry(aba_buscar)
+cod_busca_entry.grid(row=0, column=1, padx=10, pady=6)
+
+# Botão para buscar produto
+botao_buscar = tk.Button(aba_buscar, text="Buscar Produto", command=busca_produto_interface_busca)
+botao_buscar.grid(row=1, column=1, columnspan=2, pady=10)
+
+nome_busca_label = tk.Label(aba_buscar, text="Nome do Produto: ")
+nome_busca_label.grid(row=2, column=0, padx=10, pady=6)
+nome_busca_entry = tk.Entry(aba_buscar, state='readonly')
+nome_busca_entry.grid(row=2, column=1, padx=10, pady=6)
+
+qtd_busca_label = tk.Label(aba_buscar, text="Quantidade do Produto: ")
+qtd_busca_label.grid(row=3, column=0, padx=10, pady=6)
+qtd_busca_entry = tk.Entry(aba_buscar, state='readonly')
+qtd_busca_entry.grid(row=3, column=1, padx=10, pady=6)
+
+preco_busca_label = tk.Label(aba_buscar, text="Preço do Produto: ")
+preco_busca_label.grid(row=4, column=0, padx=10, pady=6)
+preco_busca_entry = tk.Entry(aba_buscar, state='readonly')
+preco_busca_entry.grid(row=4, column=1, padx=10, pady=6)
+
+# Botão para adicionar produto
+botao_add_busca = tk.Button(aba_buscar, text="Adicionar Produto", command=chama_add)
+botao_add_busca.grid(row=5, column=1, columnspan=2, pady=10)
+
 # Aba de Adicionar Produto
 aba_adicionar = ttk.Frame(notebook)
 notebook.add(aba_adicionar, text="Adicionar Produto")
 
 # Elementos da aba de adicionar
+botao_fechar_add = tk.Button(aba_adicionar, text="X", command=exit_add)
+botao_fechar_add.grid(row=0, column=3, columnspan=2, pady=10)
 cod_label = tk.Label(aba_adicionar, text="Código do Produto: ")
 cod_label.grid(row=0, column=0, padx=10, pady=6)
 cod_entry = tk.Entry(aba_adicionar)
@@ -221,42 +364,50 @@ preco_entry.grid(row=3, column=1, padx=10, pady=6)
 botao_adicionar = tk.Button(aba_adicionar, text="Adicionar Produto", command=adicionar_produto_interface)
 botao_adicionar.grid(row=4, column=0, columnspan=2, pady=10)
 
-# Aba de Buscar Produto
-aba_buscar = ttk.Frame(notebook)
-notebook.add(aba_buscar, text="Buscar Produto")
+# Aba de Editar Produto
+aba_edit = ttk.Frame(notebook)
+notebook.add(aba_edit, text="Editar Produto")
 
-# Elementos da aba de buscar
-cod_busca_label = tk.Label(aba_buscar, text="Código do Produto: ")
-cod_busca_label.grid(row=0, column=0, padx=10, pady=6)
-cod_busca_entry = tk.Entry(aba_buscar)
-cod_busca_entry.grid(row=0, column=1, padx=10, pady=6)
-
-# Botão para buscar produto
-botao_buscar = tk.Button(aba_buscar, text="Buscar Produto", command=pesquisar_produto_interface)
-botao_buscar.grid(row=1, column=0, columnspan=2, pady=10)
-
-nome_busca_label = tk.Label(aba_buscar, text="Nome do Produto: ")
-nome_busca_label.grid(row=2, column=0, padx=10, pady=6)
-nome_busca_entry = tk.Entry(aba_buscar, state='readonly')
-nome_busca_entry.grid(row=2, column=1, padx=10, pady=6)
-
-qtd_busca_label = tk.Label(aba_buscar, text="Quantidade do Produto: ")
-qtd_busca_label.grid(row=3, column=0, padx=10, pady=6)
-qtd_busca_entry = tk.Entry(aba_buscar, state='readonly')
-qtd_busca_entry.grid(row=3, column=1, padx=10, pady=6)
-
-preco_busca_label = tk.Label(aba_buscar, text="Preço do Produto: ")
-preco_busca_label.grid(row=4, column=0, padx=10, pady=6)
-preco_busca_entry = tk.Entry(aba_buscar, state='readonly')
-preco_busca_entry.grid(row=4, column=1, padx=10, pady=6)
+# Elementos da aba de editar
+botao_fecha_edit = tk.Button(aba_edit, text="X", command=exit_edit)
+botao_fecha_edit.grid(row=0, column=3, columnspan=2, pady=10)
+cod_edit_label = tk.Label(aba_edit, text="Código do Produto: ")
+cod_edit_label.grid(row=0, column=0, padx=10, pady=6)
+cod_edit_entry = tk.Entry(aba_edit)
+cod_edit_entry.grid(row=0, column=1, padx=10, pady=6)
 
 # Botão para editar produto
-botao_edit = tk.Button(aba_buscar, text="Editar Produto", command=editar_produto_interface)
-botao_edit.grid(row=5, column=0, pady=10)
+botao_buscar_edit = tk.Button(aba_edit, text="Buscar Produto", command=busca_produto_interface_edit)
+botao_buscar_edit.grid(row=1, column=1, columnspan=2, pady=10)
+
+nome_edit_label = tk.Label(aba_edit, text="Nome do Produto: ")
+nome_edit_label.grid(row=2, column=0, padx=10, pady=6)
+nome_edit_entry = tk.Entry(aba_edit, state='normal')
+nome_edit_entry.grid(row=2, column=1, padx=10, pady=6)
+
+qtd_edit_label = tk.Label(aba_edit, text="Quantidade do Produto: ")
+qtd_edit_label.grid(row=3, column=0, padx=10, pady=6)
+qtd_edit_entry = tk.Entry(aba_edit, state='normal')
+qtd_edit_entry.grid(row=3, column=1, padx=10, pady=6)
+
+preco_edit_label = tk.Label(aba_edit, text="Preço do Produto: ")
+preco_edit_label.grid(row=4, column=0, padx=10, pady=6)
+preco_edit_entry = tk.Entry(aba_edit, state='normal')
+preco_edit_entry.grid(row=4, column=1, padx=10, pady=6)
+
+# Botão para editar produto
+botao_edit_edit = tk.Button(aba_edit, text="Editar Produto", command=editar_produto_interface)
+botao_edit_edit.grid(row=5, column=0, pady=10)
 
 # Botão para excluir produto
-botao_delete = tk.Button(aba_buscar, text="Excluir Produto", command=deletar_produto_interface)
-botao_delete.grid(row=5, column=1, pady=10)
+botao_delete = tk.Button(aba_edit, text="Excluir Produto", command=deletar_produto_interface)
+botao_delete.grid(row=5, column=3, pady=10)
 
-# Loop principal da interface
+# Oculta todas as abas primeiro
+notebook.forget(aba_edit)
+notebook.forget(aba_adicionar)
+notebook.forget(aba_buscar)
+notebook.forget(aba_menu)
+
+# Mantém a janela aberta
 tela.mainloop()
