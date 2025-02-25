@@ -1,0 +1,27 @@
+1. Explique os três tipos de sistemas estudados em aula.
+   Existem tr~es principais processos, o processo em Batch que é quando os usuários não necessitam de respostas tão rápidas, sendo assim o SO agrupa processos semelhantes e os executa em sequência, deixando tarefas repetitivas mais ágeis; o processo interativo é quando o processo que depende da ação do usuário, onde o usuário se utiliza dos periféficos para constantemente se comunicar com a máquina; os processos em tmepo são processos mais ágeis e rápidos, seu principal objetivo é o tempo, quanto mais rápido melhor.
+
+2. Explique o algoritmo Shortest Job First.
+ É um algoritmo de escalonamento que pega o processo mais curto (shortest job) e o coloca em primeiro da fila de execução, diminuindo o tempo de espera para processos simples, sua desvantagem consiste na fila de espera curta, se tiverem poucos processos prontos ele não será tão eficaz.
+
+3. O que é Quantum?
+  Quantum nada mais é do que um intervalo de tempo que o algoritmo de escalonamento define para execução dos processos.
+
+4. Explique o algoritmo Round-Robin.
+   O algoritmo Round Robin se utiliza dos Quantums para definir um certo intervalo de tempo para cada processo ao final desse intervalo de tempo, o algoritmo passa a vez de execução para outro processo.
+
+5. Explique como funciona o algoritmo de prioridades.
+   É um algoritmo de escalonamento que define a cada processo um peso, uma prioridade, e conforme os processos de maior prioridade vão ficando prontos eles vem sendo executados primeiro.
+
+6. O que é Hard Real Time e Soft Real Time?
+   Ambos os escalonamentos estão ligados ao Sistemas em Tempo Real. O Hard Real Time não tolera atrasos no processamento devido a necessidade do programa pela informação precisa, como nos intrumentos dos aviões; o Soft Real Time já tolera atraso, pois seus programas não necessitam de tanta precisão na informação, um exemplo são os bancos.
+
+7. Cinco jobs estão esperando para serem executados. Seus tempos de execução previstos são
+9, 6, 3, 5 e X. Em que ordem eles deveriam ser executados para minimizar o tempo de resposta?
+(Sua resposta dependerá de X.)
+
+  Se X = 3, ordem de execução: X,3,5,6,9
+  Se 3<=X<5, ordem de execução: 3,X,5,6,9
+  Se 5<=X<6, ordem de execução: 3,5,X,6,9
+  Se 6<=X<9, ordem de execução: 3,5,6,X,9
+  Se X >= 3, ordem de execução: 3,5,6,9,X

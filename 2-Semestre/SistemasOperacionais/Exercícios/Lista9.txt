@@ -1,0 +1,83 @@
+Exerc�cio 9:
+
+Leia o capitulo de gerenciamento de dispositivos de E/S do Tanenbaum.
+Responda individualmente todas as quest�es abaixo.
+
+1. Dispositivos de E/S podem ser divididos em dispositivos de blocos e dispositivo de caracteres. 
+Explique as diferen�as entre eles.
+    Dispositivos de blocos trnsferem dados em unidades fixas, permitindo acesso aleatório. Já os dispositivos de caracteres transferem dados em fluxos contínuos.
+
+
+2. Dentro do contexto de Sistema Operacionais, defina "interrup��o" e descreva a sua utilidade citando um exemplo.
+    A interrupção é um sinal enviado ao processador para indicar que determinada operação precisa ser tratada. Ex: Quando uma tecla é pressionada, uma interrupção é gerada para que o sistema processe a entrada do teclado.
+
+
+3. Considerando os aspectos de software da E/S, diferencie E/S programada, E/S dirigida por interrup��o e E/S usando DMA.
+     E/S programada: o processador gerencia a trnsferencia de dados, aguardando o fim da operação.
+
+     E/S por interrupção: o processador é interrompido quando a operação de E/S é concluída.
+
+     E/S usando DMA: O controlador DMA estabelece a transferencia de dados entre o dispositivo e a memória, sem interrupções do processador.
+
+
+4. Dentro do contexto de Sistema Operacionais, defina "drivers" e quais s�o as suas fun��es?
+      Os drivers são programas que permitem que o sistema operacional se comunique com o hardware.
+
+
+5. As solicita��es de disco chegam para o driver de disco na seguinte ordem: 10, 22, 20, 2, 40, 6 e 38. 
+Uma busca leva 6 msec por cilindro movido. Quanto tempo de busca � necess�rio para o algoritmo:
+OBS 1: Posi��o inicial do bra�o do disco: cilindro 20.
+OBS 2: Elevador para a direita.
+
+
+        � FCFS:
+           --Ordem de execução: 10, 22, 20, 2, 40, 6, 38
+           --Movimentos da agulha: 10, 12, 2, 18, 38, 34, 32
+           --Total: 146 Movimentos
+
+           146 Movimentos X 6ms = 876ms
+
+
+
+        � SSF:
+           --Ordem de execução: 20, 22, 10, 6, 2, 38, 40
+           --Movimentos da agulha: 0, 2, 12, 4, 4, 36, 2
+           --Total: 60 Movimentos
+
+           60 Movimentos X 6ms = 360ms
+
+
+        � Elevador:
+           --Ordem de execução: 20, 22, 38, 40, 10, 6, 2
+           --Movimentos da agulha: 0, 2, 16, 2, 30, 4, 4
+           --Total: 58 Movimentos
+
+           58 Movimentos X 6ms = 348ms
+
+6. Explique como funciona o rel�gio de hardware.
+     O relógio de hardware envia sinais regulares para o processador, gerando interupções periódicas para sincronizar a execução de processos.
+
+
+7. Explique os 07 (sete) n�veis de RAID.
+
+RAID 0: Os dados são divididos em blocos e distribuidos igualmente entre dois discos.
+
+RAID 1: Os dados são duplicados em dois discos.
+
+RAID 2: Os dados são divididos em bits e para cada bit de dados, a paridade é armazenada em discos separados.
+
+RAID 3: Os dados são divididos em blocos e distribuidos entre discos. Um disco adicional armazena a paridade.
+
+RAID 4: Os dados são divididos em blocos e distribuidos entre discos. a paridade é armazenada em blocos.
+
+RAID 5: Os dados são distribuidos em blocos entre os discos e a paridade é distribuida entre os discos.
+
+RAID 6: Os dados são distribuidos em blocos entre os discos e há dupla paridade distribuída entre os discos.
+
+RAID 10: Combinação entre as RAIDs 0 e 1. Dois discos armazenam cópias dos dados e esses dados são distribuidos entre os discos.
+
+
+
+
+
+

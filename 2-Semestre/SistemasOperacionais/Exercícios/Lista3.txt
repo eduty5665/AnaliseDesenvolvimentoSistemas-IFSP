@@ -1,0 +1,16 @@
+Exerc�cio 3:
+
+1. Quais s�o os estados b�sicos de um processo? Explique as suas trocas de estados (intera��es)?
+   Pronto, Bloqueado e Executando. Quando o processo passa de executando para bloqueado, ele verifica que não pode continuar(sendo algo automatico ou devido a systemcall) . Quando o processo passa de pronto para executando, o escalonador é encarregado de tomar sua escolha. Quando o processo passa de executando para pronto, o escalonador para o processo anterior e passa a vez para o próximo. Quando o processo passa de bloqueado para pronto, o evento foi finalizado.
+
+2. O que � o escalonador de processo de um SO? Qual a sua fun��o?
+   O escalonador é um componenete do SO capaz de gerenciar a ordem e o tempo em que os processos serão executados pela CPU. Sua principal função é a escolha do próximo processo a ser executado.
+
+3. O que � uma Thread?
+   Uma thread é uma llinha de comando, a menor unidade de processamento que um SO pode reaizar, sendo considerada o processo mais leve.
+
+4. Diferencie Threads de Usu�rio e Threads de N�cleo.
+   A thread de usuário ocorre a partir de uma bibioteca implementada no vível do usuário, ou seja, são gerenciadas fora do sistema operacional. Já a thread do núcleo é realizada no kernel sendo responsavel pelo gerenciamento dos processos e tarefas.
+
+5. Cite tr�s itens que s�o criados por processo e tr�s que s�o criados por thread.
+   Dentro dos itens relacionados aos processos temos os mabientes de desenvolvimento em que cada parte de um codigo pode ser compilada em um processo; o gerenciamento de uma rede; e ao abrir aplicativos como a Google, o SO se encarrega de criar um novo processo. Por outro lado, referente as threads temos o carregamento de uma imagem em um site; a requisição de um download; e a requisição de um dado à memória.

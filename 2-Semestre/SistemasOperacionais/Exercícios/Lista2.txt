@@ -1,0 +1,28 @@
+Exerc�cio 2:
+
+1 - O que � uma Shell?
+    Uma shell é um painel, uma interface grafica da qual o usuário se utiliza para executar comandos ou outros programas sobre o sistema operacional, o famoso prompt de comando.
+
+2 - O que s�o as chamadas ao sistema?
+    Uma chamada ao sistema, ou system call, nada mais é do que uma função, uma rotina que o programa executa para pedir algum serviço ao núcleo do sistema operacional, as system call podem ser vistas como uma porta de entrada ao nucleo do sistema, dando maior privilegio a quem se utiliza de tal.
+
+3 - O que significa "modo usu�rio" e "modo kernel" no contexto de sistemas operacionais?
+    Para navegarmos no sistema existem dois tipos de usuario, o usuário comum, do qual não vemos privilégios e do qual se tentarmos modificar alho no sistema como atualizar, criar ou deletar, não poderemos, e existe o segundo modo, o modo kernel, que podemos chamar de um administrador, neste podemos executar qualquer função, pois teremos todas as liberações.
+
+4 - De acordo com a Estrutura dos Sistemas Operacionais, discorra sobre os seguintes tipos estruturais:
+
+	5.1 - Monol�ticos: As chamadas requisitadas ao sistema são elaboradas ao se estabelecer parâmetros em registradores ou pilhas de serviço seguido da execução de uma instrução chamada Trop.
+	5.2 - Em Camadas: É dividida em uma hierarquia de 6 níveis, visando isolar as funções do sistema operacional para facilitar manutenção e depurações.
+	5.3 - Micro-kernel: O Kernel é o núcleo do sistema, de tal modo ele realiza atividades que suportam outras funcionalidades do SO. Neste sentido, o Micro-Kernel é um modelo simplificado/minimalista do kernel, o qual recebe determinadas funções para controle e delega as demais funcionalidades a sistemas internos. Desvantagem TRAP, muitas requisições.
+	5.4 - Cliente-Servidor: è implementado entre os serviços do servidor e do cliente por meio do kernel, visando simplificar o uso do SO, com processos mais intuitivos ao usuário/cliente.
+	
+5 - Das instru��es a seguir, quais devem ser executadas em modo n�cleo?
+    a) Desabilite todas as interrup��es. (V)
+    b) Leia o hor�rio do rel�gio. (F)
+    c) Altere o hor�rio do rel�gio. (V)
+    d) Altere o mapa da mem�ria. (V)
+
+6 - Escolha duas chamadas ao sistema do Linux e explique o funcionamento de cada uma.
+    -- Fork(): é uma chamada capaz de criar um novo processo, sendo uma cópia do processo chamador (processo pai). O processo filho herda o espaço de memória e variáveis, porém possui um PID (identificador) diferente.
+
+    --Wait(): É uma chamada que faz com que o processo pai espere até que um ou mais dos seus filhos terminem. Isso é interessante para sincronizar a execução dos processos e coletar o status de finalização dos processos filhos.

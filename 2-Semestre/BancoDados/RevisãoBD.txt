@@ -1,0 +1,83 @@
+--Considere as tabelas (relações) abaixo para responder todas as perguntas: 
+
+Fornecedores (codf, nomef, cidade) 
+
+Peças (codp, nomep, peso, cor) 
+
+Embarques (codf, codp, qtde) 
+
+
+
+--Para cada uma das consultas abaixo, crie a sentença correspondente na linguagem SQL. 
+
+1.Crie o Banco de Dados 
+
+CREATE DATABASE Fabrica
+
+
+
+2.Crie os comandos SQL necessários para criar as tabelas acima. 
+
+USE Fabrica
+
+CREATE TABLE FORNECEDOR(
+
+              CODF INT NOT NULL PRIMARY KEY,
+              NOMEF VARCHAR(20) NOT NULL,
+              CIDADE VARCHAR(20) NOT NULL
+       )
+       CREATE TABLE PECA(
+              CODP INT NOT NULL PRIMARY KEY,
+              NOMEP VARCHAR(20) NOT NULL,
+              PESO FLOAT NOT NULL,
+              COR VARCHAR(10) NOT NULL
+      )
+      CREATE EMBARQUE(
+              ID_EMB NOT NULL PRIMARY KEY,
+              CODF INT NOT NULL,
+              CODP INT NOT NULL,
+              QTD INT NOT NULL
+              FOREIGN KEY (CODF) REFERENCES FORNECEDOR(CODF),
+              FOREIGN KEY (CODP) REFERENCES PECA(CODP)
+     )
+
+
+
+3.Crie dois comandos SQL de inserção para cada uma das três tabelas. 
+
+INSERT INTO FORNECEDOR VALUES ('1', 'Leves','Rio Preto')
+INSERT INTO FORNECEDOR VALUES ('2', 'Pesados','Catanduva')
+
+
+INSERT INTO PECA VALUES ('1', 'Maçaneta','20','Verde')
+INSERT INTO PECA VALUES ('2', 'Chave','10','Azul')
+
+
+INSERT INTO EMBARQUE VALUES ('1', '1','2','30')
+INSERT INTO EMBARQUE VALUES ('2', '2','1','40')
+
+
+
+
+
+4.Crie uma consulta SQL para atualizar o peso da peça 1 em 15%. 
+
+UPDATE PECA SET PESO = PESO + (PESO*0.15) WHERE PECA = 1
+
+
+
+5.Crie uma consulta SQL para excluir a peça 1. 
+
+DELETE FROM PECA WHERE COD_PECA = 1
+
+
+
+6.Selecione os nomes e as cidades de todos os fornecedores. 
+
+SELECT NOME, CIDADE FROM FORNECEDOR
+
+
+
+7.Buscar os dados das peças que pesam mais do que 5 gr.
+
+        SELECT * FROM PECA WHERE PESO > 5 

@@ -1,0 +1,55 @@
+Exerc�cio 8:
+
+Leia o capitulo de sistemas de arquivos do Tanenbaum.
+Responda todas as quest�es abaixo.
+(Essa lista pode ser feita em dupla!)
+
+1. No Windows, quando um usu�rio d� dois cliques sobre um arquivo relacionado pelo Windows Explorer, �
+executado um programa e aquele arquivo � oferecido como par�metro. Liste duas formas diferentes de como 
+o sistema operacional poderia saber qual programa executar.
+   Existem algumas formas, mas iremos falar da associação por extensão de arquivo, na qual o Windows mantém um registro que associa extensão de arquivos, como .txt, .jpg à programas específicos, ao clique o sistema verifica essa associação e executa o prgrama correspondente; e da associação por cabeçalho mágico, onde alguns sitemas verificam o conteúdo do arquivo para identificar seu tipo, independentemente da extensão. embora o Windos use o sistema por extensão pela praticidade, softwares mais específicos podem empregar essa técnica para maior precisão.
+
+
+2. H� diferen�as com rela��o a nomea��o e estrutura Arquivos em diversos sistemas operacionais?
+Se sim, d� um exemplo com rela��o a nomea��o e outro com rela��o a estrutura.
+   Sim, existem algumas diferenças. Por exemplo, em relaçao a nomeação, O Windows tem como padrão não ser case sensitive, ou seja, um mesmo nome minusculo ou maiusculo, sera a mesma coisa para ele, diferentemente do Linux o qual usa a diferenciação de maiusculo e minusculo, ou seja, é case sensitive. Outra diferença entre os mesmos sistemas operacionais é em relação a sua estrutura de caminho de arquivos, o Windows segue uma estrutura hierarquica baseada em volumes, já o Linux se utiliza de uma estrutura de diretórios de raiz unica, ou seja, os "caminhos" das pastas e/ou arquivos sempre sairão da raiz.
+
+3. Alguns sistemas operacionais fornecem uma chamada ao sistema "rename" para atribuir um novo nome a um
+arquivo. H� alguma diferen�a entre usar essa chamada para dar um novo nome a um arquivo e apenas copi�-lo
+para um novo arquivo com o novo nome e depois remover o antigo?
+   Sim, há uma enorme diferença, ao se renomear um arquivo, a chamada apenas altera o nome ou a localização no sistema de arquivos sem mover os dados. Ao contrario de se copiar e remover, onde você acaba criando uma duplicata completa dos dados em um outro local do disco, consumindo tempo e espaço.
+
+4. No contexto de implementa��o de arquivos em SO, explique o funcionamento sobre:
+4.1 - Aloca��o Cont�nua: o blocos de disco são alocados de forma sequencial e contínua para um arquivo, dando um acesso mais rápido e eficiente, embora possa causar fragmentação e tem uma dificuldade em se lidar com arquivos que crescem.
+
+4.2 - Aloca��o por lista encadeada: Os blocos de arquivos contêm ponteiros para o próximo bloco, evitando aquela necessidade de espaço contínuo, todavia se comprometer um bloco pode comprometer toda integridade de todo sistema, alem do acesso ser mais lento.
+
+4.3 - Aloca��o por lista encadeada usando uma tabela na mem�ria: Assim como na lista encadeada, os blocos são separados e direcionados pelos ponteiros, so que desta vez, os ponteiros são salvos em uma tabela a parte, dando maior confiabilidade ao sistema.
+
+4.4 - Inodes: Cada arquivo tem um inode que armazena os metadados(permissoês, localização dos blocos), dessa forma é mais eficiente trabalhar com arquivos grandes, alem da flexibilidade e rapidez no acesso que o sistema ganha.
+
+
+
+5. Cite uma vantagem das liga��es estritas (hard links) sobre as liga��es simb�licas e uma vantagem das 
+liga��es simb�licas sobre as liga��es estritas.
+   Do hard link para o soft link existe uma forte resiliencia a exclusão, acaso o arquivo original for deletado, o contepudo ainda pode ser acessado pelos hards links, ja que são referencias diretas do disco. Em contrario, os softlinks se tornam invalidos(um "link quebrado") se o arquivo original/destino for excluído. Por outro lado, os softlinks ganham na flexibilidade, já que eles podem apontar para arquivos ou diretórios localizados em sistemas de arquivos distintos ou até mesmo inexistentes. Ja os hardlinks só podem existir dentro do mesmo sistema de arquivos e não funcionam para diretórios na maioria dos sistemas.
+
+
+
+6. O inic�o de um mapa de bits do espa�o livre parece-se com isto depois que a parti��o de disco � 
+formatada pela primeira vez: 1000 0000 0000 0000 (o primeiro bloco � usado pelo diret�rio-raiz). O 
+sistema sempre busca por blocos livres a partir do bloco com o menor n�mero; assim, depois de escrever um 
+arquivo A, que usa seis blocos, o mapa de bits se parece com isto: 1111 1110 0000 0000. Mostre o mapa de 
+bits depois de cada uma das seguintes a��es adicionais:
+6.1 - O arquivo B � escrito, usando cinco blocos.
+1111 1111 1111 0000
+
+6.2 - O arquivo A � removido.
+0000 0001 1111 0000
+
+6.3 - O arquivo C � escrito, usando oito blocos.
+1111 1111 1111 0000
+
+6.4 - O arquivo B � removido.
+1111 0000 0000 0000
+

@@ -1,0 +1,45 @@
+Exerc�cios 5:
+
+1. Cinco jobs em lote, A a E, chegam a um centro de computa��o quase ao mesmo tempo. Eles 
+t�m tempos de execu��o estimados em 10, 6, 2, 4 e 8 minutos. Suas prioridades (externamente 
+determinadas) s�o 3, 5, 2, 1 e 4 respectivamente, sendo 5 a prioridade mais alta. Para cada 
+um dos seguintes algoritmos de escalonamento, determine o tempo m�dio de ida e volta 
+(turnaround time). Ignore a sobrecarga de altern�ncia de processos.
+
+a) Circular (Round-Robin)
+	                                           Quantum --> 2 minutos
+                                                   ordem: 10, 6, 2, 4, 8
+
+    Contagem Tempo     |     Contagem Tempo      |      Contagem Tempo    |     Contagem Tempo    |    Contagem Tempo
+    2  4  6  8  10     |    12  14     16  18    |     20  22       24    |     26           28   |   30            
+   Execução Programa   |    Execução Programa    |     Execução Programa  |    Execução Programa  |   Execução Programa
+    A  B  C  D  E      |    A   B   C  D   E     |     A   B  C  D  E     |     A   B  C  D  E    |   A   B  C  D  E
+    8  4  0  2  6      |    6   2   0  0   4     |     4   0  0  0  2     |     2   0  0  0  0    |   0   0  0  0  0
+
+                                                  C=6 D=16 B=22 E=28 A=30     
+                                       (6+16+22+28+30) / 5 --> 102/5 = 20,4 Minutos
+
+b) Escalonamento por prioridades
+   ordem: 6,8,10,2,4 -->
+   (6 + (6+8) + (6+8+10) + (6+8+10+2) + (6+8+10+2+4)) / 5 -->
+   --> (6+14+24+26+30) / 5 --> 100/5 = 20 Minutos
+
+c) Primeiro a chegar, primeiro a ser servido (FCFS - First-Come First-Served - execute na 
+ordem: 10, 6, 2, 4, 8).
+  ordem: 10, 6, 2, 4, 8 -->
+  (10 + (10+6) + (10+6+2) + (10+6+2+4) + (10+6+2+4+8)) / 5 -->
+  --> (10+16+18+22+30) / 5 --> 96/5 = 19,2 Minutos
+
+d) Job mais curto primeiro (SJF - Shortest Job First)
+  ordem: 2, 4, 6, 8, 10 -->
+  (2 + (2+4) + (2+4+6) + (2+4+6+8) + (2+4+6+8+10)) / 5 -->
+  --> (2+6+12+20+30) / 5 --> 70/5 = 14 Minutos
+
+Para (a), presuma que o sistema � multiprogramado e que cada job obtenha sua fra��o justa de CPU.
+Para (b) e (d), considere a execu��o de somente um job por vez, at� que termine. Todos os jobs s�o 
+completamente orientados a CPU.
+
+2. Defina: (a) regi�o cr�tica e (b) condi��o de disputa. Apresente um exemplo em que � 
+utilizada alguma t�cnica para eliminar a condi��o de disputa em uma regi�o cr�tica.
+
+   Para eliminar a situação de disputa em uma região critica, pode-se citar as primitivas Sleep/WakeUp. Em um buffer, o processo A acessa para escrever determinado dad. Caso o processo B tente entrar no buffer, ele não conseguirá e entrará em modo de espera, já que processo A esta utilizando o buffer(região critica). Assim que o processo A encerra sua tarefa, ele finaliza seu acesso ao buffer e notifica o processo B, que agora conseguirá acessar o buffer e realizar a leitura de dados.

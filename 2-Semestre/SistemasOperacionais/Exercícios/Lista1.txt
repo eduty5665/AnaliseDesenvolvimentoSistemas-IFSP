@@ -1,0 +1,12 @@
+Exerc�cio 1:
+
+1 - Quais s�o as duas princiais fun��es de um sistema operacional?
+    SO (Sistema Operacional) tem como funçao gerenciar os dispositivos e a comunicação entre o usuário e a máquina
+    Gerenciador de dispositivos e maquina estendida 
+
+2 - O que � multiprograma��o?
+    Multiprogramação é a utilização de dois ou mais nucleos da CPU para carregar programas simultaneamente na memoria
+    alternar processos dentro da CPU, para usar mais a CPU e não deixar osiosa
+
+3 - O que � timesharing?
+    TimeSharing, ou tempo compartilhado, é quando o sistema operacioanl partilha o uso da CPU por um intervalo de tempo, cada processo recebe o controle por este determinado tempo, após o devolve para outro processo.

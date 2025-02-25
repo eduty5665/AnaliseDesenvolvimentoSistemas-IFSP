@@ -1,0 +1,48 @@
+Exerc�cio 7 - Parte 2:
+
+Leia o capitulo de gerenciamento de mem�ria do Tanenbaum.
+Responda todas as quest�es abaixo.
+
+1. Por que o algoritmo de substitui��o de p�ginas �timo n�o � vi�vel?
+   O algoritmo de substituição de páginas ótimo não é viável porque é imposspivel saber a página que tem menor chance de ser referenciada.
+
+
+2. Explique as vantagens e desvantagens do algoritmo de substitui��o de p�ginas
+ NRU (Not Recently Used).
+   Dentre as vantagens do algoritmo de substituição NRU, pode-se apresentar a facilidade de entendimento, a en=ficiencia para implementar e ele fornece um bom desempenho. Dentre as desvantagens, pode-se destacar a falta de priorização de páginas importantes e a necessidade frequente da limpeza do bit R.
+
+
+3. Explique e relacione os algoritmos FIFO, Segunda Chance e do Rel�gio.
+   O algoritmo FIFO escolhe sempre a página mais antiga na memória para ser substituída (funciona como uma fila).
+   O algoritmo de Segunda Chance funciona da mesma forma que o FIFO, porém cada página possui um bit R e receberá uma nova chacne de permanecer na memória se esse bit estiver ligado. Poém se o bit estiver desligado, a página é substituida.
+   O algoritmo do relógio funciona em um plano circullar onde o ponteiro sempre apontará para a página mais antiga. Se bit R=0, sera substituída. Se bit R=1, o bit é setado para zero e a busca continua.
+
+
+4. Por que o algoritmo LRU (least recently used) � dif�cil de implementar?
+   O algoritmo LRU é dificil de implementar, pois nesse sistema é utilizado uma lista encadeada com as páginas mais utilizadas no inicio, e as menos utilizadas no final. A lista deve ser atualizada a cada referência na memória.
+
+
+5. Descreva o funcionamento do algoritmo Aging.
+   O algoritmo Aging é responsável por estabelecer quantas vezes uma página foi referenciada e quando ocorre essa referenciação, buscando manter páginas frequentemente acessadas na memória.
+
+
+6. Explique e relacione os algoritmos WS e WSClock.
+   O algoritmo WS busca manter na memória um conjunto de páginas que estão sendo usadas por um processo, como um conjunto de trabalho, definido por um tempo determinado. Já o algoritmo WS Clock combina o algoritmo WS com a técnica de relógio, considerando também o acesso recente e o bit de referência. Esse sistema leva um consideração se a página está dentro do conjunto de trabalho e se o bit R está ligado ou desligado.
+
+
+7. O que � thrashing?
+   O Thrashing refere-se a uma situação negativa em que o sistema operacional gasta mais tempo trocando páginas de memória, em vez de executar processos.
+
+
+8. De acordo com os conceitos estudados na parte de gerenciamento de mem�ria virtual,
+defina Segmenta��o e como ela funciona.
+   A segmentação é uma técnica de gerenciamento de memória virtual em que a memória do processo é dividida em segmentos lógicos, cada um representando uma parte específica do programa, como código, dados, pilha, etc. Nesse sistema, a memória é dividida em blocos de tamanho flexível, dependendo da necessidade do processo.
+
+
+9. Quais as vantagens e os problemas de se utilizar segmenta��o em Mem�ria Virtual?
+   Dentre as vantagens da Segmentação, pode-se destacar a proteção de dados, e a facilidade de compartilhardados e procedimentos entre processos. Já os problemas, as desvantagens, são a falta de espaço contínuo na memória e a fragmentação externa.
+
+
+10. Como funciona o esquema de Segmenta��o-Paginada?
+   A segmentação Paginada combina segmentação e paginação para gerenciar a memória de forma eficiente. A memória do processo é dividida em segmentos lógicos(códigos, dados, pilhas) e cada segmento é dividido em páginas de tamanho físico.
+

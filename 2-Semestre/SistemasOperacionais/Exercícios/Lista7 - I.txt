@@ -1,0 +1,184 @@
+1. O que � compacta��o de mem�ria?
+  A compactação de memória consiste em uma técnica utilizada pararecuperar os espaços perdidos por fragmentação na memória realizada a partir da reorganização dos blocos de memórias.
+
+2. Como funciona o gerenciamento de mem�ria com bitmaps e com listas encadeadas? Cite vantagens e desvantagens delas.
+  No gerenciamento de memória utilizando os Bitmaps, a memória é dividida em unidades de alocação em Kleyter e cda unidade corresponde a um bit no bitmap. Se o bit for 1 está ocupado e se for 0 está livre, o tamanho do bitmap depende do tamanho da memória. Algumas vantagens são a simplicidade de implementação e busca rápida por um bloco livre, porém existem algumas desvantagens como por exemplo a perda de espaço caso as unidades de alocação sejam grandes e os dados a serem guardados sejam menores, e a limitação do tamanho do bitmap que é definido previamente.
+  No gerenciamneto de memória utilizando listas encadeadas, pode ser gerado uma lista para espaços livres e uma lista para espaços ocupados, ou ambos ao mesmo tempo. Cada item desta lista representa um nó, ou seja, uma unidade de informação que contém dados sobre um bloco de memória alocado como identificador de espaço ocupado ou livre, endereço onde o bloco começa, tamanho do bloco e ponteiro que indica o próximo bloco. Dentre as vantagens pode-se apontar a flexibilidade e a dimuinuição da fragmentação externa(fusão de blocos adjacentes). Por outro lado, as desvantagens são o maior uso da memória para alocar partiçõesnos blocos e o tempo de procura para um bloco livre.
+
+3. [Adaptado Tannebaum] Considere um sistema de troca de processos entre a mem�ria e o disco no qual a mem�ria � 
+constitu�da dos seguintes tamanhos de lacunas em ordem na mem�ria: 10KB, 4KB, 20KB, 18KB, 7K, 9KB, 12KB e 15KB. 
+Qual a lacuna � tomada pelas solicita��es sucessivas do segmento de: 12KB, 10KB e 9KB, pelos algoritmos:
+First-Fit, Best-Fit e Worst-Fit, exatamente nesta ordem.
+
+
+(a)	First-Fit (20 KB, 10 KB e 18 KB) |  Best-Fit (12 KB, 10 KB, e 9 KB) |  Worst-Fit (20 KB, 18 KB, e 15 KB)
+                12KB em 20KB             |           12KB em 12KB           |            12KB em 20KB
+                10KB em 10KB             |           10KB em 10KB           |            10KB em 18KB
+                9KB em 18KB              |           9KB em 9KB             |            9KB em 15KB
+
+
+
+
+(b)	First-Fit (10 KB, 4 KB e 20 KB) | Best-Fit (18 KB, 15 KB, e 12 KB) | Worst-Fit (4 KB, 7 KB, e 9 KB)
+                 10KB em 10KB           |           18KB em 18KB           |           4KB em 20KB           
+                 4KB em 4KB             |           15KB em 15KB           |           7KB em 18KB             
+                 20KB em 20KB           |           12KB em 12KB           |           9KB em 15KB           
+
+
+
+
+(c)	First-Fit (4 KB, 7 KB, e 9 KB) | Best-Fit (18 KB, 15 KB, e 12 KB) | Worst-Fit (10 KB, 4 KB e 20 KB)
+                 4KB em 10KB           |           18KB em 18KB           |           10KB em 20KB           
+                 7KB em 20KB           |           15KB em 15KB           |           4KB em 18KB             
+                 9KB em 18KB           |           12KB em 12KB           |           20KB em 15KB           
+
+
+
+(d)	First-Fit (10 KB, 4 KB e 20 KB) |  Best-Fit (12 KB, 10 KB, e 9 KB) | Worst-Fit (4 KB, 7 KB, e 9 KB);
+                 10KB em 10KB           |           12KB em 12KB           |           4KB em 20KB           
+                 4KB em 4KB             |           10KB em 10KB           |           7KB em 18KB             
+                 20KB em 20KB           |           9KB em 9KB             |           9KB em 15KB           
+
+
+
+(e)	First-Fit (20 KB, 10 KB e 18 KB) |  Best-Fit (4 KB, 7 KB, e 9 KB)  |   Worst-Fit (20 KB, 18 KB, e 15 KB)
+                 20KB em 20KB            |           4KB em 4KB            |            20KB em 20KB           
+                 10KB em 10KB            |           7KB em 7KB            |            18KB em 18KB             
+                 18KB em 18KB            |           9KB em 9KB            |            15KB em 15KB           
+
+
+
+4. Defina pagina��o no contexto de SO.
+   Paginação representa uma forma de gerenciamento de memória pela qual um computador armazena e recupera dados de um armazenamento secundário para uso na memória principal. Nesse sistema, os dados são recuperados do armazenamento secundário em blocos de tamanho físico chamados de páginas. Além disso, é realizado um mapeamento entre endereços físicos(reais) e virtuais.
+
+5. Diferencie Swapping e Paging?
+  Enquanto o Swaping move processos inteiros entre a memória principal e o disco, o Paging representa um método em que os processos utilizam apenas partes da memória, uma vez que a informação está dividida em pequenas unidades. Ao utilizar o Paging é possivel evitar a fragmentação externa.
+
+6. Defina mem�ria virtual.
+  A memória virtual é uma forma de gerenciamento de memoria em que é permitido ao computador utilizar o disco como uma extensão da memória principal. Quando a RAM esta cheia, o sistema operacional move os dados que não estão sendo mais utilizados para o disco rígido. O sistema operacional além de dividir os programas maiores que a memória em pedaços menores(overlays), também é responsável por reaizar o chaveamento desses pedaços entre a memória e o disco.
+
+7. Qual a diferen�a entre p�ginas (pages) e molduras de p�gina (page frames)?
+  As páginas representam as divisões em blocos da memória lógica, os quais possuem tamanho fisico. Já as molduras de páginas representam divisões em blocos de memória física, as quais também possuem tamanho físico. Ambos são sempre do mesmo tamanho.
+
+8. O que � a MMU e qual sua import�ncia para o sistema operacional?
+   A Unidade de Gerenciamento da Memória (MMU) é responsavel por realizar o mapeamento dos endereços lógicos(usados pelos processos) para endereços físicos.
+
+9. O que � uma falta de p�gina?
+   A falta de página ocorre quando um processo é suspenso e seu descritor é inserido em uma fila especial (fila dos processos esperando uma página lógica). Isso ocorre quando um programa acessa uma página no espaço de memória lógica que não foi carregada na memória física.
+
+10. Discuta qual a influ�ncia que o tamanho de p�gina tem no gerenciamento de mem�ria.
+   As páginas maiores proporcionam uma leitura mais eficiente, tabela menor, mas maior fragmentação interna. Já as paginas menores proporcionam uma leitura pouco eficiente, tabela maior, mas menor fragmentação interna.
+
+11. O que � uma TLB. Por que ela existe?
+   A TLB é uma memória cache na Unidade de Gerenciamento da Memória (MMU) responsável por mapear endereços virtuais para endereços físicos, reais, sem ter que passar pela tabela de páginas na memória principal garantindo melhor desempenho.
+
+12. Por que o bit M � importante para a troca de p�ginas?
+   O bit M é fundamental para o gerenciamento de troca de páginas porque ele permite que o SO identifique se a página precisa ser escrita no disco (bit igual a 1) ou se a página não precisa ser escrita no disco (bit igual a 0) e pode ser descartada. Isso gera uma otimização do uso da memória e melhora o desempenho do sistema
+
+13. Uma m�quina tem um espa�o de endere�amento de 32 bits e uma p�gina de 8K. A tabela de p�ginas est�
+totalmente em hardware, com uma palavra de 32 bits para cada entrada. Quando um processo tem in�cio, 
+a tabela de p�ginas � copiada para o hardware a partir da mem�ria, no ritmo de uma palavra a cada 100ns. Se cada processo executa durante 100ms (incluindo o tempo para carregar a tabela de p�ginas), qual a fra��o do tempo de CPU que � dedicada ao carregamento das tabelas de p�ginas?
+   --Dados
+     tamanho do endereçamento = 32bits ou 2^32 bytes
+     tamanho da página = 8KB ou 2^13 bytes
+     tamanho de cada entrada = 32 bits ou 4 bytes
+     velocidade = 100 ns por entrada
+     duração = 100 ms
+
+   --Número de Páginas
+        2^32 / 2^13 = 2^19 ou 524,288 páginas
+
+   --Tempo Total de Carregamentto das Páginas
+        524,288 X 100ns = 52,428,800ns ou 52,4288ms
+
+   --Fração de Tempo para CPU
+        52,4288ms / 100ms = 0,524288 =~ 52,43%
+
+   --A fração do tempo da CPU dedicada ao carregamento da tabela de páginas é aproximadamente 52,43%--
+
+14. Considere uma m�quina que utilize um endere�o virtual de 48 bits e um endere�o real de 32 bits.
+O tamanho das p�ginas � de 8K. Determinar:
+
+                               EV: 48bits     ER: 32bits    Página: 8KB
+
+a) N�mero de bits do endere�o virtual destinados � identifica��o da p�gina e o n�mero de bits destinados ao n�mero de palavra dentro da p�gina.
+    --Tamanho da Pagina
+        8 X 1024 --> 2^3 X 2^10 = 2^13bytes
+        13 bits destinados ao número de páginas
+        48 - 13 = 35 bits destinados para identificar a página
+
+b) N�mero de bits do endere�o real destinados � identifica��o da p�gina e o n�mero de bits destinados ao
+n�mero da palavra dentro da p�gina.
+    --O endereço real também utiliza um tamanho de página de 2^13 bytes
+       32 - 13 = 19 bits destinados para identificar pagina no endereço real
+       13 bits destinados ao npumero de palavras dentro da página
+
+c) Quantas p�ginas existem na mem�ria virtual? E na mem�ria real?
+    --Memória Virtual
+        2^48 - 2^13 = 2^35 Páginas na Memória
+    
+    --Memória Real
+        2^32 - 2^13 = 2^19 Páginas na Memória
+
+d) Considerando a seguinte tabela de p�ginas:
+
+__________________________
+|P. Virtual   |   P. Real|
+--------------------------
+|      0      |    X     |
+--------------------------
+|      1      |    0     |
+--------------------------
+|      2      |    X     |
+--------------------------
+|      3      |    3     |
+--------------------------
+|      4      |    X     |
+--------------------------
+|     ...     |    ...   |
+--------------------------
+|     10      |    2     |
+--------------------------
+|     ...     |    ...   |
+--------------------------
+
+Converter os seguintes endere�os virtuais em endere�os reais:
+I) 10.000
+   
+   10.000 / 8.192 = Pagina Virtual 1
+    
+   10.000 - 8.192 = 1.808
+   --Na tabela
+      -Página Virtual 1 --> Pagina Real 0
+		
+
+
+II) 20.000
+
+   20.000 / 8.192 = Pagina Virtual 2
+   
+   20.000 - (2 X 8.192) = 3.616
+   --Na tabela
+     -Página Virtual 2 --> Não pode ser mapeada para nenhuma página real
+
+III) 30.000
+
+    30.000 / 8.192 = Página Virtual 3
+
+    30.000 - (3 X 8.192) = 5.464
+    --Na tabela
+       -Página Virtual 3 --> Página Real 3
+    --Endereço Real (ER)
+    ER = NPR X TP + OffSet
+    ER = (3 X 8.192) + 5424 = 30.000
+
+IV) 90.000
+
+   90.000 / 8.192 = Pagina Virtual 10
+
+   90.000 - (10 X 8.192) = 8.080
+   --Na tabela
+      - Página Virtual 10 --> Página Real 2
+   --Endereço Real (ER)
+   ER = NRP X TP + OffSet
+   ER = (2 X 8.192) + 8.080 = 24.464

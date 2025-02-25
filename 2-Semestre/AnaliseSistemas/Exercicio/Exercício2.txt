@@ -1,0 +1,59 @@
+Objetivo da Reunião
+Entender as necessidades do cliente, de modo a transforma-las nos requisitos do sistema, trabalhando para sana-las.
+
+Topicos a serem discutidos
+Necessidade real do cliente (Sistema Mobile ou Sistema Web)
+Principais necessidades do Cliente (Agendamento, Cadastros, Armazenamento de Dados, ChatBoxs, etc.)
+Design e Layout de Marca
+Acessibilidade
+Segurança
+
+Entrevistador
+Techlead
+
+Entrevistados
+
+1° Diretor da Empresa
+* Atualmente a empresa conta com algum sistema? Seja sistema mobile ou web?
+
+* Quais são as principais dificuldades na empresa, que um sistema poderia ajudar?
+
+* Em sua visão, existe algum processo manual que a empresa realiza atualmente, que seria consideravel automatizar?
+
+* Quais departamentos utilizarão do sistema? Quais informações devem ser acessadas pelos mesmos? Haverá algum tipo de nivel de acesso?
+
+* O sistema deve interagir ou se integrar com algum outro programa?
+
+* Visando a implantação, o sistema deve funcionar localmente, ou deve ter acesso remoto?
+
+* Quais são os resultados esperados após a implementação do sistema?
+
+* Para finalizarmos, qual o prazo esperado para realização deste sistema? E o orçamento disponivel?
+
+2° Gestor Estratégico
+* Quais são as principais dificuldades na empresa, que um sistema poderia ajudar?
+
+* Existem areas da empresa com maior defasagem informacional?
+
+* Como um sistema poderia apoiar as metas de crescimento da empresa?
+
+* Quais os principais dados que devem ser guardados seguramente?
+
+* O sistema deve fornecer relatorios, estaticas ou indicadores para monitoramento da empresa?
+
+* Por ultimo, o sistema deve estar de acordo com alguma regulamentação especifica, seja ambiental, politica ou juridica?
+
+3° Gerente de Marketing
+* Quais são as principais dificuldades na empresa, que um sistema poderia ajudar?
+
+* A respeito do marketing em si, como o sistema poderia ser util para as campanhas de marketing da empresa?
+
+* Qual a grade de cores da empresa?
+
+* Quais são a logo e o slogan da empresa?Como a logo e slogan da empresa é visto no cenario corporativo?
+
+* Qual a caracteristica do publico alvo? E quais tecnologias este publico utiliza? (mobile, desktop, web)
+
+* Como o sistema ajudaria na relação da empresa para com o cliente? (Feedbacks, Chatboxs)
+
+* Como você vê o setor de marketing apos a implementação do sistema?
