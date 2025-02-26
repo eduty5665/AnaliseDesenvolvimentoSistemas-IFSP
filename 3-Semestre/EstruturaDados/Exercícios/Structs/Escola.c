@@ -7,19 +7,20 @@
 */
 
 #include <stdio.h>
+#include <string.h>
 
 struct Alunos{
     int RA;
     char nome[50];
-    int nota1;
-    int nota2;
-    int nota3;
-    double media;
+    float nota1;
+    float nota2;
+    float nota3;
+    float media;
     char status[10];
 };
 
-struct Alunos preencheDados(){
-    struct Alunos a[2]; //vetor para as structs
+void preencheDados(){
+    struct Alunos a[5]; //vetor para as structs
     int indN; //indice das notas
     int indM; //indice das media maior
     int indm; //indice das media menor
@@ -28,45 +29,52 @@ struct Alunos preencheDados(){
     int maiorMedia;
     int menorMedia;
    
-    for(i=0; i<3; i++){
-        printf("Digite o RA: ");
+    for(i=0; i<5; i++){
+        printf("\nDigite o RA: ");
         scanf("%d", &a[i].RA);
         printf("Digite o nome: ");
         scanf("%s", a[i].nome);
         printf("Digite a primera nota: ");
-        scanf("%d", &a[i].nota1);
+        scanf("%f", &a[i].nota1);
         printf("Digite a segunda nota: ");
-        scanf("%d", &a[i].nota2);
+        scanf("%f", &a[i].nota2);
         printf("Digite a terceira nota: ");
-        scanf("%d", &a[i].nota3);
+        scanf("%f", &a[i].nota3);
+        // Cálculo da média
+        a[i].media = (a[i].nota1 + a[i].nota2 + a[i].nota3) / 3;
+        // Definir status do aluno
+        if(a[i].media >= 6){
+            strcpy(a[i].status, "Aprovado!");
+        }else{
+            strcpy(a[i].status, "Reprovado!");
+        }
+        // Determinar aluno com maior nota na primeira prova
         if(a[i].nota1 > a[i-1].nota1){
-          maiorNota1=a[i].nota1;
-          indN=i;
+            maiorNota1=a[i].nota1;
+            indN=i;
         }else{
             maiorNota1=a[i-1].nota1;
             indN=i-1;
         }
-        a[i].media = (a[i].nota1 + a[i].nota2 + a[i].nota3) / 3;
-        if(a[i].media >= 6){
-            a[i].status = "Aprovado!"
-        }else{
-            a[i].status = "Reprovado!"
+        // Determinar maior e menor média
+        if (i == 0 || a[i].media > maiorMedia) {
+            maiorMedia = a[i].media;
+            indM = i;
         }
-        if (a[i].media > a[i-1].media){
-            maiorMedia=a[i].media;
-            menorMedia=a[i-1].media;
-            indM=i;
-            indm=i-1;
-        }else{
-            maiorMedia=a[i-1].media;
-            menorMedia=a[i].media;
-            indm=i;
-            indM=i-1;
+        if (i == 0 || a[i].media < menorMedia) {
+            menorMedia = a[i].media;
+            indm = i;
         }
     }
-    printf("A primeira maior nota é %d do aluno %s do RA %d", a[indN].nota1, a[indN].nome, a[indN].RA);
-    printf("/n A maior media é %g do aluno %s do RA %d", a[indM].media, a[indM].nome, a[indM].RA);
-    printf("/n A menor media é %g do aluno %s do RA %d", a[indm].media, a[indm].nome, a[indm].RA);
+     // Exibir resultados
+    printf("\nA maior nota do primeiro semestre é %.2f do aluno(a) %s do RA %d", a[indN].nota1, a[indN].nome, a[indN].RA);
+    printf("\n A maior media é %.2f do aluno(a) %s do RA %d", a[indM].media, a[indM].nome, a[indM].RA);
+    printf("\n A menor media é %.2f do aluno(a) %s do RA %d", a[indm].media, a[indm].nome, a[indm].RA);
+    // Exibir status dos alunos
+    printf("\n --STATUS DOS ALUNOS--");
+    for(i=0; i<5; i++){
+        printf("\n O aluno(a) %s foi %s", a[i].nome, a[i].status);
+    }
 }
 
 int main()

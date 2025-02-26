@@ -6,11 +6,19 @@
 	e) uma vari�vel do tipo double * (um ponteiro para double)
 */
 
-/*
+#include <stdio.h>
+#include <string.h>
 
-	a) int * x;
-	b) double * y;
-	c) char * z;
-	d) struct Hora * hr;
-	e) double **ptrXy;
-	
+struct Hora{
+    int hora, minuto, segundo;
+};
+
+int main()
+{
+	int * nPtr;
+	double * dPtr;
+	char * cPtr;
+	struct Hora h;
+	double ** ptrDPtr;
+    return 0;
+}
