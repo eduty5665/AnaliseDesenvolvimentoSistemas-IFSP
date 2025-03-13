@@ -1,0 +1,52 @@
+/*zerar espaçamentos do navegador*/
+*{
+	margin: 0;
+	padding: 0;
+}
+#cabecalho{
+	background-color: #f4f4f4;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+#cabecalho .logo{
+	text-align: center;
+}
+/*Manter a imagem em 100% para não quebrar*/
+#cabecalho .logo img{
+	max-width: 100%;
+	width: 250px;
+}
+
+main .titulo, main .titulo span{
+	font-size: 32px;
+	font-weight: normal;
+	text-transform: uppercase;
+	margin-top: 20px;
+}
+main .titulo span{
+	background-color: #00a8ff;
+	color: #fff;
+	font-weight: bold;
+}
+main .texto{
+	font-size: 18px;
+}
+main .botoes{
+	margin-top: 30px;
+}
+main .botoes .btn{
+	background-color: #00a8ff;
+	color: #fff;
+	text-transform: uppercase;
+	padding: 20px 40px;
+	text-decoration: none;
+	border-radius: 7px;
+	margin-left: 5px;
+	margin-right: 5px;
+}
+main .botoes .btn:hover{
+	background-color: #464648;
+}
+main .botoes .btn.ifsp{
+	background-color: green;
+}

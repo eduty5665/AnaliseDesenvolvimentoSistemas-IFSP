@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Aula 4</title>
+</head>
+<body>
+	<form method="POST/GET" action="">
+		<div>
+			<label for="usuario">Usuário</label>
+			<input type="email" id="usuario" required 
+			placeholder="Digite seu usuário" 
+			value="michel@ifsp.edu.br">
+		</div>
+		<div>
+			<label for="senha">Senha</label>
+			<input type="password" id="senha" required
+			placeholder="Digite sua senha">
+		</div>
+		<div>
+			<label for="permissao">Permissão</label>
+			<select required id="permissao">
+				<optgroup label="Selecione">
+					<option value="A">Administrador</option>
+					<option value="T" selected>Técnico</option>
+					<option value="C">Cliente</option>
+				</optgroup>
+				<optgroup label="Permissão">
+					<option value="A">Administrador</option>
+					<option value="T">Técnico</option>
+					<option value="C">Cliente</option>
+				</optgroup>
+			</select>
+		</div>
+		<div>
+			<label>Texto Bruto</label>
+			<textarea required placeholder="Digite Aqui" rows="5">Texto carregado</textarea>
+		</div>
+		<div>
+			<button type="submit">Enviar Dados</button>
+		</div>
+	</form>
+
+	<div>
+		<label for="campo">Idade</label>
+		<input type="file" required id="campo" multiple accept="image/*">
+	</div>
+
+	<iframe width="560" height="315" src="https://www.youtube.com/embed/1-JZ2yxtrCw?si=IhwgsMJ5PRUszpfW" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</body>
+</html>
