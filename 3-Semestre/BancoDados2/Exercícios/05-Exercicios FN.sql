@@ -25,12 +25,18 @@ CREATE FUNCTION fn_verificar_gerente(employee_id INT)
 RETURNS INT
 DETERMINISTIC
 BEGIN
-	SELECT manager_id FROM employee WHERE manager_id = '90';
-    RETURN 1;
+    DECLARE is_manager INT;
+    
+    -- Verifica se o funcionário é gerente em algum departamento
+    SELECT COUNT(*) INTO is_manager 
+    FROM departments 
+    WHERE manager_id = employee_id;
+
+    -- Retorna 1 se for gerente, 0 caso contrário
+    RETURN IF(is_manager > 0, 1, 0);
 END$$
 
 DELIMITER ;
-
 
 /* 3) Crie uma função chamada fn_tempo_empresa que receba o ID de um funcionário */
 /*e retorne o número de anos completos que ele está na empresa.*/
