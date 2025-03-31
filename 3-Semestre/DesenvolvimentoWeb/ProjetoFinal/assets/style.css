@@ -1,0 +1,107 @@
+:root{
+	--cor-texto: #464648;
+}
+@charset "UTF-8";
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+*{
+	margin: 0;
+	padding: 0;
+	font-family: "Poppins", sans-serif;
+  	font-weight: 400;
+}
+.container{
+	width: 100%;
+	max-width: 1200px;
+	margin: 0 auto;
+	padding-left: 15px;
+	padding-right: 15px;
+}
+header .menu{
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+header .logo img{
+	width: 100%;
+	max-width: 150px;
+}
+header nav{
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+}
+header .menu-item{
+	margin-left: 10px;
+}
+header .menu-item a{
+	text-decoration: none;
+	color: var(--cor-texto);
+	font-size: 21px;
+}
+/******************************/
+
+#home{
+	background-color: #ea3118;
+	padding-top: 30px;
+	padding-bottom: 30px;
+	height: 500px;
+}
+#home .container{
+	height: 100%;
+}
+#home .msg{
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	height: 100%;
+}
+#home .msg h1{
+	font-size: 48px;
+	font-weight: bold;
+	color: #fff;
+}
+#home .msg h5{
+	color: #fff;
+	font-size: 24px;
+	text-transform: uppercase;
+}
+/***********************************/
+
+#sobre{
+	margin-top: 30px;
+	margin-bottom: 30px;
+}
+#sobre .conteudo{
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+#sobre .texto{
+	padding-right: 20px;
+}
+#sobre h5{
+	color: #ea3118;
+	font-size: 32px;
+	font-weight: bold;
+}
+#sobre p{
+	font-size: 21px;
+}
+#sobre img{
+	max-width: 100%;
+	border-radius: 30px;
+}
+#sobre .botao{
+	margin-top: 20px;
+}
+#sobre .botao a{
+	text-decoration: none;
+	background-color: #ea3118;
+	color: #fff;
+	padding: 10px 30px;
+	border-radius: 15px;
+}
