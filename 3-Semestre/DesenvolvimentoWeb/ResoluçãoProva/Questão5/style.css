@@ -1,0 +1,15 @@
+body{
+	margin: 0;
+	text-align: center;
+}
+
+footer{
+	text-align: center;
+}
+
+table{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: 1;
+}

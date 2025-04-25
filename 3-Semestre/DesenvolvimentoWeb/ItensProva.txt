@@ -1,0 +1,8 @@
+ATENÇÃO PARA OS ITENS DA PROVA 17/04
+
+Estrutura HTML (h1, p, a , div, spam)
+Tabelas <table>
+Tags semânticas (header, footer, main, section, article, navs)
+Seletores (#id, .class, elemento)
+CSS + Flexbox
+Formulário

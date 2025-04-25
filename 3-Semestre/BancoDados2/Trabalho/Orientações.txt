@@ -1,0 +1,64 @@
+TRABALHO DE BANCO DE DADOS NOSQL
+
+OBJETIVO:
+Aprofundar os conhecimentos dos alunos sobre Bancos de Dados NoSQL por meio de pesquisa teórica e desenvolvimento prático de uma aplicação simples (web ou app) que interaja com o banco escolhido.
+
+ORIENTAÇÕES GERAIS:
+
+*Formação de Grupos:
+Cada grupo deverá conter no máximo 4 alunos.
+O grupo deverá escolher um dos bancos de dados NoSQL conforme apresentado em planilha.
+
+*Entrega do Trabalho Escrito:
+O trabalho deverá seguir o formato de monografia, contendo os seguintes tópicos obrigatórios:
+
+-Capa, resumo e sumário
+-Introdução
+-Descrição do banco de dados NoSQL escolhido
+-Histórico e desenvolvedor principal
+-Modelo de dados utilizado (documento, chave-valor, grafo, etc.)
+-Linguagem de consulta (se aplicável)
+-Casos de uso e aplicações reais
+-Comparativo com bancos relacionais (se pertinente)
+-Pontos positivos e negativos
+-Descrição da aplicação desenvolvida
+-Objetivo da aplicação
+-Tecnologias utilizadas
+-Telas principais (com imagens se possível)
+-Conclusão
+-Referências (formato ABNT ou IEEE)
+
+A entrega será feita em PDF até a data limite estipulada em aula.
+
+*Aplicação Prática:
+
+Desenvolver uma aplicação WEB ou APP que:
+
+-Realize a conexão com o banco de dados NoSQL escolhido
+-Permita inserção de dados
+-Permita consultas (pelo menos uma consulta relevante)
+
+A complexidade da aplicação será proporcional à proposta, podendo conter funcionalidades simples, desde que demonstre domínio da integração com o banco.
+
+*Apresentação:
+
+Cada grupo deverá apresentar seu trabalho em aula em até 10 minutos, contemplando:
+
+-Introdução ao banco escolhido
+-Características técnicas e modelo de dados
+-Casos de uso e aplicações
+-Pontos positivos e negativos
+-Demonstração da aplicação desenvolvida (ou vídeo da execução em ultimo caso, podendo ser descontado pontuação caso o motivo não seja devidamente justificado e comprovado.)
+
+AVALIAÇÃO:
+
+A nota será composta pelos seguintes critérios:
+
+
+Critério	                              Peso
+Qualidade do trabalho escrito	               3,0
+Funcionamento da aplicação	               3,0
+Clareza e conteúdo da apresentação oral	       2,0
+Coerência na divisão de tarefas no grupo       1,0
+Referências e formatação correta	       1,0
+Total	                                      10,0

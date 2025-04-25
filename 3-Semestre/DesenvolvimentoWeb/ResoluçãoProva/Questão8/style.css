@@ -1,0 +1,26 @@
+body{
+	margin: 0;
+	text-decoration: none;
+	text-align: center;
+	background:#d3d3d3;
+}
+
+form{
+	width:500px;
+	text-align: center;
+	background:#fff;
+	border-radius: 5px;
+}
+
+.header{
+	background:#f00;
+}
+
+.container{
+	background:#fff;
+}
+
+.button{
+	text-decoration: none;
+	background:#0f0;
+}

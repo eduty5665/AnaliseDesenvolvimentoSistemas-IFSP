@@ -1,0 +1,36 @@
+body{
+	text-align: center;
+	margin: 0;
+}
+
+main{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.Quadros{
+	width: 150px;
+	height: 150px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+	margin: 5px;
+}
+
+#qd1{
+	background: #f00;
+}
+
+#qd2{
+	background: #0f0;
+}
+
+#qd3{
+	background: #00f;
+}
+
+#qd4{
+	background: #f0f;
+}

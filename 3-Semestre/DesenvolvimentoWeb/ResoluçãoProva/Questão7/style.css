@@ -1,0 +1,30 @@
+body{
+	margin: 0;
+	text-decoration:none;
+	text-align: center;
+}
+
+header{
+	height: 15%;
+}
+
+footer{
+	height: 15%;
+}
+
+main{
+	height: 800px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+button{
+	text-decoration:none;
+	background-color:#d3d3d3;
+}
+
+button:hover{
+	background-color:#f00;
+	text-decoration:bold;
+}

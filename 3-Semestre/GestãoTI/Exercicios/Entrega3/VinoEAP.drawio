@@ -1,0 +1,226 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36" version="26.2.14">
+  <diagram id="prtHgNgQTEPvFCAcTncT" name="Page-1">
+    <mxGraphModel dx="28520" dy="16020" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="10000" pageHeight="1500" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-1" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#B8B8B8;strokeColor=#23445d;opacity=70;" vertex="1" parent="1">
+          <mxGeometry x="180" y="230" width="17140" height="2560" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-2" value="&lt;font style=&quot;font-size: 40px;&quot;&gt;Vinicola VINO Bebidas&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="9020" y="370" width="490" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-3" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Planejamento e Análise de Requisitos&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1240" y="780" width="560" height="215" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-9" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Levantamento de Requisitos&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="565" y="1110" width="380" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-12" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Realização de entrevistas com CFO e contador da empresa&lt;/font&gt;&lt;span style=&quot;color: rgba(0, 0, 0, 0); font-family: monospace; font-size: 0px; text-align: start; white-space: nowrap;&quot;&gt;%3CmxGraphModel%3E%3Croot%3E%3CmxCell%20id%3D%220%22%2F%3E%3CmxCell%20id%3D%221%22%20parent%3D%220%22%2F%3E%3CmxCell%20id%3D%222%22%20value%3D%22%26lt%3Bfont%20style%3D%26quot%3Bfont-size%3A%2035px%3B%26quot%3B%26gt%3BLevantamento%20de%20Requisitos%26lt%3B%2Ffont%26gt%3B%22%20style%3D%22rounded%3D1%3BwhiteSpace%3Dwrap%3Bhtml%3D1%3BfontSize%3D46%3B%22%20vertex%3D%221%22%20parent%3D%221%22%3E%3CmxGeometry%20x%3D%22350%22%20y%3D%221010%22%20width%3D%22740%22%20height%3D%22240%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%3C%2Froot%3E%3C%2FmxGraphModel%3E&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="450" y="1430" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-13" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Coleta de documentos financeiros, relatórios e formulários usados pelos setores&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="450" y="1750" width="610" height="250" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-14" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Análise dos fluxos financeiros atuais e das principais falhas identificadas&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="450" y="2050" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-15" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Criação de DED (Descrição Estruturada de Dados)&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1215" y="1430" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-16" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Elaboração de casos de uso e diagramas MER&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1215" y="1740" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-17" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Validação de documentos com Stakeholders&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1215" y="2050" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-18" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Modelagem de Requisitos&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1330" y="1110" width="380" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-19" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Planejamento Geral do Projeto&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="2075" y="1110" width="380" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-20" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Definição de escopo, marcos e fases&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1985" y="1430" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-21" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Alocação de recursos humanos e materiais&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1985" y="1740" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-22" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Criação do cronograma e orçamento no ProjectLibre&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1985" y="2050" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-23" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Desenvolvimento e Configuração do Sistema&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="4460" y="780" width="560" height="215" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-24" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Criação de Mockups e Validação com Cliente&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="3415" y="1110" width="380" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-25" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Design de interfaces com base nos requisitos funcionais&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="3300" y="1430" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-26" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Apresentação dos mockups ao cliente em reuniões de validação&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="3300" y="1750" width="610" height="250" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-27" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Ajustes visuais e funcionais com base no feedback&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="3300" y="2050" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-28" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Programação do front-end e back-end com base nos requisitos levantados&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="4065" y="1430" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-29" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Implementação dos módulos de cadastro, relatório, alerta e digitalização&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="4065" y="1740" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-31" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Desenvolvimento do Sistema&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="4180" y="1110" width="380" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-32" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Integração de Scanners e OCR&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="4925" y="1110" width="380" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-33" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Instalação dos Scanners Epson&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="4835" y="1430" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-34" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Integração do OCR ao sistema para digitalização e conversão dos documentos&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="4835" y="1740" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-36" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Banco de Dados&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="5700" y="1110" width="380" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-37" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Criação do banco de dados pela empresa terceirizada&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="5610" y="1430" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-38" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Estruturação, testes e hospedagem da base online&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="5610" y="1740" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-39" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Testes Técnicos&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="6865" y="1110" width="380" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-40" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Testes unitários nos módulos desenvolvidos&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="6750" y="1430" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-41" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Verificação do desempenho do OCR e da digitalização&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="6750" y="1750" width="610" height="250" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-42" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Simulação de uso por funcionários do setor financeiro&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="7515" y="1430" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-43" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Correções conforme feedback dos testes&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="7515" y="1740" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-44" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Testes de Usabilidade e Integração&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="7630" y="1110" width="380" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-45" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Auditoria e Revisão&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="8375" y="1110" width="380" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-46" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Avaliação final da integridade do sistema&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="8285" y="1430" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-47" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Ajustes em relatórios, funcionalidades e layouts&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="8285" y="1740" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-48" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Teste e Ajustes&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="7540" y="780" width="560" height="215" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-49" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Treinamento e Implantação&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="10390" y="780" width="560" height="215" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-50" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Preparação para Treinamento&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="9715" y="1110" width="380" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-51" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Criação de manuais, videos tutoriais e ambiente de testes&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="9600" y="1430" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-52" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Agendamento das capacitações com equipe interna&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="9600" y="1750" width="610" height="250" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-53" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Capacitação do CFO e estagiário com simulações reais&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="10365" y="1430" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-54" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Duvidas e teste de uso&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="10365" y="1740" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-55" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Treinamento dos Usuários&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="10480" y="1110" width="380" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-56" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Implantação do Sistema&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="11225" y="1110" width="380" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-57" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Publicação do sistema na empresa&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="11135" y="1430" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-58" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Ativação do banco de dados hospedado&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="11135" y="1740" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-59" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Suporte pós-implantação&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="11135" y="2050" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-60" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Gestão de Solicitações&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="12307" y="1110" width="380" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-61" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;canal de comunicação exclusivo (Discord e e-mail)&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="12192" y="1430" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-62" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Registro formal de mudanças com motivos, impacto e validação&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="12192" y="1750" width="610" height="250" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-63" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Reuniões de aprovação de alterações&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="12957" y="1430" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-64" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Atualização do cronograma e documentação&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="12957" y="1740" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-65" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Avaliação e Atualização&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="13072" y="1110" width="380" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-66" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Registro de Lições Aprendidas&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="13817" y="1110" width="380" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-67" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Registro final das decisões&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="13727" y="1430" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-68" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Documentação de aprendizados para projetos futuros&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="13727" y="1740" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-69" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Controle de Mudanças&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="12982" y="780" width="560" height="215" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-70" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Engajamento e Comunicação&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="15580" y="780" width="560" height="215" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-71" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Plano de Comunicação&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="14905" y="1110" width="380" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-72" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Canais organizados no Discord por área: desenvolvimento, testes, analise financeira, etc.&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="14790" y="1430" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-73" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Atualizações constantes por e-mail e mensagens&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="14790" y="1750" width="610" height="250" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-75" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Reuniões de alinhamento a cada 3 dias com os stakeholders&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="15555" y="1430" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-76" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Registro e ata digital de cada encontro&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="15555" y="1740" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-77" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Validações intermediárias com diretores e usuários-chave&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="15555" y="2050" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-78" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Reuniões Estratégicas&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="15670" y="1110" width="380" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-79" value="&lt;font style=&quot;font-size: 35px;&quot;&gt;Monitoramento do Engajamento&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="16415" y="1110" width="380" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-80" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Acompanhamento da participação em reuniões&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="16325" y="1430" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-81" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Ações corretivas em caso de baixo engajamento&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="16325" y="1740" width="610" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="oiEDG2ry6PtssP4YHXQ4-82" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;Estratégias de motivação e reforço do comportamento&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=46;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="16325" y="2050" width="610" height="270" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
