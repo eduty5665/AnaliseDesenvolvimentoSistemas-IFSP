@@ -1,0 +1,71 @@
+-- ============================================
+-- EXERCÍCIO 1: DIRTY READ
+-- ============================================
+
+-- SIMULAÇÃO DO PROBLEMA COM READ UNCOMMITTED
+-- ABA 1 - Transação A (atualização sem commit)
+SET SESSION TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
+START TRANSACTION;
+UPDATE employees SET salary = 9000 WHERE employee_id = 207;
+-- (não comita ainda)
+
+-- ABA 2 - Transação B (leitura de dado não confirmado)
+SET SESSION TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
+START TRANSACTION;
+SELECT salary FROM employees WHERE employee_id = 207;
+COMMIT;
+
+-- ABA 1 - Transação A decide desfazer
+ROLLBACK;
+
+-- SOLUÇÃO USANDO READ COMMITTED
+-- ABA 1 - Transação A
+SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED;
+START TRANSACTION;
+UPDATE employees SET salary = 9000 WHERE employee_id = 207;
+-- (não comita ainda)
+
+-- ABA 2 - Transação B (agora a leitura será do dado confirmado)
+SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED;
+START TRANSACTION;
+SELECT salary FROM employees WHERE employee_id = 207;
+COMMIT;
+
+-- ============================================
+-- EXERCÍCIO 2: PHANTOM READ
+-- ============================================
+
+-- SIMULAÇÃO DO PROBLEMA COM READ COMMITTED
+-- ABA 1 - Transação A (consulta inicial e posterior)
+SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED;
+START TRANSACTION;
+SELECT * FROM employees WHERE department_id = 50;
+SELECT SLEEP(10);
+SELECT * FROM employees WHERE department_id = 50;
+COMMIT;
+
+-- ABA 2 - Transação B (inserção durante a transação A)
+SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED;
+START TRANSACTION;
+INSERT INTO employees (employee_id, first_name, last_name, email, hire_date, job_id, salary, department_id)
+VALUES 
+  (208, 'Carlos', 'Pereira', 'carlos.pereira@example.com', '2024-05-24', 'IT_PROG', 7000, 50),
+  (209, 'Ana', 'Silva', 'ana.silva@example.com', '2024-05-24', 'IT_PROG', 7500, 50);
+COMMIT;
+
+-- SOLUÇÃO USANDO SERIALIZABLE
+-- ABA 1 - Transação A
+SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+START TRANSACTION;
+SELECT * FROM employees WHERE department_id = 50;
+SELECT SLEEP(10);
+SELECT * FROM employees WHERE department_id = 50;
+COMMIT;
+
+-- ABA 2 - Transação B (essa ficará bloqueada até a A liberar o recurso)
+SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+START TRANSACTION;
+INSERT INTO employees (employee_id, first_name, last_name, email, hire_date, job_id, salary, department_id)
+VALUES 
+  (210, 'Carlos', 'Pereira', 'carlos.pereira@example.com', '2024-05-24', 'IT_PROG', 7000, 50);
+COMMIT;
