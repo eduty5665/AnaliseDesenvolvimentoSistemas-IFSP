@@ -1,0 +1,31 @@
+@charset "UTF-8";
+
+.infoCasa {
+    padding: 20px;
+    margin-top: 110px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.infoCasa p {
+    font-weight: normal;
+    line-height: 20px;
+    max-width: 700px;
+    text-align: justify;
+}
+
+.infoCasa span {
+    padding-left: 20px;
+}
+
+video {
+    border: 2px solid rgba(0, 0, 0, 0.364);
+    margin-top: 20px;
+    align-self: center;
+    width: 80%;
+    height: auto;
+    max-width: 400px;
+    display: block;
+    border-radius: 20px;
+}

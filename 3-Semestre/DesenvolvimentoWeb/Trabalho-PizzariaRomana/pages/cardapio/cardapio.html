@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cardápio</title>
+    <link rel="shortcut icon" href="../../media/iconeRomana.png" type="image/x-icon">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="cardapio.css">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+</head>
+
+<body>
+    <nav class="navbar navbar-dark fontSecundaria fixed-top navbar-expand-lg">
+        <div class="container-fluid" id="containerNavbar">
+            <img src="../../media/logoRomana.png" alt="Romana Pizzaria" id="logoRomana">
+
+            <a href="https://xmenu.com.br/pedidos/index.html?loja=15492" id="linkPedido">Peça online <i
+                    class="fa-solid fa-pizza-slice fa-sm" style="color: #FFD43B;"></i>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas"
+                data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="offcanvas offcanvas-end menuLateral" tabindex="-1" id="offcanvasDarkNavbar"
+                aria-labelledby="offcanvasDarkNavbarLabel">
+                <div class="offcanvas-header">
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"
+                        aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body menuLateral">
+                    <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="../../index.html">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../aCasa/aCasa.html">A Casa</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="cardapio.html">Cardápio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../contato/contato.html">Contato</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div id="containerCardapio">
+        <h1 class="fontPrincipal">Cardápio</h1>
+
+        <ul class="nav fontSecundaria" id="navCardapio">
+            <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="#pizza">Pizzas</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#pizzaDoce">Pizzas Doces</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#calzone">Calzones</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#wrapSalgado">Wraps Salgados</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#wrapDoce">Wraps Doces</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#grelhados">Grelhados</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#saladas">Saladas</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#especiais">Especiais</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#porcoes">Porções</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#bebidas">Bebidas</a>
+            </li>
+        </ul>
+
+
+        <div id="cardapio" class="fontSecundaria">
+
+            <h2 style="color: #FAD340; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.416);" id="pizza">PIZZAS</h2>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>A Moda</h3>
+                </div>
+                <p>Molho de tomates frescos, peito de peru, ricota, ervilhas frescas, muçarela e legítimo catupiry</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Abobrinha</h3>
+                </div>
+                <p>Molho de tomates frescos, muçarela, abobrinha temperada ao alho e pimenta, salpicada com parmesão</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Artesanal</h3>
+                </div>
+                <p>Molho de tomates frescos, muçarela, linguiça da casa, cebola e pimenta biquinho</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Aliche</h3>
+                </div>
+                <p>Molho de tomates frescos, muçarela, aliche importado e fatias de tomate</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Atum</h3>
+                </div>
+                <p>Molho de tomates frescos, atum, cebola e muçarela</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Atum especial</h3>
+                </div>
+                <p>Molho de tomates frescos, atum sólido, cebola e muçarela</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Bacalhau</h3>
+                </div>
+                <p>Molho de tomates frescos, bacalhau ao molho, cebola, ovos e catupiry</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Babo Genaro</h3>
+                </div>
+                <p>Molho de tomates frescos, gorgonzola, alcaparras e tomates fatiados</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Bacon</h3>
+                </div>
+                <p>Molho de tomates frescos, muçarela e bacon</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Bacalhau do Porto</h3>
+                </div>
+                <p>Molho de tomates frescos, acalhau do porto desfiado e temperado, ovos, cebola e catupiry</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Baiana</h3>
+                </div>
+                <p>Molho de tomates frescos, calabresa moída, pimenta, cebola e provolone</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Banana Catupiry</h3>
+                </div>
+                <p>Molho de tomates frescos, banana fatiada, bacon e catupiry</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Berinjela</h3>
+                </div>
+                <p>Molho de tomates frescos, berinjela temperada, cebola, muçarela e tomates fatiados</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Bologna</h3>
+                </div>
+                <p>Molho de tomates frescos, filé mignon moído ao alho, muçarela e catupiry</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Brasilis</h3>
+                </div>
+                <p>Molho de tomates frescos, atum, palmito, ervilhas e muçarela</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Brócolis</h3>
+                </div>
+                <p>Molho de tomates frescos, brócolis, bacon, muçarela ou catupiry</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Caipira</h3>
+                </div>
+                <p>Molho de tomates frescos, filé de frango desfiado, creme de milho e muçarela</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Calabresa</h3>
+                </div>
+                <p>Molho de tomates frescos, calabresa fatiada, muçarela e cebola</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Calabresa Catupiry</h3>
+                </div>
+                <p>Molho de tomates frescos, calabresa fatiada e cebola, coberta com catupiry</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Calabresa com Bacon</h3>
+                </div>
+                <p>Molho de tomates frescos, calabresa fatiada, bacon, muçarela e cebola</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Calabria</h3>
+                </div>
+                <p>Molho de tomates frescos, muçarela, calabresa ceratti em rodas e cebola</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>California</h3>
+                </div>
+                <p>Molho de tomates frescos, peito de peru, pêssego, figo, abacaxi e catupiry</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Camarão</h3>
+                </div>
+                <p>Molho de tomates frescos, camarão ao molho e catupiry</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Cheddar</h3>
+                </div>
+                <p>Molho de tomates frescos, filé de frango desfiado, muçarela, cheddar cremoso e tomate fatiado</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Cinco queijos</h3>
+                </div>
+                <p>Molho de tomates frescos, gorgonzola, muçarela, provolone, parmesão e catupiry</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Couve com Bacon</h3>
+                </div>
+                <p>Molho de tomates frescos, muçarela, couve refogada e bacon</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Da Roça</h3>
+                </div>
+                <p>Molho de tomates frescos, presunto, milho, ervilhas, ovos fritos, cebola e muçarela</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Di Parma</h3>
+                </div>
+                <p>Molho de tomates frescos, muçarela de búfala, presunto di parma e tomates fatiados</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Do Chefe</h3>
+                </div>
+                <p>Molho de tomates frescos, presunto cozido, ovos, cebola e catupiry</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Do Imperador</h3>
+                </div>
+                <p>Molho de tomates frescos, filé de frango empanado e frito, molho ao sugo, muçarela e parmesão</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Do Mestre</h3>
+                </div>
+                <p>Molho de tomates frescos, presunto, ovos, palmito, ervilha e catupiry</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Do Norte</h3>
+                </div>
+                <p>Molho de tomates frescos, carne seca desfiada, cebola e catupiry ou muçarela</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Dois queijos</h3>
+                </div>
+                <p>Molho de tomates frescos, muçarela e catupiry</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Do Papa</h3>
+                </div>
+                <p>Molho de tomates frescos, queijo brie, folhas de escarola levemente refogadas ao azeite e alho e
+                    aliche</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Don Peron</h3>
+                </div>
+                <p>Molho de tomates frescos, calabresa fatiada, alcaparras, cebola, tomate fatiado e muçarela</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Don Tchê</h3>
+                </div>
+                <p>Molho de tomates frescos, lombo, palmito, champignon na manteiga e alho, muçarela e catupiry</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Duas carnes</h3>
+                </div>
+                <p>Molho de tomates frescos, muçarela, presunto picado, calabresa e tomate</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Escarola com bacon</h3>
+                </div>
+                <p>Molho de tomates frescos, escarola temperada, cebola, muçarela e bacon</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Escarola Verde</h3>
+                </div>
+                <p>Molho de tomates frescos, muçarela, bacon, escarola, tomate, temperado com limão, sal e azeite</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Filé Mignon</h3>
+                </div>
+                <p>Molho de tomates frescos, filé mignon, alho e catupiry</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Filé com brócolis</h3>
+                </div>
+                <p>Molho de tomates frescos, filé mignon, brócolis, alho crocante e catupiry</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Florença</h3>
+                </div>
+                <p>Molho de tomates frescos, palmito, muçarela, calabresa e catupiry</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Frango</h3>
+                </div>
+                <p>Molho de tomates frescos, filé de frango desfiado, cebola e catupiry</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Frango Especial</h3>
+                </div>
+                <p>Molho de tomates frescos, filé de frango desfiado, milho, cebola, bacon e catupiry</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Italiana</h3>
+                </div>
+                <p>Molho de tomates frescos, lombo, ovos, cebola, muçarela, tomates fatiados e bacon</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Lombo</h3>
+                </div>
+                <p>Molho de tomates frescos, lombo defumado e catupiry</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Margherita</h3>
+                </div>
+                <p>Molho de tomates frescos, muçarela, tomates tatiados e manjericão</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Margherita Búfala</h3>
+                </div>
+                <p>Molho de tomates frescos, muçarela de búfala, tomates tatiados e manjericão</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Mexicana</h3>
+                </div>
+                <p>Molho de tomates frescos, linguiça queima rosca, cebola e muçarela</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Milho</h3>
+                </div>
+                <p>Molho de tomates frescos, milho e catupiry</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Muçarela</h3>
+                </div>
+                <p>Molho de tomates frescos e muçarela</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Muçarela de búfala</h3>
+                </div>
+                <p>Molho de tomates frescos, muçarela de búfala e tomates fatiados</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Muçarela especial</h3>
+                </div>
+                <p>Molho de tomates frescos, muçarela, tomate fatiado e parmesão</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Palmito</h3>
+                </div>
+                <p>Molho de tomates frescos, palmito e muçarela</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Palmito Catupiry</h3>
+                </div>
+                <p>Molho de tomates frescos, palmito, muçarela e catupiry</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Pepperoni</h3>
+                </div>
+                <p>Molho de tomates frescos, tomate fatiado, muçarela e pepperoni</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Peru</h3>
+                </div>
+                <p>Molho de tomates frescos, peito de peru e catipiry</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Peruana</h3>
+                </div>
+                <p>Molho de tomates frescos, atum, ervilhas, champignon, cebola, muçarela, parmesão e manjericão</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Picanha</h3>
+                </div>
+                <p>Molho de tomates frescos, picanha frita na manteiga, muçarela, rúcula e alho</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Portuguesa</h3>
+                </div>
+                <p>Molho de tomates frescos, presunto cozido, cebola, ovos, ervilha, palmito e muçarela</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Portuguesa Especial</h3>
+                </div>
+                <p>Molho de tomates frescos, presunto cozido, palmito, ervulha, cebola, ovos, muçarela e bacon</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Presunto</h3>
+                </div>
+                <p>Molho de tomates frescos, presunto cozido, muçarela e tomates fatiados</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Quatro Carnes</h3>
+                </div>
+                <p>Molho de tomates frescos, lombo, calabresa, presunto, bancon, muçarela e catupiry</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Quatro Queijos</h3>
+                </div>
+                <p>Molho de tomates frescos, gorgonzola, muçarela, provolone e catupiry</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Romana</h3>
+                </div>
+                <p>Molho de tomates frescos, filé mignon empanado, molho ao sugo, muçarela e parmesão ralado</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Rúcula</h3>
+                </div>
+                <p>Molho de tomates frescos, rúcula, muçarela, tomate seco e alho</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Serrana</h3>
+                </div>
+                <p>Molho de tomates frescos, lombo, creme de milho e muçarela</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Sertaneja</h3>
+                </div>
+                <p>Molho de tomates frescos, abóbora cabotiã, carne seca, cebola e catupiry</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Shimeji</h3>
+                </div>
+                <p>Molho de tomates frescos, shimeji refogado na manteiga e alho, muçrela de búfala, manjericão e
+                    azeitonas pretas</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Siciliana</h3>
+                </div>
+                <p>Molho de tomates frescos, champignon refogado na manteiga e alho, muçarela e bancon</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Strogonoff Filé Mignon</h3>
+                </div>
+                <p>Molho de tomates frescos, filé mignon, creme, champignon, muçarela e batata palha</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Strogonoff Frango</h3>
+                </div>
+                <p>Molho de tomates frescos, filé de frango em cubos, creme, champignon, muçarela e batata palha</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Toscana</h3>
+                </div>
+                <p>Molho de tomates frescos, calabresa moída, cebola e muçarela</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Três Queijos</h3>
+                </div>
+                <p>Molho de tomates frescos, muçarela, provolone e catupiry</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Tropical</h3>
+                </div>
+                <p>Molho de tomates frescos, ricota, peito de peru, muçarela, tomate e parmesão</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Veridiana</h3>
+                </div>
+                <p>Molho de tomates frescos, lombo, palmito e catupiry</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Vicenza</h3>
+                </div>
+                <p>Molho de tomates frescos, muçarela, caqui, muçarela de búfala, pasta de azeitona e manjericão</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Vegana</h3>
+                </div>
+                <p>Massa integral, mto frescos, abobrinha temperada, palmito, ervilhas frescas e tomate seco</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Vegetariana</h3>
+                </div>
+                <p>Mto frescos, brôcolis, palmito, ervilhas frescas, tromate fatiado, manjericão e muçrela</p>
+            </div>
+
+            <h2 style="color: #FAD340; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.416);" id="pizzaDoce">PIZZAS DOCES</h2>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Banana Cristalizada</h3>
+                </div>
+                <p>Bananas fatiadas, açúcar mascavo e canela</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Chocolate</h3>
+                </div>
+                <p>Doce de leite, chocolate e cereja</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Morango com Chantily</h3>
+                </div>
+                <p>Chocolate, chantily, morango fruta ou polpa</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Nutella</h3>
+                </div>
+                <p>Nutella, banana e confetis</p>
+            </div>
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Sorvete</h3>
+                </div>
+                <p>Sorvete de creme, doce de leite, cereja e borda recheada com goiabada</p>
+            </div>
+
+            <h2 style="color: #FAD340; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.416);" id="calzone">CALZONES</h2>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Frango</h3>
+                </div>
+                <p>Molho de tomates frescos, frango desfiado, catupiry e parmesão</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Presunto</h3>
+                </div>
+                <p>Molho de tomates frescos, presunto cozido, muçarela, catupiry e parmesão</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Quatro queijos</h3>
+                </div>
+                <p>Molho de tomates frescos, muçarela, gorgonzola, catupiry e parmesão</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Tropical</h3>
+                </div>
+                <p>Molho de tomates frescos, ricota, peito de peru, muçarela, catupiry e parmesão</p>
+            </div>
+
+            <h2 style="color: #FAD340; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.416);" id="wrapSalgado">WRAPS SALGADOS</h2>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Bauru</h3>
+                </div>
+                <p>Massa fina leve recheada com muçarela, filé mignon, tomate, cebola e cheiro verde</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Carne seca</h3>
+                </div>
+                <p>Massa fina leve recheada com muçarela, carne seca, tomate, cebola e cheiro verde</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Rúcula</h3>
+                </div>
+                <p>Massa fina leve recheada com muçarela, rúcula, tomate seco e alho crocante</p>
+            </div>
+            
+            <h2 style="color: #FAD340; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.416);" id="wrapDoce">WRAPS DOCES</h2>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Banana</h3>
+                </div>
+                <p>Massa fina leve recheada com banana, açúcar mascavo e colda de caramelo</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Beijinho</h3>
+                </div>
+                <p>Massa fina leve recheada com leite condensado e coco</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Charge</h3>
+                </div>
+                <p>Massa fina leve recheada com chocolate branco e escuro, amendoim, creme de leite e calda de caramelo</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Maracujá</h3>
+                </div>
+                <p>Massa fina leve rechada com creme de maracujá e creme de leite</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Negresco</h3>
+                </div>
+                <p>Massa fina leve rechada com chocolate branco, biscoito negresco e coberta com leite condensado</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Prestígio</h3>
+                </div>
+                <p>Massa fina leve rechada com leite condensado, chocolate e coco</p>
+            </div>
+
+            <h2 style="color: #FAD340; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.416);" id="grelhados">GRELHADOS</h2>
+
+            <h3 style="color: #FAD340; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.416);"> - Aves</h3>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Frango a parmeggiana</h3>
+                </div>
+                <p>Filé de frango ampanado e frito, muçrela, parmeão, molho ao sugo, batata frita e arroz branco</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Frango com creme de milho</h3>
+                </div>
+                <p>Filé de frango empanado, creme de milho, batata palha e arroz branco</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Frango com legumes</h3>
+                </div>
+                <p>Filé de frango grelhado, ervilhas, palmito e cenoura na manteiga, bacon, batata frita e arroz branco</p>
+            </div>
+
+            <h3 style="color: #FAD340; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.416);"> - Bovinos</h3>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>A Parmeggiana</h3>
+                </div>
+                <p>Filé mignon empanado, muçarela, parmesão, molho ao sugo, arroz branco e batata frita</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Picanha</h3>
+                </div>
+                <p>Picanha grelhada na manteiga com alho, vinagrete, batata frita, rúcula e arroz branco</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Filé a cubana</h3>
+                </div>
+                <p>Filé mignon empanado, batata frita, frutas empanadas, presunto, palmito, ervilhas frescas e arroz branco</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Filé a tratoria</h3>
+                </div>
+                <p>Filé mignon empanado e recheado com presunto e muçarela, molho branco puxado na mostarda, palmito, cenoura e ervilhas frescas na manteiga, batata frita e arroz branco</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Filé com talharin</h3>
+                </div>
+                <p>Filé mignon empanado, muçarela, molho ao sugo, talharin e parmesão</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Filé romana</h3>
+                </div>
+                <p>Filé mignon grelhado, muçarela, banana, figo, pêssego, abacaxi, arroz a grega e farofa</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Filé com legumes</h3>
+                </div>
+                <p>Filé mignon grelhado, ervilhas frescas, palmito, cenoura na manteiga, bacon e arroz branco e batata frita</p>
+            </div>
+
+            <h3 style="color: #FAD340; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.416);"> - Peixes</h3>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Abadejo com camarão</h3>
+                </div>
+                <p>Grelhado no azeite, molho de camarão, bata soté e arroz branco</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Abadejo e meuniere</h3>
+                </div>
+                <p>Grelhado no azeite, molho de manteiga e champignon, alcaparras, bata soté e arroz branco</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Abadejo com brócolis</h3>
+                </div>
+                <p>Grelhado no azeita, brócolis na mateiga e arroz a grega</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Salmon a meuniere</h3>
+                </div>
+                <p>Grelhado no azeite, molho de manteiga e champignon, alcaparras, bata soté e arroz branco</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Salmon com legumes</h3>
+                </div>
+                <p>Grelhado no azeite, ervilhas, palmito e cenoura na manteiga e arroz branco</p>
+            </div>
+
+            <h2 style="color: #FAD340; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.416);" id="saladas">SALADAS</h2>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Palmito</h3>
+                </div>
+                <p>Palmito, tomate e azeitonas</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>De búfala</h3>
+                </div>
+                <p>Rucula, muçarela de búfala e tomate seco</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>De frios</h3>
+                </div>
+                <p>Salame, provolone, palmito e tomate</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Folhas com tomate</h3>
+                </div>
+                <p>Rúcula, alface, tomate e cebola</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Da Casa</h3>
+                </div>
+                <p>Pepino, tomate, ovos de codorna, rúcula e alface</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Carpaccio com rúcula</h3>
+                </div>
+                <p>Rúcula, fatias bem finas de carne bovina, molho, alcaparras e parmesão</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Carpaccio tradicional</h3>
+                </div>
+                <p>Fatias bem finas de carne bovina, molho, alcaparras e parmesão</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Completa</h3>
+                </div>
+                <p>Alface, batata, cebola, ervilhas, milho, muçarela, ovos de codorna, palmito, presunto, rúcula, tomate e azeitonas</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Completa com salame</h3>
+                </div>
+                <p>Alface, batata, ceb., erv., milh, muçarela, ovos de codorna, palmito, presunto, rúcula, tomate, azeitonas e salame</p>
+            </div>
+
+            <h2 style="color: #FAD340; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.416);" id="especiais">ESPECIAIS</h2>
+            
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Picanha na telha</h3>
+                </div>
+                <p>Picanha acebolada, mandioca cozida, salada, vinagrete e farofa</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Filé Mignon na telha</h3>
+                </div>
+                <p>Filé mignon acebolado, mandioca cozida, salada, vinagrete e farofa</p>
+            </div>
+
+            <h2 style="color: #FAD340; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.416);" id="porcoes">PORÇÕES</h2>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Batata frita</h3>
+                </div>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Batata frita com parmesão</h3>
+                </div>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Batata frita com bacon</h3>
+                </div>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Carne seca acebolada</h3>
+                </div>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Calabresa acebolada</h3>
+                </div>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Casquinha de siri</h3>
+                </div>
+                <p>Unitário</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Filé de frango acebolado</h3>
+                </div>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Filé de frango catupiry</h3>
+                </div>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Filé de peixe (tilápia)</h3>
+                </div>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Filé mignon acebolado</h3>
+                </div>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Filé mignon catupiry</h3>
+                </div>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Filé mignon com brócolis</h3>
+                </div>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Frango a passarinho acebolado</h3>
+                </div>
+            </div>
+            
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Palmito</h3>
+                </div>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Picanha acebolada</h3>
+                </div>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Salame</h3>
+                </div>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Azeitonas</h3>
+                </div>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Alho frito</h3>
+                </div>
+                <p>Pote pequeno</p>
+            </div>
+
+            <h2 style="color: #FAD340; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.416);" id="bebidas">BEBIDAS</h2>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Água Mineral</h3>
+                </div>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Água com gás</h3>
+                </div>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Água Prata</h3>
+                </div>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Água prata com gás</h3>
+                </div>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Coca-cola</h3>
+                </div>
+                <p>290ml e Lata</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Coca-cola zero</h3>
+                </div>
+                <p>290ml e Lata</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Guaraná Antarctica</h3>
+                </div>
+                <p>290ml e Lata</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Sprite</h3>
+                </div>
+                <p>290ml e Lata</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Fanta laranja</h3>
+                </div>
+                <p>290ml e Lata</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Refrigerante lata</h3>
+                </div>
+                <p>Vários sabores</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>H2O</h3>
+                </div>
+                <p>sabores</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Soda Antarctica</h3>
+                </div>
+                <p>290ml e Lata</p>
+            </div>
+
+            <div class="pizza-item">
+                <div class="pizza-header">
+                    <h3>Soda Antarctica</h3>
+                </div>
+                <p>Sabores</p>
+            </div>
+            
+        </div>
+
+        <div id="voltaTopo" class="fontSecundaria">
+            <a href="cardapio.html">VOLTAR AO TOPO</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous">
+        </script>
+
+    <script src="https://kit.fontawesome.com/710c03a8ef.js" crossorigin="anonymous"></script>
+</body>
+
+</html>

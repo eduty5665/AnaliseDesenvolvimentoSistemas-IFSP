@@ -1,0 +1,96 @@
+@charset "UTF-8";
+
+#containerCardapio{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    padding: 10px;
+    background-color: whitesmoke;
+    margin-top: 115px;
+}
+
+#navCardapio{
+    display: flex;
+    justify-content: center;
+}
+
+#navCardapio a{
+    text-decoration: none;
+    color: black;
+    font-weight: normal;
+    border-radius: 20px;
+    margin: 2px;
+}
+
+#navCardapio a:hover{
+    scale: 1.05;
+    background-color: rgba(221, 219, 219, 0.385);
+}
+
+#cardapio{
+    padding: 20px;
+}
+
+h2 {
+    color: #c8983f;
+    font-size: 28px;
+    margin: 80px 0px;
+}
+
+.pizza-item {
+    margin-bottom: 25px;
+}
+
+.pizza-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.pizza-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #000;
+    position: relative;
+    background-color: whitesmoke;
+    padding-right: 10px;
+    z-index: 1;
+}
+
+.pizza-header::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #ccc;
+    margin-left: 10px;
+    z-index: 0;
+}
+
+.pizza-item p {
+    font-size: 14px;
+    font-style: italic;
+    color: #555;
+    margin: 0;
+}
+
+#voltaTopo{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #eaeaea;
+    border-radius: 10px;
+}
+
+#voltaTopo:hover{
+    scale: 1.05;
+}
+
+#voltaTopo a{
+    padding: 10px;
+    color: #000;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 13px;
+}
