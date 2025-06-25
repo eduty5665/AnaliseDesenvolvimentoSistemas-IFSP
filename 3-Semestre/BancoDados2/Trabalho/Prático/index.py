@@ -8,7 +8,6 @@ from decimal import Decimal
 
 dynamodb = resource('dynamodb', region_name="sa-east-1")  # Substitua pela sua região
 ProdTable = dynamodb.Table('TurtleTrackDB')
-UserTable = dynamodb.Table('Users')
 
 def verificar_id_existente(product_id):
     response = ProdTable.get_item(Key={'product_id': product_id})
