@@ -28,6 +28,7 @@ Testes.
 | `Estrutura de Dados` | Exploração de formas de organizar e armazenar dados em memória, como listas, pilhas, filas, árvores e grafos, com ênfase em desempenho e complexidade. |
 | `Gestão de TI` | Gerenciamento de recursos, serviços e infraestrutura de tecnologia da informação dentro das organizações, alinhando TI à estratégia empresarial. |
 | `História dos Computadores` | Visão cronológica da evolução dos computadores, desde os primeiros dispositivos mecânicos até as tecnologias atuais. |
+| `Inglês` | Desenvolvimento da compreensão e produção oral e escrita em inglês, com foco em vocabulário, gramática e situações do dia a dia. |
 | `Interação Humano e Computador` | Estudo da usabilidade, acessibilidade e design centrado no usuário, visando interfaces mais intuitivas e eficientes. |
 | `Linguagem de Programação` | Aprendizado prático de linguagens de programação (como Java, Python ou C#), aplicando lógica computacional e estruturação de código. |
 | `Lógica e Algoritmo de Programação` | Fundamentos da lógica computacional, construção de algoritmos e resolução de problemas por meio de fluxogramas e pseudocódigos. |
@@ -56,3 +57,4 @@ Testes.
 
 
 feito com 🤍 por [eduty](https://github.com/eduty5665).
+
