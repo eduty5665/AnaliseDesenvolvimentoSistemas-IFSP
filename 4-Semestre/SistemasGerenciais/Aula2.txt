@@ -1,0 +1,51 @@
+===============================================================
+======================CADEIA HIERARQUICA=======================
+===============================================================
+
+
+PIRAMIDE HIERARQUICA
+	
+	NIVEL ESTRATEGICO
+	NIVEL GERENCIAL/TATICO
+	NIVEL OPERACIONAL/TRANSACIONAL
+
+**SAZONALIDADE: Periodico, algo que acontece mais em um periodo doq em outro, é algo sazonal.**
+
+--OPERACIONAL
+	Vendido, entrou no estoque, faturamento (preço praticado)
+	Informações basicas,, informações diarias, rotineiras
+	Internas e Detalhadas
+
+--GERENCIAL
+	Composição de duas ou mais informações operacionais
+	união das informações internas
+	aglomerado de informações para mandar pro estrategico
+	Internas e mais sucintas
+
+--ESTRATEGICO
+	Gotejamento, união das informações
+	internas e externas
+	mais superficiais, traz os dados mais importantes
+	une todas as informações 
+	para tomada de decisão
+
+Em cada Nivel organizacional tem um tipo diferente de informação, sendo necessario um sistema de informação especifico para cada nivel organizacional
+
+EXEMPLO
+
+	                   CAMPEONATO BRASILEIRO DE FUTEBOL
+	
+	                   -----------ESTRATEGIA-----------
+	
+	CASA 3 PONTOS --GANHAR                   **NIVEL ESTRATÉGICO**
+	FORA 1 PONTO  --EMPATE/GANHAR                 DIRETORIA
+
+
+	Acaso estamos perdendo em casa	           **NIVEL TÁTICO**
+	comissão tecnica muda a estratégia             COMISSÃO
+	muda a formação de campo                       TÉCNICA
+
+	Defender bem, atacar bem
+	fazer gol, garra, esforço                **NIVEL OPERACIONAL**
+	táticas dentro de campo                       JOGADORES
+	capitão e jogadores

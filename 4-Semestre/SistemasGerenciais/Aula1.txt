@@ -1,0 +1,55 @@
+SISTEMA DA INFORMAÇÃO - KLEBER
+
+AULA01 - SISTEMA
+
+Sistema --> é um conjunto de partes, coisas e/ou elementos inteligados ou interconectados que tem um objetivo.
+Todo sistema, para ser sistema, tem que ter
+Entrada --> Processamento --> Saida
+
+*Teoria Geral de Sistema - Belfer*
+	A Teoria Geral de Sistemas (TGS), desenvolvida por Ludwig von Bertalanffy, propõe que sistemas, independentemente de sua natureza (biológica, social, técnica, etc.), compartilham características comuns e podem ser estudados através de um conjunto de princípios e conceitos unificados. A TGS enfatiza a interdependência e interação entre as partes de um sistema, considerando o todo como maior que a soma de suas partes. 
+Sistema: Um conjunto de elementos inter-relacionados que atuam juntos para alcançar um objetivo comum.
+
+*Ambiente de um Sistema*
+	Tudo o que esta fora/ao redor do sistema
+	lugar aonde ele esta inserido
+
+CLASSIFICAÇÃO DOS SISTEMAS
+
+- Sistema Vivo ou Não Vivo
+Vivo: Nascem, crescem, se reproduzem, morrem. Funções Biológicas
+Não Vivo: Não tem funções biológicas
+
+- Sistema Concreto ou Abstrato
+Concreto: Existe de forma fisica. Existe no material.
+Abstrato: O que não se pode tocar, mas existe em conceito.
+
+- Sistemas Abertos ou Fechados
+Abertos: Todo sistema que troca algo com o ambiente
+Fechado: So o universo
+
+- Sistema Sócio ou Técnico
+Sócio: Sistema composto por PESSOAS, que não tem máquinas
+Técnico: Todo sistema composto por MÁQUINAS, que não tem pessoas
+Sóciotécnico: Sistema que unificam as duas definições, são compostos tanto por maquinas como por pessoas.
+
+*Todo sistema fora das definições acima, não têm definição*
+
+SISTEMA DA INFORMAÇÃO
+
+Dados --> Tudo o que tenho interesse e posso coletar
+
+Informação --> Dados devidamente organizados e processados. Trazem valor.
+
+Conhecimento --> Fazer uso, de qualquer forma, da informação. Transformação da informação.
+
+Sabedoria --> Fazer BOM uso da informação. Uso do conhecimento para o BEM.
+
+Sistema da Informação:
+	Um sistema, ou seja partes conectadas que tem um objetivo, com entradas, processamento e saida. Tem como entrada os dados, o processamento como alguem que lida e transforma os dados em informações, e a saida como a informação.
+
+DADOS --> PROCESSAMENTO --> INFORMAÇÃO 
+
+A pessoa se utiliza dessa informação para
+TOMADA DE DECISÕES
+tornando conhecimento ou sabedoria, dependendo do uso
