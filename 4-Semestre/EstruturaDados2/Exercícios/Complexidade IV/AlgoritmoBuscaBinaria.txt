@@ -1,0 +1,13 @@
+Algoritmo BuscaBinaria(A, ini, fim, x)
+Entrada: A[ini..fim], vetor ordenado
+Saída: posição de x em A ou -1
+se ini > fim então
+retornar -1
+
+meio := (ini + fim) / 2
+se A[meio] = x então
+retornar meio
+senao se x < A[meio] então
+retornar BuscaBinaria(A, ini, meio-1, x)
+senao
+retornar BuscaBinaria(A, meio+1, fim, x) 

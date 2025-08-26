@@ -1,0 +1,9 @@
+Algoritmo Fib(n)
+Entrada: n, inteiro, n>=1
+Saída: retorna o elemento de ordem n da sequência de Fibonacci
+{
+se (n ≤ 2)
+  retornar 1
+senão
+  retornar Fib(n - 1) + Fib(n - 2)
+}

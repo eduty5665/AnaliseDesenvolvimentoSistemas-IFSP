@@ -1,0 +1,10 @@
+Algoritmo Termo3(n)
+	Entrada: n, um npumero natural, isto é, n é inteiro e n >= 1
+	Saida: t, o n-ésimo termo da sequencia 3, 6, 9, …
+	{
+	i := 1; t := 0;
+	enquanto(i <= n){
+		t := t + 3;
+		i := i + 1;
+	}
+}

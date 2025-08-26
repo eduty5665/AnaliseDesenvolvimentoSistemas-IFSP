@@ -1,0 +1,12 @@
+Algoritmo Fib(n)
+Entrada: n, inteiro, n>=1
+Saída: retorna o elemento de ordem n da sequência de Fibonacci
+{
+a ← 1; aa ← 1; f ← 1; i ← 3;
+enquanto (i ≤ n)
+{
+  aux ← f; f ← f + aa; a ← aa; aa ← aux;
+  i ← i + 1;
+}
+retornar f
+}

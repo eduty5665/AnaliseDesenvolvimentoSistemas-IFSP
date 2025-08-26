@@ -1,0 +1,9 @@
+Algoritmo Hanoi(n, origem, destino, auxiliar)
+Entrada: n discos, origem, destino, auxiliar
+Saída: sequência de movimentos
+se n = 1 então
+mover disco da origem para destino
+senao
+Hanoi(n-1, origem, auxiliar, destino)
+mover disco da origem para destino
+Hanoi(n-1, auxiliar, destino, origem)

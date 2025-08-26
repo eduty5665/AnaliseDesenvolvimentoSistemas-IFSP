@@ -1,0 +1,64 @@
+===============================================================
+=======================APP DE PIZZARIA=========================
+===============================================================
+
+
+Empresas estão mudando sua visão de sistema prorpio de fluxo de trabalho
+de uma visão baseada em setores, ou seja, cada qual em seu setor fazendo bem seu trabalho
+para uma visão processual, aonde foca nos processos que o cliente exerga, entregando valor ao mesmo
+
+Ao inves de agrupar as pessoal por setores agrupammos por processos
+
+ATIVIDADE
+
+Sabado - Pizzaria Lotada - 20hrs - Chegam 100 pedidos
+Dever: EVITAR O CAOS
+
+1 - Quais setores são mais importantes neste momento?
+R: O atendimento, pois ele vai ditar a fila de prioridade dos pedidos que irão para os proximos setores
+
+2 - Quais informações são cruciais tanto em recebimento como em envio?
+R: Sabor e quantidade de pizza por comanda, tendo essa informação os proximos setores conseguem se programar
+o pizzaiolo para fazer as pizzas, o estoque para nao deixar faltar nada, mas smp repor
+
+3 - Qual sistema de informação mais ajudaria neste momento?
+R: Sistema interno de comanda (virtual) para apresentar a fila de prioridade aos outros setores,
+tendo uma tela com tais comandas cada setor pode verificar ao vivo seu status de trabalho
+
+4 - Como garantir fluxo continuo entre todos os setores?
+R: Fila de Prioridade, para garantir que cada pedido saia no horario certo para cada setor
+conforme o tempo que cada setor demora para entregar
+
+ EFICACIA                  EFICIENCIA
+fazer algo                 criterios
+  valor                   de desempenho
+
+REFLEXÃO FINAL
+
+- O cliente so enxerga o processo inteiro
+  pedir --> receber --> comer
+
+- Setores isolados otimizam partes
+
+- Processos integrados entregam valor
+
+- Qual Maior risco: falta de informação ou informação fragmentada
+		      perde eficacia        perde eficiencia
+mas ambos tem risco igual, cada um com sua peculiaridade, são muito perigosos
+
+ * KPIs --> Key Process indicator (indicadores chave de processo)
+	- tempo medio de preparo
+	- taxa de entregas no prazo
+	- ticket medio por cliente
+	- taxa de ruptura de estoque
+	- indice de satisfaçao do cliente
+
+LEVANTAMENTO DE PROCESSO
+
+ Entrevista com stakeholders
+ Observaçao direta das atividades no local
+ Questionarios estruturados
+ Analise documental
+ Workshops e dinamicas de grupo
+ Ferramentas digitais
+

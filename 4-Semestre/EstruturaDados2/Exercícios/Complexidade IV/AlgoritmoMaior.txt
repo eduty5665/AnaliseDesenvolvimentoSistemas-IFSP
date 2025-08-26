@@ -1,0 +1,12 @@
+Algoritmo Maior(A, n)
+	Entrada: A, um vetor de n elementos (n >= 1)
+	Saida: o maior elemento do vetor
+	{
+	Max := A[1];
+	
+	para i := 2 até n faça
+		se(Max < A[i])
+			Max := A[i];
+	
+	retornar Max;
+}
