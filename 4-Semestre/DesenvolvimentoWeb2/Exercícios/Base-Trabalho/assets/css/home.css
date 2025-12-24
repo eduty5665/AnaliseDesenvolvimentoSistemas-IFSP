@@ -1,0 +1,19 @@
+#produtos .box{
+	display: flex;
+	justify-content: initial;
+	align-items: top;
+	flex-wrap: wrap;
+}
+
+#produtos .box .item{
+	float: left;
+	width: 23%;
+	margin-left: 1%;
+	margin-right: 1%;
+	margin-bottom: 20px;
+	box-shadow: 7px 7px 10px rgba(0,0,0,0.1);
+	border-radius: 20px;
+	-moz-border-radius: 20px;
+	-webkit-border-radius: 20px;
+	padding: 20px
+}

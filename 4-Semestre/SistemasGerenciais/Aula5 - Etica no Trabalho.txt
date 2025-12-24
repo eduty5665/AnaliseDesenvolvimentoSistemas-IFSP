@@ -1,0 +1,70 @@
+ETICA NO TRABALHO
+Aula de Ética em Sistema da Informação
+
+--Caso 1: Um colega acessando sites inadequados no trabalho
+
+1º O que seria legalmente correto fazer?
+Demissão por justa causa para esse funcionário
+
+2º O que seria profissionalmente correto fazer?
+Reportar ao superior sobre o ocorrido, para o próprio tomar as medidas legais
+
+3º O que você, pessoalmente, faria nessa situação?
+Conversaria sobre a situação com a pessoa, aconselhando-a a não realizar novamente
+
+4º Quais seriam as possíveis consequências da ação ou omissão?
+As consequências da denúncia resultam na demissão da pessoa, melhoria do ambiente da empresa e evitar repetição do ato
+
+--Caso 2: Sonegação de impostos pela empresa
+
+1º O que seria legalmente correto fazer?
+O correto será denunciar a sonegação para um órgão fiscal
+
+2º O que seria profissionalmente correto fazer?
+Profissionalmente seria tentar contato com o dono sobre a sonegação e se está ciente do ocorrido
+
+3º O que você, pessoalmente, faria nessa situação?
+Pessoalmente denunciamos conforme dita lei, pois as consequências seriam semelhantes em varias situações
+
+4º Quais seriam as possíveis consequências da ação ou omissão?
+Se denunciarmos a empresa poderia nos causar perda do emprego, seja de forma direta(demissão pois descobriram) ou indiretamente(falência da empresa por conta da denuncia)
+
+--Caso 3: Divulgação de salários pela equipe de TI
+
+1º O que seria legalmente correto fazer?
+Denuncie ao Ministério do Trabalho acerca do vazamento (LGPD)
+
+2º O que seria profissionalmente correto fazer?
+Entrar em contato com RH da empresa sobre o ocorrido
+
+3º O que você, pessoalmente, faria nessa situação?
+Denunciaria sobre a situação, mesmo se conhecer a pessoa
+
+4º Quais seriam as possíveis consequências da ação ou omissão?
+A situação sendo denunciada provavelmente causaria demissão em massa, mesmo apenas quem omitiu
+
+--Caso 4: Filho do dono roubando o caixa da empresa
+
+1º O que seria legalmente correto fazer?
+Denuncia o filho a policia sobre o furto
+
+2º O que seria profissionalmente correto fazer?
+Denuncia ao setor financeiro sobre o desvio de caixa
+
+3º O que você, pessoalmente, faria nessa situação?
+
+4º Quais seriam as possíveis consequências da ação ou omissão?
+
+--Caso 5: Uso de software pirata na empresa
+
+1º O que seria legalmente correto fazer?
+Reportar o uso indevido do software sem pagar
+
+2º O que seria profissionalmente correto fazer?
+Solicitar que fosse feito a compra do software
+
+3º O que você, pessoalmente, faria nessa situação?
+Entraria em contato com e TI para parar o uso do software. Se o mesmo não parasse de utilizar, entrada em contato com o dono do software
+
+4º Quais seriam as possíveis consequências da ação ou omissão?
+A consequência em denunciar seria uma investigação aberta contra a empresa ou meu desligamento da empresa por ele.

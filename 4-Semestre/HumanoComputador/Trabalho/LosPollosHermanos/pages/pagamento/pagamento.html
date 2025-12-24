@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forma de Pagamento - Los Pollos Hermanos</title>
+  <link rel="stylesheet" href="../../style.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <nav class="navbar navbar-dark fontSecundaria navbar-expand-lg">
+    <div class="container-fluid" id="containerNavbar">
+      <img src="../../media/losPollosLogo.png" alt="Los Pollos Hermanos" id="logoRomana">
+      <a class="navbar-brand text-white ms-3" href="../../index.html">Los Pollos Hermanos</a>
+    </div>
+  </nav>
+
+  <main class="fontSecundaria" style="padding-top:10px; color:white;">
+    <div class="container text-center">
+
+      <div class="card p-4 mb-5 bg-light text-dark">
+        <h3 class="mb-3">Endereço de Entrega</h3>
+        <form class="row g-3 text-start">
+          <div class="col-md-6">
+            <label for="rua" class="form-label">Rua</label>
+            <input type="text" class="form-control" id="rua" placeholder="Ex: Av. Central">
+          </div>
+          <div class="col-md-2">
+            <label for="numero" class="form-label">Número</label>
+            <input type="text" class="form-control" id="numero" placeholder="Ex: 123">
+          </div>
+          <div class="col-md-4">
+            <label for="bairro" class="form-label">Bairro</label>
+            <input type="text" class="form-control" id="bairro" placeholder="Ex: Centro">
+          </div>
+          <div class="col-md-6">
+            <label for="cidade" class="form-label">Cidade</label>
+            <input type="text" class="form-control" id="cidade" placeholder="Ex: Albuquerque">
+          </div>
+          <div class="col-md-3">
+            <label for="cep" class="form-label">CEP</label>
+            <input type="text" class="form-control" id="cep" placeholder="Ex: 87105">
+          </div>
+          <div class="col-md-3">
+            <label for="complemento" class="form-label">Complemento</label>
+            <input type="text" class="form-control" id="complemento" placeholder="Apto, bloco...">
+          </div>
+        </form>
+      </div>
+
+      <h1 class="fontPrincipal mb-4">Escolha sua forma de pagamento</h1>
+
+      <div class="row g-4 justify-content-center">
+        <div class="col-md-4">
+          <div class="card p-3 bg-light">
+            <h3>Cartão de Crédito / Débito</h3>
+            <p>Pague com segurança utilizando seu cartão.</p>
+            <button class="btn btn-warning">Selecionar</button>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="card p-3 bg-light">
+            <h3>Pix</h3>
+            <p>Pagamento instantâneo via chave Pix.</p>
+            <button class="btn btn-warning">Gerar QR Code</button>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="card p-3 bg-light">
+            <h3>Dinheiro</h3>
+            <p>Pague na entrega. Informe se precisa de troco.</p>
+            <button class="btn btn-warning">Selecionar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="rodape">
+    <p>&copy; 2025 Los Pollos Hermanos – Todos os direitos reservados.</p>
+  </footer>
+</body>
+</html>

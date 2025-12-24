@@ -1,0 +1,19 @@
+LOS POLLOS HERMANOS
+
+Trabalho Final   
+   Escopo do Site
+    Conformidade com Heurísticas de Nielsen
+    Conformidade com Diretrizes de Acessibilidade
+    Teste de Usabilidade (Planejamento)
+        Público-alvo
+        Tipo de Teste
+        Tarefa (caso de teste)
+        Formulário de feedback
+    Apresentação do Site
+        Mapa de Navegação do Site
+        Rascunho
+        Storyboard
+        Protótipo de alta-fidelidade
+    Conclusão
+
+Entrega dia 03/12

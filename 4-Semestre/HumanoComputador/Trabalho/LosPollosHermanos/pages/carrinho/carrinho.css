@@ -1,0 +1,77 @@
+@charset "UTF-8";
+
+#containerCarrinho {
+  margin-top: 140px;
+  padding: 30px;
+  background-color: whitesmoke;
+  min-height: 100vh;
+  text-align: center;
+}
+
+.listaProdutos {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin: 30px auto;
+  max-width: 800px;
+}
+
+.itemProduto {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #fff8e1;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  
+}
+
+.itemProduto h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #512e14;
+}
+
+.itemProduto p {
+  margin: 5px 0 0;
+  font-size: 16px;
+  color: #7a5c3b;
+}
+
+.btnRemover {
+  background-color: #fad340;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btnRemover:hover {
+  background-color: #f2c000;
+}
+
+.resumoCompra {
+  margin-top: 40px;
+}
+
+.resumoCompra h2 {
+  font-size: 24px;
+  color: #512e14;
+}
+
+.btnFinalizar {
+  margin-top: 20px;
+  background-color: #512e14;
+  color: #fff;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.btnFinalizar:hover {
+  background-color: #6b3f1e;
+}

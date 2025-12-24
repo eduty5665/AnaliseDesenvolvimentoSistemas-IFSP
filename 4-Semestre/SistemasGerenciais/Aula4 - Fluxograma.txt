@@ -1,0 +1,23 @@
+FLUXOGRAMA
+
+- Padronização das empresas --> padronização dos processos para que as pessoas façam igual, da mesma forma/padrão
+
+- Usado pelo facil entendimento, qualquer um na empresa consegue entender o que se dispõe num fluxograma
+
+	- Visualização Clara
+	- Padronização
+	- Identificação dos Problemas
+	- Comunicação Efetiva
+
+Circulo Oval --> Inicio/Fim
+Retangulo --> Processos
+Losango - Decisão (IF/Else)
+Quadrilatero base menor, superficie maior --> entrada/saida
+Quadrado com lado inferior circular --> Documento
+Circulo --> Conector
+Linhas Obrigatórias sempre
+Ao ligar, ifs ou repetições, as setas sempre irão no meio do fluxo, ou seja no meio de outras linhas
+
+DESAFIO PILHA TIJOLOS
+
+Há uma pilha de tijolos no ponto A e um muro a ser erguido em um ponto B. Você tem que pegar uma carriola e levar os tijolos do ponto A ao ponto B. Entretanto, voc~e não sabe quantos tijolos cabem na carriola. Como você faria?

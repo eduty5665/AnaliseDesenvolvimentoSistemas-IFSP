@@ -1,0 +1,13 @@
+Estrutura de trabalho do Projeto Base - Método de rotas configurado no projeto
+
+.com.br/ ou localhost/base/
+= homeController + index
+
+.com.br/usuarios
+= usuariosController + index
+
+.com.br/usuarios/adicionar
+= usuariosController + adicionar
+
+.com.br/usuarios/apagar/joao
+= usuariosController + apagar + parametro
