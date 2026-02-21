@@ -1,0 +1,27 @@
+Criei um GEM para pesquisa das duas primeiras semanas.
+
+
+Fazer essa pesquisa é um passo fundamental para o seu Projeto Integrador (PI)! Ela ajuda a entender o que já existe, o que funciona e, principalmente, onde seu projeto pode ser diferente e melhor. 🚀
+
+Para começar, vamos separar essa busca em três "gavetas" principais:1. Pesquisa Direta e Indireta 🔍
+	Concorrentes Diretos: São aqueles que resolvem o mesmo problema da mesma forma que você. Se você está criando um app de delivery de comida vegana, outros apps de delivery vegano são seus concorrentes diretos.
+	Concorrentes Indiretos: Resolvem o mesmo problema, mas de forma diferente. No exemplo do app, um restaurante vegano físico ou um mercado que vende marmitas congeladas seriam concorrentes indiretos. Eles também matam a fome do seu cliente!
+
+
+2. Onde e Como buscar? 🌐
+Existem ferramentas e técnicas simples que ajudam muito:
+Busca por Palavras-Chave: No Google, use termos como "Alternativas a [serviço famoso]", "[Nome do seu setor] + startups" ou "[Problema que você resolve] + solução".
+Lojas de Aplicativos e Redes Sociais: Pesquise na App Store/Play Store e use hashtags no Instagram ou TikTok para ver como as empresas se comunicam.
+Sites de Avaliação: O Reclame Aqui é excelente para descobrir o que os clientes odeiam nos serviços atuais (isso é ouro para o seu projeto!).
+Plataformas de Startups: Sites como Crunchbase ou Angellist mostram empresas novas e inovadoras que podem estar fazendo algo parecido.
+
+
+3. O que analisar neles? 📊
+Para o seu PI, não basta apenas achar o nome do serviço. É legal criar uma tabela comparativa (Benchmarking) analisando:
+  Funcionalidades: O que o produto faz?
+  Preço: É gratuito? Assinatura? Venda única?
+  Público-alvo: Para quem eles estão vendendo?
+  Diferencial: Por que as pessoas usam esse e não outro?
+
+
+Vamos dar o primeiro passo? Para eu te ajudar a refinar essa busca:Qual é o "problema central" que o seu projeto quer resolver?Você já tem em mente algum serviço que seja uma inspiração (mesmo que não seja exatamente igual)?

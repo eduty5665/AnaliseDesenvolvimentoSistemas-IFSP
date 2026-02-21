@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PrimeiroApp</string>
+    <string name="nome_completo">Nome Completo:</string>
+    <string name="limpar">Limpar</string>
+    <string name="salvar">Salvar</string>
+    <string name="guardar_e_mail">Guardar E-mail?</string>
+    <string name="fulano_provedor_com">fulano@provedor.com</string>
+    <string name="feminino">Feminino</string>
+    <string name="masculino">Masculino</string>
+    <string name="telefone">Telefone:</string>
+    <string name="e_mail">E-mail:</string>
+    <string name="cidade">Cidade:</string>
+    <string name="estado">Estado:</string>
+</resources>

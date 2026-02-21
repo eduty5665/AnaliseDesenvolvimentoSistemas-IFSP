@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Idiomas</string>
+    <string name="hint">Escribe tu nombre aquí.</string>
+    <string name="save">Ahorrar</string>
+    <string name="name">Nombre:</string>
+</resources>
