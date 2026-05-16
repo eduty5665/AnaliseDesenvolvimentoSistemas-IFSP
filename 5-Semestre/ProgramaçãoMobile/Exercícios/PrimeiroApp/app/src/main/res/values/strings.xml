@@ -1,18 +1,17 @@
 <resources>
-
     <string name="app_name">PrimeiroApp</string>
 
     <string name="nome_completo">Full Name:</string>
-    <string name="limpar">Clean</string>
-    <string name="guardar_e_mail">Save E-mail?</string>
-    <string name="fulano_provedor_com">user@provider.com</string>
-    <string name="feminino">Female</string>
-    <string name="masculino">Male</string>
     <string name="telefone">Phone:</string>
     <string name="e_mail">E-mail:</string>
+    <string name="masculino">Male</string>
     <string name="cidade">City:</string>
     <string name="estado">State:</string>
-
+    <string name="limpar">Clean</string>
+    <string name="enviar">Send</string>
+    <string name="sexo">Sex:</string>
+    <string name="guardar_e_mail">Save E-mail?</string>
+    <string name="fulano_provedor_com">user@provider.com</string>
 
     <string-array name="estados">
         <item>Acre</item>
@@ -43,6 +42,5 @@
         <item>Sergipe</item>
         <item>Tocantins</item>
     </string-array>
-    <string name="salvar">Save</string>
-
+    <string name="feminino">Female</string>
 </resources>

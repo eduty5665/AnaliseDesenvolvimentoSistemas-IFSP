@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">IntentApp</string>
+    <string name="google">Google</string>
+    <string name="dial">Dial</string>
+    <string name="call">Call</string>
+    <string name="sms">SMS</string>
+    <string name="whatsapp">Whatsapp</string>
+    <string name="about">About</string>
+    <string name="exit">Exit</string>
+</resources>

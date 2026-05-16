@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "795436334",
+    "project_id": "aulafirebase-turmadois",
+    "storage_bucket": "aulafirebase-turmadois.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:795436334:android:88e500b34b3b68204a06bf",
+        "android_client_info": {
+          "package_name": "br.edu.ifsp.aulafirebase2026"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "COLOQUE_AQUI_A_SUA_CHAVE_DO_SEU_PROJETO_NO_FIREBASE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

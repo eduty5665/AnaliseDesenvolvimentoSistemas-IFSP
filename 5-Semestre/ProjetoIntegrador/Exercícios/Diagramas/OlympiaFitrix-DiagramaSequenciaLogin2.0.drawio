@@ -1,0 +1,169 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Página-1" id="4shFDmjOC1aT8xLvCVJs">
+    <mxGraphModel dx="7070" dy="3885" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="gernon_i0jOD6c58iGBN-28" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" value="" vertex="1">
+          <mxGeometry height="1440" width="1880" x="510" y="660" as="geometry" />
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-29" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" value="&lt;u&gt;:Usuário&lt;/u&gt;" vertex="1">
+          <mxGeometry height="110" width="50" x="640" y="700" as="geometry" />
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-30" parent="1" style="rounded=0;whiteSpace=wrap;html=1;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" value="" vertex="1">
+          <mxGeometry height="1100" width="20" x="655" y="850" as="geometry" />
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-31" parent="1" style="rounded=1;whiteSpace=wrap;html=1;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" value="&lt;u&gt;:Login&lt;/u&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="940" y="790" as="geometry" />
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-32" parent="1" style="rounded=1;whiteSpace=wrap;html=1;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" value="&lt;u&gt;:Personal&lt;/u&gt;" vertex="1">
+          <mxGeometry height="60" width="150" x="1430" y="790" as="geometry" />
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-33" parent="1" style="rounded=0;whiteSpace=wrap;html=1;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" value="" vertex="1">
+          <mxGeometry height="1080" width="20" x="990" y="870" as="geometry" />
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-34" edge="1" parent="1" source="gernon_i0jOD6c58iGBN-30" style="endArrow=classic;html=1;rounded=0;exitX=1.25;exitY=0.103;exitDx=0;exitDy=0;exitPerimeter=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;entryX=-0.036;entryY=0.085;entryDx=0;entryDy=0;entryPerimeter=0;" target="gernon_i0jOD6c58iGBN-33" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="810" y="970" as="sourcePoint" />
+            <mxPoint x="990" y="954" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-35" edge="1" parent="1" style="endArrow=classic;html=1;rounded=0;exitX=1.25;exitY=0.193;exitDx=0;exitDy=0;exitPerimeter=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="1112.5" y="1020" />
+              <mxPoint x="1112.5" y="1080" />
+            </Array>
+            <mxPoint x="1010" y="1019.8400000000001" as="sourcePoint" />
+            <mxPoint x="1010.5" y="1080" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-36" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" value="1: AdicionaDados(email, senha)" vertex="1">
+          <mxGeometry height="30" width="210" x="730" y="930" as="geometry" />
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-37" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" value="2: ValidarDados(email, senha)" vertex="1">
+          <mxGeometry height="30" width="247.5" x="982.5" y="990" as="geometry" />
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-38" parent="1" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" value="" vertex="1">
+          <mxGeometry height="40" width="455" x="1155" y="660" as="geometry" />
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-39" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Diagrama de Sequência - Login&lt;/font&gt;" vertex="1">
+          <mxGeometry height="30" width="270" x="1242.5" y="665" as="geometry" />
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-40" parent="1" style="rounded=1;whiteSpace=wrap;html=1;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" value="&lt;u&gt;:Cadastro&lt;/u&gt;&lt;span style=&quot;color: rgba(0, 0, 0, 0); font-family: monospace; font-size: 0px; text-align: start; white-space: nowrap;&quot;&gt;%3CmxGraphModel%3E%3Croot%3E%3CmxCell%20id%3D%220%22%2F%3E%3CmxCell%20id%3D%221%22%20parent%3D%220%22%2F%3E%3CmxCell%20id%3D%222%22%20value%3D%22%26lt%3Bdiv%20style%3D%26quot%3Btext-align%3A%20justify%3B%26quot%3B%26gt%3B%26lt%3Bbr%26gt%3B%26lt%3B%2Fdiv%26gt%3B%26lt%3Bdiv%20style%3D%26quot%3Btext-align%3A%20justify%3B%26quot%3B%26gt%3B%26lt%3Bspan%20style%3D%26quot%3Bfont-size%3A%2050px%3B%20background-color%3A%20transparent%3B%26quot%3B%26gt%3BClasses%3A%26lt%3B%2Fspan%26gt%3B%26lt%3B%2Fdiv%26gt%3B%26lt%3Bdiv%20style%3D%26quot%3Btext-align%3A%20justify%3B%26quot%3B%26gt%3B%26lt%3Bspan%20style%3D%26quot%3Bfont-size%3A%2050px%3B%20background-color%3A%20transparent%3B%26quot%3B%26gt%3BUsuario%26lt%3B%2Fspan%26gt%3B%26lt%3B%2Fdiv%26gt%3B%26lt%3Bdiv%20style%3D%26quot%3Btext-align%3A%20justify%3B%26quot%3B%26gt%3B%26lt%3Bfont%20style%3D%26quot%3Bfont-size%3A%2050px%3B%26quot%3B%26gt%3BProduto%26lt%3B%2Ffont%26gt%3B%26lt%3B%2Fdiv%26gt%3B%26lt%3Bdiv%20style%3D%26quot%3Btext-align%3A%20justify%3B%26quot%3B%26gt%3B%26lt%3Bfont%20style%3D%26quot%3Bfont-size%3A%2050px%3B%26quot%3B%26gt%3BEnsumos%26lt%3B%2Ffont%26gt%3B%26lt%3B%2Fdiv%26gt%3B%26lt%3Bdiv%20style%3D%26quot%3Btext-align%3A%20justify%3B%26quot%3B%26gt%3B%26lt%3Bfont%20style%3D%26quot%3Bfont-size%3A%2050px%3B%26quot%3B%26gt%3BVenda%26lt%3B%2Ffont%26gt%3B%26lt%3B%2Fdiv%26gt%3B%26lt%3Bdiv%26gt%3B%26lt%3Bfont%20style%3D%26quot%3Bfont-size%3A%2050px%3B%26quot%3B%26gt%3B%26lt%3Bbr%26gt%3B%26lt%3B%2Ffont%26gt%3B%26lt%3B%2Fdiv%26gt%3B%22%20style%3D%22text%3Bhtml%3D1%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3BwhiteSpace%3Dwrap%3Brounded%3D0%3B%22%20vertex%3D%221%22%20parent%3D%221%22%3E%3CmxGeometry%20x%3D%22250%22%20y%3D%221574%22%20width%3D%22240%22%20height%3D%22360%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%3C%2Froot%3E%3C%2FmxGraphModel%3Eenda&lt;/span&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="1210" y="790" as="geometry" />
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-41" parent="1" style="rounded=0;whiteSpace=wrap;html=1;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" value="" vertex="1">
+          <mxGeometry height="1080" width="20" x="1260" y="870" as="geometry" />
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-42" parent="1" style="rounded=0;whiteSpace=wrap;html=1;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" value="" vertex="1">
+          <mxGeometry height="1080" width="20" x="1495" y="870" as="geometry" />
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-43" parent="1" style="rounded=1;whiteSpace=wrap;html=1;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" value="&lt;u&gt;:tTreinos&lt;/u&gt;" vertex="1">
+          <mxGeometry height="60" width="150" x="1710" y="791" as="geometry" />
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-44" parent="1" style="rounded=0;whiteSpace=wrap;html=1;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" value="" vertex="1">
+          <mxGeometry height="1079" width="20" x="1775" y="871" as="geometry" />
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-45" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" value="" vertex="1">
+          <mxGeometry height="809.99" width="1520" x="710" y="1100.01" as="geometry" />
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-46" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" value="7: VisualizarTreinos" vertex="1">
+          <mxGeometry height="30" width="295" x="1240.94" y="1700" as="geometry" />
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-47" edge="1" parent="1" style="endArrow=classic;html=1;rounded=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1015.94" y="1730" as="sourcePoint" />
+            <mxPoint x="1785.94" y="1730" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-48" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" value="8: VisualizarAlunos" vertex="1">
+          <mxGeometry height="30" width="295" x="1490.94" y="1810" as="geometry" />
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-49" edge="1" parent="1" style="endArrow=classic;html=1;rounded=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;entryX=-0.047;entryY=0.82;entryDx=0;entryDy=0;entryPerimeter=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1015.94" y="1835.48" as="sourcePoint" />
+            <mxPoint x="2034.9999999999986" y="1836.58" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-50" parent="1" style="shape=card;whiteSpace=wrap;html=1;rotation=-90;flipH=0;legacyAnchorPoints=0;flipV=1;align=center;" value="" vertex="1">
+          <mxGeometry height="146.16" width="44.23" x="761.6199999999999" y="1053.835" as="geometry" />
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-51" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;font&gt;Usuario Existe&lt;/font&gt;" vertex="1">
+          <mxGeometry height="32.89" width="120" x="720" y="1110.4650000000004" as="geometry" />
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-52" edge="1" parent="1" source="gernon_i0jOD6c58iGBN-45" style="endArrow=classic;html=1;rounded=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;exitX=0;exitY=0.172;exitDx=0;exitDy=0;exitPerimeter=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="620" y="1230" as="sourcePoint" />
+            <mxPoint x="1258.5" y="1239" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-53" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" value="3: AdicionaDados()" vertex="1">
+          <mxGeometry height="30" width="210" x="894" y="1200" as="geometry" />
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-54" edge="1" parent="1" style="endArrow=classic;html=1;rounded=0;exitX=1.25;exitY=0.193;exitDx=0;exitDy=0;exitPerimeter=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="1382.75" y="1247.83" />
+              <mxPoint x="1383" y="1298.83" />
+            </Array>
+            <mxPoint x="1280.25" y="1247.67" as="sourcePoint" />
+            <mxPoint x="1280" y="1298.83" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-55" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" value="4: ValidarDados()" vertex="1">
+          <mxGeometry height="30" width="247.5" x="1209" y="1225.83" as="geometry" />
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-56" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" value="5: RetornaCadastro" vertex="1">
+          <mxGeometry height="30" width="295" x="984" y="1348.83" as="geometry" />
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-57" edge="1" parent="1" style="endArrow=block;dashed=1;endFill=0;endSize=12;html=1;rounded=0;" value="">
+          <mxGeometry relative="1" width="160" as="geometry">
+            <mxPoint x="1259" y="1368.83" as="sourcePoint" />
+            <mxPoint x="1009" y="1368.83" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-58" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="[If not Usuario Existe]" vertex="1">
+          <mxGeometry height="32.89" width="120" x="714" y="1160" as="geometry" />
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-59" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="[else If Usuario == Aluno and Aluno hasn&#39;t Personal]" vertex="1">
+          <mxGeometry height="32.89" width="291" x="710" y="1430" as="geometry" />
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-60" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="[else]" vertex="1">
+          <mxGeometry height="32.89" width="180" x="645.94" y="1750" as="geometry" />
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-61" parent="1" style="rounded=1;whiteSpace=wrap;html=1;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" value="&lt;u&gt;:Aluno&lt;/u&gt;" vertex="1">
+          <mxGeometry height="60" width="150" x="1970" y="791" as="geometry" />
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-62" parent="1" style="rounded=0;whiteSpace=wrap;html=1;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" value="" vertex="1">
+          <mxGeometry height="1079" width="20" x="2035" y="871" as="geometry" />
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-63" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" value="6: SelecionarPersonal" vertex="1">
+          <mxGeometry height="30" width="295" x="1045" y="1470" as="geometry" />
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-64" edge="1" parent="1" style="endArrow=classic;html=1;rounded=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1010" y="1500" as="sourcePoint" />
+            <mxPoint x="1500" y="1500" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-65" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="[else If Usuario == Aluno and Aluno has Personal]" vertex="1">
+          <mxGeometry height="32.89" width="291" x="704" y="1620" as="geometry" />
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-66" edge="1" parent="1" style="endArrow=classic;html=1;rounded=0;exitX=1.25;exitY=0.193;exitDx=0;exitDy=0;exitPerimeter=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="1613.75" y="1531.8899999999999" />
+              <mxPoint x="1614" y="1582.8899999999999" />
+            </Array>
+            <mxPoint x="1511.25" y="1531.73" as="sourcePoint" />
+            <mxPoint x="1511" y="1582.8899999999999" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="gernon_i0jOD6c58iGBN-67" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" value="7: AtribuiTreinos()" vertex="1">
+          <mxGeometry height="30" width="247.5" x="1450" y="1509.8899999999999" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
