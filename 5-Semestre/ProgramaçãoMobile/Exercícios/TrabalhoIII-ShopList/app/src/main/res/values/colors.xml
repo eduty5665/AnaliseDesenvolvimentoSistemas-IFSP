@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    
+    <!-- Cores baseadas no ícone ShopList -->
+    <color name="primaryGreen">#087234</color>
+    <color name="secondaryOrange">#DA9407</color>
+    <color name="lightGreenBG">#E7F3E3</color>
+    <color name="accentRed">#CE3B16</color>
+    <color name="itemCardBG">#FFFFFF</color>
+</resources>

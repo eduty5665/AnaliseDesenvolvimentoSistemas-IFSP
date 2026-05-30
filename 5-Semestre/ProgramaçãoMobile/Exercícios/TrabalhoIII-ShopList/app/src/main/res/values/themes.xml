@@ -1,0 +1,19 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.AppGerencia" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Cores primárias baseadas no ShopList (Verde) -->
+        <item name="colorPrimary">@color/primaryGreen</item>
+        <item name="colorPrimaryVariant">#065A2A</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Cor secundária (Laranja/Ouro) -->
+        <item name="colorSecondary">@color/secondaryOrange</item>
+        <item name="colorSecondaryVariant">#B27402</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <!-- Barra de Notificações / Status Bar -->
+        <item name="android:statusBarColor">@color/primaryGreen</item>
+        <!-- Garante que os ícones da barra de status sejam visíveis -->
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <style name="Theme.AppGerencia" parent="Base.Theme.AppGerencia" />
+</resources>

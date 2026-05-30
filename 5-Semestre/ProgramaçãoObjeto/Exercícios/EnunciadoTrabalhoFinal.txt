@@ -1,0 +1,171 @@
+Descrição do trabalho - Projeto
+Condições de conclusão
+Projeto Prático: Sistema Orientado a Objetos em Java com MVC
+
+1. Objetivo do projeto
+
+Desenvolver um sistema em Java que aplique, de forma prática, os principais conceitos de Programação Orientada a Objetos:
+
+Encapsulamento;
+Herança;
+Polimorfismo;
+Interface;
+Organização em camadas usando MVC: Model, View e Controller;
+Diagrama de classes com os relacionamentos entre as classes.
+A proposta está alinhada à abordagem de sugerida, que trabalha classes, objetos, encapsulamento, herança, interfaces, polimorfismo e UML como fundamentos da tecnologia de objetos em Java .
+
+2. Tema do sistema
+
+O grupo poderá escolher um tema, desde que ele permita aplicar todos os conceitos exigidos.
+
+Sugestões:
+
+* Todos os temas a seguir devem seguir o conceito de MVP (Produto Mínimo Viável). O objetivo é entregar o valor central de cada software com o mínimo de complexidade técnica.
+
+1 - Grupo1 - Turma A - 9 - Sistema de reservas de hotel/pousada.
+2 - Grupo2 - Turma A - 4 - Sistema de vendas (PDV);
+3 - Grupo3 - Turma A - 2 - Sistema de escolar;
+4 - Grupo4 - Turma A - 8 - Sistema de cadastro e atendimento (CRM).
+5 - Grupo1 - Turma B - 3 - Sistema de clínica;
+6 - Grupo2 - Turma B - 6 - Sistema bancário simples;
+7 - Grupo3 - Turma B - 1 - Sistema de biblioteca;
+8 - Grupo4 - Turma B - 7 - Sistema de folha de pagamento;
+9 - Grupo5 - Turma B - 5 - Sistema de locação de veículos;
+
+Exigido no mínimo:
+
+1 classe abstrata ou superclasse;
+2 ou mais subclasses;
+1 interface;
+1 uso real de polimorfismo;
+atributos privados com métodos de acesso;
+separação em pacotes model, view e controller;
+diagrama de classes UML.
+3. Requisitos obrigatórios
+3.1 Encapsulamento
+
+O projeto deve utilizar atributos privados e métodos públicos controlados, como get, set e métodos de negócio.
+
+3.2 Herança
+
+O projeto deve conter relação do tipo “é um”.
+O projeto deve conter no mínimo uma sobrescrita de método.
+
+3.3 Polimorfismo
+
+O projeto deve demonstrar objetos diferentes sendo tratados por uma referência comum.
+
+Exemplo:
+
+List<Funcionario> funcionarios = new ArrayList<>();
+
+funcionarios.add(new Professor("Ana", 40));
+funcionarios.add(new Coordenador("Carlos", 5000));
+
+for (Funcionario f : funcionarios) {
+    System.out.println(f.calcularPagamento());
+}
+Aqui, o método chamado é o mesmo, mas o comportamento muda conforme o objeto real. Vimos que o polimorfismo permite processar objetos de subclasses como objetos da superclasse, facilitando sistemas extensíveis e sustentáveis .
+
+3.4 Interface
+
+O projeto deve conter pelo menos uma interface com aplicação prática.
+
+Exemplo:
+
+public interface Imprimivel {
+    String gerarRelatorio();
+}
+
+public class Cliente implements Imprimivel {
+    @Override
+    public String gerarRelatorio() {
+        return "Relatório do cliente";
+    }
+}
+A interface não deve ser criada apenas “para cumprir requisito”. Ela precisa representar uma capacidade comum entre classes diferentes, como Autenticavel, Pagavel, Imprimivel, Calculavel, Exportavel ou Notificavel.
+
+3.5 MVC
+
+O projeto deve ser organizado no padrão MVC:
+
+src/
+ ├── model/
+ │    ├── Cliente.java
+ │    ├── Funcionario.java
+ │    └── Professor.java
+ │
+ ├── view/
+ │    └── MenuView.java
+ │
+ ├── controller/
+ │    └── SistemaController.java
+ │
+ └── Main.java
+
+
+4 Apresentação (Sugestão)
+
+4.1 Estrutura MVC
+- Como o projeto foi dividido em pacotes.
+- Quais classes estão no model.
+- Quais classes estão na view.
+- Quais classes estão no controller.
+- Como ocorre a comunicação entre as camadas.
+
+4.2 Diagrama de classes UML
+- Apresentar o diagrama de classes.
+- Identificar a superclasse ou classe abstrata.
+- Identificar as subclasses.
+- Mostrar interfaces implementadas.
+- Explicar os relacionamentos entre as classes.
+- Comparar o diagrama com o código desenvolvido.
+
+4.3 Encapsulamento
+- Tem atributos privado, protegido, por que da escolha.
+- Tem métodos get e set? por que da escolha.
+- Apresentar validações ou métodos de negócio, se houver.
+- Indicar uma classe onde o encapsulamento foi aplicado.
+
+4.4 Herança
+- Apresentar a superclasse.
+- Apresentar as subclasses.
+- Explicar a relação entre as classes se hover.
+- Mostrar um método sobrescrito com @Override.
+
+4.5 Polimorfismo
+- Mostrar objetos diferentes tratados por uma referência comum.
+- Apresentar uma lista ou variável usando a superclasse/interface.
+- Mostrar o mesmo método sendo chamado em objetos diferentes.
+- Explicar como o comportamento muda conforme o objeto real.
+- Mostrar o trecho de código onde isso acontece.
+
+4.6 Interface
+- Apresentar a interface criada.
+- Explicar qual capacidade ela representa.
+- Mostrar quais classes implementam a interface.
+- Mostrar o uso de implements.
+- Justificar por que a interface faz sentido no projeto.
+
+4.7 Divisão de tarefas do grupo
+- Informar o que cada integrante fez.
+- Explicar a participação individual.
+- Indicar quem trabalhou no model, view, controller, UML e apresentação.
+- Mostrar como o grupo organizou o trabalho.
+- Relacionar a entrega com a contribuição de cada aluno.
+
+4.8 Dificuldades encontradas
+- Dificuldades com POO.
+- Dificuldades com MVC.
+- Dificuldades com UML.
+- Dificuldades com integração entre classes.
+- Problemas encontrados durante o desenvolvimento.
+- Como o grupo resolveu ou tentou resolver essas dificuldades.
+
+4.9 Demonstração prática do sistema
+- Executar o sistema.
+- Mostrar o menu ou tela principal.
+- Demonstrar as funcionalidades principais.
+- Mostrar uma regra de negócio funcionando.
+- Relacionar a execução com o MVC.
+- Mostrar rapidamente onde os conceitos aparecem no código.
