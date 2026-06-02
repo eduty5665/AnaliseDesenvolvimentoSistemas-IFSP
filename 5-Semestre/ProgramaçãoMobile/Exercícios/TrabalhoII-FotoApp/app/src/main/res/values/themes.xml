@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Tema Principal (Light) -->
+    <style name="Theme.MyApplication" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Cores Primárias -->
+        <item name="colorPrimary">@color/picif_blue_primary</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/picif_blue_light</item>
+        <item name="colorOnPrimaryContainer">@color/white</item>
+
+        <!-- Cores Secundárias -->
+        <item name="colorSecondary">@color/picif_accent</item>
+        <item name="colorOnSecondary">@color/black</item>
+
+        <!-- Cores de Superfície e Fundo -->
+        <item name="android:windowBackground">@color/picif_background</item>
+        <item name="colorSurface">@color/white</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+
+        <!-- Barra de Status e Navegação -->
+        <item name="android:statusBarColor">@color/picif_blue_dark</item>
+        <item name="android:navigationBarColor">@color/picif_background</item>
+    </style>
+</resources>

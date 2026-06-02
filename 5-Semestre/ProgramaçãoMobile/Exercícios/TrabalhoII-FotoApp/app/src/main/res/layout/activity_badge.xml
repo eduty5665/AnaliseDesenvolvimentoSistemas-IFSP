@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/picif_background"
+    tools:context=".BadgeActivity">
+
+    <!-- Card do Crachá Rotacionado (Efeito Paisagem em Tela Retrato) -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/badgeCard"
+        android:layout_width="500dp"
+        android:layout_height="320dp"
+        android:rotation="90"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="12dp"
+        app:strokeColor="@color/picif_blue_primary"
+        app:strokeWidth="2dp"
+        app:layout_constraintBottom_toTopOf="@+id/layoutButtons"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:padding="24dp">
+
+            <!-- Linha 1: Logo e Instituição -->
+            <ImageView
+                android:id="@+id/badgeLogo"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@mipmap/logo_picif"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textViewInstitution"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="Instituto Federal de São Paulo\nCampus Catanduva"
+                android:textColor="@color/picif_blue_primary"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@+id/badgeLogo"
+                app:layout_constraintEnd_toStartOf="@+id/badgeUserPhoto"
+                app:layout_constraintStart_toEndOf="@+id/badgeLogo"
+                app:layout_constraintTop_toTopOf="@+id/badgeLogo" />
+
+            <!-- Foto do Aluno -->
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/badgeUserPhoto"
+                android:layout_width="110dp"
+                android:layout_height="140dp"
+                android:scaleType="centerCrop"
+                android:background="@color/gray_light"
+                app:shapeAppearanceOverlay="@style/RoundedSquare"
+                app:strokeColor="@color/picif_blue_primary"
+                app:strokeWidth="2dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Nome do Aluno -->
+            <TextView
+                android:id="@+id/badgeUserName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="Nome do Aluno"
+                android:textColor="@color/black"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@+id/badgeUserPhoto"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/badgeLogo" />
+
+            <!-- Prontuário -->
+            <TextView
+                android:id="@+id/badgeUserProntuario"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Prontuário: SP123456"
+                android:textColor="@color/picif_blue_primary"
+                android:textSize="22sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/badgeUserName" />
+
+            <!-- Validade -->
+            <TextView
+                android:id="@+id/badgeValidity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Validade: 01/01/2025"
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp"
+                android:textStyle="italic"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Botões de Ação (No rodapé, formato Retrato) -->
+    <LinearLayout
+        android:id="@+id/layoutButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonEdit"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:text="Editar"
+            android:textAllCaps="false"
+            app:cornerRadius="8dp"
+            app:icon="@android:drawable/ic_menu_edit" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonPrint"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:text="Imprimir"
+            android:textAllCaps="false"
+            app:cornerRadius="8dp"
+            app:icon="@android:drawable/ic_menu_save" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

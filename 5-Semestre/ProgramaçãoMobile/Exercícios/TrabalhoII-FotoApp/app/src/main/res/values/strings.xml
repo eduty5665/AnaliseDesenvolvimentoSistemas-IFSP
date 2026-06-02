@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PicIF</string>
+    <string name="take_photo">Tirar Nova Foto</string>
+    <string name="save_data">Salvar Dados</string>
+    <string name="badge_title">Crachá Digital</string>
+    <string name="hint_name">Nome Completo</string>
+    <string name="hint_prontuario">Prontuário (Ex: SP123456)</string>
+    <string name="exit_app">Sair</string>
+    <string name="generate_badge">Gerar Crachá</string>
+</resources>

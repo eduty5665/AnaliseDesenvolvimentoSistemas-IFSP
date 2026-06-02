@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Paleta PicIF - Azul Profissional -->
+    <color name="picif_blue_primary">#004AAD</color>
+    <color name="picif_blue_dark">#00357A</color>
+    <color name="picif_blue_light">#4982E9</color>
+    <color name="picif_accent">#00C2FF</color>
+    
+    <!-- Cores de Suporte -->
+    <color name="picif_background">#F0F4F8</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
+    <color name="text_primary">#1A1C1E</color>
+    <color name="text_secondary">#4A4A4A</color>
+    <color name="gray_light">#E0E0E0</color>
+    <color name="divider">#D1D9E0</color>
+
+    <!-- Aliases e Cores faltantes para corrigir erros de compilação -->
+    <color name="logo_picif_background">#004AAD</color>
+    <color name="background_light">#F0F4F8</color>
+</resources>
