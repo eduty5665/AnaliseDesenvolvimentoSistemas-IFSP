@@ -1,0 +1,10 @@
+model\Pessoa.class
+model\QuartoLuxo.class
+model\Funcionario.class
+model\QuartoSimples.class
+model\Cliente.class
+com\mycompany\sistemahotel\SistemaHotel.class
+model\Quarto.class
+model\Reserva.class
+controller\HotelController.class
+model\Relatorio.class

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juliu's ADM | Gestão Total</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/controle.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="admin-body">
+
+    <header class="main-header">
+    <div class="header-content">
+        <a href="../index.html" class="logo-container">
+            <img src="../img/logo.webp" alt="Juliu's Logo" class="main-logo"></a>
+        <nav class="nav-menu" id="navMenu">
+            <ul>
+                <li><a href="../index.html">VOLTAR AO SITE</a></li>
+                <li><a href="controle.html" class="active-link">CONTROLE</a></li>
+
+                <li class="user-info">
+                    ADM: <strong>Juliu's</strong>
+                    <i class="fas fa-crown"
+                       style="color: gold; margin-left: 5px;"></i>
+                </li>
+            </ul>
+        </nav>
+        <button class="hamburger" id="hamburger">
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+        </button>
+    </div>
+</header>
+
+    <main class="admin-layout">
+        <aside class="sidebar">
+            <button class="tab-btn active" onclick="switchTab(event, 'tab-produtos')">
+                <i class="fas fa-hotdog"></i> Cardápio
+            </button>
+            <button class="tab-btn" onclick="switchTab(event, 'tab-insumos')">
+                <i class="fas fa-box"></i> Insumos
+            </button>
+            <button class="tab-btn" onclick="switchTab(event, 'tab-vendas')">
+                <i class="fas fa-chart-line"></i> Relatórios
+            </button>
+        </aside>
+
+        <section class="content-area">
+            <div id="tab-produtos" class="tab-content active">
+                <div class="header-flex">
+                    <h2>Gestão de Cardápio</h2>
+                    <button class="btn-add-premium" onclick="openModal('modalProduto')">
+                        <i class="fas fa-plus"></i> NOVO PRODUTO
+                    </button>
+                </div>
+                <h3 class="section-title">Lanches</h3>
+                <div id="render-lanches" class="products-grid"></div>
+                <h3 class="section-title">Bebidas</h3>
+                <div id="render-bebidas" class="products-grid"></div>
+            </div>
+
+            <div id="tab-insumos" class="tab-content">
+                <div class="header-flex">
+                    <h2>Estoque de Insumos</h2>
+                    <button class="btn-add-premium" onclick="openModal('modalInsumo')">
+                        <i class="fas fa-plus-circle"></i> NOVO INSUMO
+                    </button>
+                </div>
+                <div id="render-insumos" class="insumos-grid"></div>
+            </div>
+
+            <div id="tab-vendas" class="tab-content">
+                <div class="report-hero">
+                    <div>
+                        <span class="report-eyebrow">Visão financeira</span>
+                        <h2>Relatórios de vendas</h2>
+                        <p>Acompanhe os pedidos aceitos por dia, mês ou ano.</p>
+                    </div>
+                    <div class="report-period-badge" id="report-period-label">Hoje</div>
+                </div>
+
+                <div class="report-filter-panel">
+                    <div class="report-period-tabs" role="group" aria-label="Período do relatório">
+                        <button type="button" class="report-period-btn active" data-report-period="day" onclick="setReportPeriod('day')">
+                            <i class="fas fa-calendar-day"></i> Dia
+                        </button>
+                        <button type="button" class="report-period-btn" data-report-period="month" onclick="setReportPeriod('month')">
+                            <i class="fas fa-calendar-alt"></i> Mês
+                        </button>
+                        <button type="button" class="report-period-btn" data-report-period="year" onclick="setReportPeriod('year')">
+                            <i class="fas fa-calendar"></i> Ano
+                        </button>
+                    </div>
+
+                    <div class="report-filter-fields">
+                        <div class="report-filter-field" data-period-field="day">
+                            <label for="report-date">Escolha o dia</label>
+                            <input type="date" id="report-date">
+                        </div>
+                        <div class="report-filter-field" data-period-field="month" hidden>
+                            <label for="report-month">Escolha o mês</label>
+                            <select id="report-month"></select>
+                        </div>
+                        <div class="report-filter-field" data-period-field="month" hidden>
+                            <label for="report-month-year">Ano</label>
+                            <input type="number" id="report-month-year" min="2020" step="1">
+                        </div>
+                        <div class="report-filter-field" data-period-field="year" hidden>
+                            <label for="report-year">Escolha o ano</label>
+                            <input type="number" id="report-year" min="2020" step="1">
+                        </div>
+                        <button class="report-search-btn" type="button" onclick="carregarRelatorios()">
+                            <i class="fas fa-search"></i> Atualizar relatório
+                        </button>
+                    </div>
+                </div>
+
+                <div class="reports-grid">
+                    <div class="report-card">
+                        <div class="icon-circle money"><i class="fas fa-dollar-sign"></i></div>
+                        <div class="report-info">
+                            <span>Faturamento do periodo</span>
+                            <h3 id="fat-hoje">R$ 0,00</h3>
+                        </div>
+                    </div>
+                    <div class="report-card">
+                        <div class="icon-circle orders"><i class="fas fa-shopping-basket"></i></div>
+                        <div class="report-info">
+                            <span>Pedidos aceitos</span>
+                            <h3 id="total-pedidos">0</h3>
+                        </div>
+                    </div>
+                    <div class="report-card">
+                        <div class="icon-circle ticket"><i class="fas fa-receipt"></i></div>
+                        <div class="report-info">
+                            <span>Ticket médio</span>
+                            <h3 id="ticket-medio">R$ 0,00</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="orders-report-section">
+                    <h3 class="section-title">Pedidos filtrados</h3>
+                    <div id="report-orders-list" class="report-orders-list"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="modalProduto" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('modalProduto')">&times;</span>
+            <h2 id="modal-prod-title">Produto</h2>
+            <form id="form-produto" onsubmit="salvarProduto(event)">
+                <input type="hidden" id="prod-id">
+                <div class="input-group-admin">
+                    <label>Nome</label>
+                    <input type="text" id="prod-nome" required>
+                </div>
+                <div class="input-group-admin">
+                    <label>Descrição</label>
+                    <textarea id="prod-desc" rows="3" required></textarea>
+                </div>
+                <div class="input-group-admin">
+                    <label>Preço (R$)</label>
+                    <input type="number" id="prod-preco" min="0.01" step="0.01" required>
+                </div>
+                <div class="input-group-admin">
+                    <label>Secao</label>
+                    <select id="prod-category" onchange="toggleProductCategory()">
+                        <option value="snack">Lanche</option>
+                        <option value="drink">Bebida</option>
+                    </select>
+                </div>
+                <div class="input-group-admin" id="drink-type-group">
+                    <label>Tipo da bebida</label>
+                    <select id="prod-beverage-type">
+                        <option value="can">Lata</option>
+                        <option value="bottle">Garrafa</option>
+                    </select>
+                </div>
+                <div class="input-group-admin" id="drink-stock-group">
+                    <label>Unidades em estoque</label>
+                    <input type="number" id="prod-stock-quantity" min="0" step="1">
+                </div>
+                <div class="input-group-admin">
+                    <label>Insumos usados neste produto</label>
+                    <div id="prod-insumos" class="ingredient-list"></div>
+                </div>
+                <button type="submit" class="btn-save">SALVAR NO CARDÃPIO</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalInsumo" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('modalInsumo')">&times;</span>
+            <h2>Novo Insumo</h2>
+            <form onsubmit="adicionarInsumo(event)">
+                <div class="input-group-admin">
+                    <label>Nome do Insumo</label>
+                    <input type="text" id="ins-nome" required>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <div class="input-group-admin" style="flex:1">
+                        <label>Qtd</label>
+                        <input type="number" id="ins-qtd" step="0.1" required>
+                    </div>
+                    <div class="input-group-admin" style="flex:1">
+                        <label>Unid</label>
+                        <select id="ins-unid">
+                            <option value="KG">KG</option>
+                            <option value="UN">UN</option>
+                            <option value="LT">LT</option>
+                        </select>
+                    </div>
+                </div>
+                <label class="checkbox-row">
+                    <input type="checkbox" id="ins-boolean" onchange="toggleInsumoTipo()">
+                    Insumo de checkbox
+                </label>
+                <label class="checkbox-row">
+                    <input type="checkbox" id="ins-available" checked>
+                    Disponivel
+                </label>
+                <button type="submit" class="btn-save">ADICIONAR AO ESTOQUE</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/controle.js"></script>
+</body>
+</html>
