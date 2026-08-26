@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#105c4a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="ecomove-logo.png" type="image/png">
+  <link rel="apple-touch-icon" href="ecomove-logo.png">
+  <title>EcoMove | Mobilidade Sustentavel</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <section id="splashScreen" class="state-screen splash-screen" aria-label="Carregando EcoMove"><img src="ecomove-logo.png" alt="EcoMove"></section>
+  <section id="authScreen" class="state-screen auth-screen hidden" aria-labelledby="login-title">
+    <div class="auth-panel"><img src="ecomove-logo.png" alt="EcoMove"><p class="eyebrow">ACESSO LOCAL</p><h1 id="login-title">Bem-vindo ao EcoMove</h1><p>Entre para acompanhar suas escolhas sustentaveis neste aparelho.</p><form id="loginForm"><label>Seu nome<input id="loginName" maxlength="35" required></label><label>E-mail<input id="loginEmail" type="email" required></label><label>Senha local<input id="loginPassword" type="password" minlength="4" required></label><label>Meta semanal de pontos<input id="loginGoal" type="number" min="10" max="1000" value="80" required></label><button class="primary-button" type="submit">Entrar no EcoMove</button><p id="loginStatus" class="login-status" aria-live="polite"></p></form><small>Seus dados ficam somente neste celular.</small></div>
+  </section>
+  <div id="appShell" class="app-shell hidden">
+  <header class="topbar">
+    <a class="brand" href="#home" data-tab-link="home" aria-label="EcoMove inicio"><img src="ecomove-logo.png" alt=""><span>EcoMove</span></a>
+    <nav class="main-nav" aria-label="Guias do aplicativo">
+      <button class="nav-button active" data-tab="home">Inicio</button>
+      <button class="nav-button" data-tab="calculo">Calculo CO2</button>
+      <button class="nav-button" data-tab="ranking">Ranking</button>
+      <button class="nav-button" data-tab="contato">Contato</button>
+    </nav>
+    <div class="profile-area"><button id="profileButton" class="profile-button" aria-label="Abrir menu do usuario"><img src="user-avatar.svg" alt=""><span id="profileInitials">EM</span></button><div id="profileMenu" class="profile-menu hidden"><p id="profileMenuName">EcoMove</p><button data-tab="home">Inicio</button><button data-tab="calculo">Calculo CO2</button><button data-tab="ranking">Ranking</button><button data-tab="contato">Contato</button><button id="logoutButton" class="logout-button">Sair</button></div></div>
+  </header>
+
+  <main>
+    <section id="home" class="tab-panel active" aria-labelledby="home-title">
+      <div class="home-hero">
+        <div>
+          <p class="eyebrow">MOBILIDADE SUSTENTAVEL</p>
+          <h1 id="home-title">Cada trajeto deixa uma marca. Escolha uma marca melhor.</h1>
+          <p>O EcoMove transforma escolhas cotidianas em CO2 evitado, pontos e dados que ajudam a pensar cidades mais sustentaveis.</p>
+          <button class="primary-button" data-tab="calculo">Calcular meu impacto</button>
+        </div>
+        <aside class="co2-orbit" aria-label="Resumo de CO2 evitado">
+          <img src="ecomove-logo.png" alt="Logo EcoMove">
+          <p>CO2 evitado por voce</p>
+          <strong id="heroCo2">0,00 kg</strong>
+          <span id="heroEquivalent">Registre um trajeto para comecar.</span>
+        </aside>
+      </div>
+
+      <section class="impact-strip" aria-label="Resumo do seu impacto">
+        <article><p>Distancia limpa</p><strong id="distanceMetric">0,0 km</strong></article>
+        <article><p>EcoPontos</p><strong id="pointsMetric">0 pts</strong></article>
+        <article><p>Trajetos</p><strong id="tripMetric">0</strong></article>
+        <article><p>Meta semanal</p><strong id="homeGoalMetric">0%</strong></article>
+      </section>
+
+      <section class="content-section news-section">
+        <div class="section-heading"><div><p class="eyebrow">ATUALIDADE CLIMATICA</p><h2>Mobilidade e clima em foco</h2></div><button id="refreshNews" class="text-button">Atualizar noticias</button></div>
+        <p class="section-intro">Emissoes do transporte representam uma parcela relevante dos gases de efeito estufa. Acompanhe fontes abertas para entender o tema e inspirar novas escolhas.</p>
+        <p id="newsStatus" class="muted-text" aria-live="polite">Carregando fontes de noticias...</p>
+        <div id="newsList" class="news-grid"></div>
+      </section>
+    </section>
+
+    <section id="calculo" class="tab-panel" aria-labelledby="calculo-title">
+      <div class="page-intro"><p class="eyebrow">SEU DIARIO DE MOBILIDADE</p><h1 id="calculo-title">Calcule o impacto do seu caminho</h1><p>Comparamos cada escolha com a emissao estimada de um carro individual.</p></div>
+      <div class="calculation-layout">
+        <form id="tripForm" class="surface form-grid">
+          <label>Como voce se deslocou?<select id="mode" required><option value="walk">Caminhada</option><option value="bike">Bicicleta</option><option value="bus">Onibus</option><option value="carpool">Carona compartilhada</option><option value="car">Carro individual</option></select></label>
+          <label>Distancia (km)<input id="distance" type="number" min="0.1" step="0.1" placeholder="Ex.: 4,5" required></label>
+          <label>Data<input id="date" type="date" required></label>
+          <button class="primary-button" type="submit">Salvar trajeto</button>
+        </form>
+        <aside class="calculation-summary">
+          <p class="eyebrow">PREVISAO DO TRAJETO</p><strong id="previewPoints">+0 pontos</strong><p id="previewText">Escolha o meio e a distancia para calcular.</p>
+          <div class="mini-bar"><span id="previewBar"></span></div><small>Referencia: carro individual, 0,19 kg CO2/km.</small>
+        </aside>
+      </div>
+      <section class="content-section compact-section"><div class="section-heading"><div><p class="eyebrow">HISTORICO</p><h2>Seus trajetos</h2></div><span id="tripCountLabel" class="muted-text">Nenhum trajeto ainda</span></div><div id="tripList" class="trip-list surface"><p class="empty-state">Seu primeiro registro aparecera aqui.</p></div></section>
+    </section>
+
+    <section id="ranking" class="tab-panel" aria-labelledby="ranking-title">
+      <div class="page-intro"><p class="eyebrow">GAMIFICACAO</p><h1 id="ranking-title">Mais escolhas limpas, mais impacto.</h1><p>Acumule EcoPontos e acompanhe sua evolucao na comunidade.</p></div>
+      <div class="ranking-layout">
+        <article class="surface personal-score"><p class="eyebrow">SEU PROGRESSO</p><strong id="goalProgress">0 / 80 pontos</strong><div class="progress-track"><span id="goalBar"></span></div><p id="goalMessage">Registre um trajeto sustentavel para comecar.</p><button id="editGoal" class="text-button">Editar meta</button></article>
+        <article class="rank-callout"><p>SEU NIVEL</p><strong id="levelName">Semente</strong><span id="levelHint">0 pontos para o proximo nivel</span></article>
+      </div>
+      <section class="content-section compact-section"><div class="section-heading"><div><p class="eyebrow">PLACAR DA COMUNIDADE</p><h2>Ranking semanal</h2></div><span class="muted-text">Atualizado nesta semana</span></div><div id="rankingList" class="ranking-list surface"></div></section>
+      <section class="badges-section"><p class="eyebrow">CONQUISTAS</p><div class="badge-grid"><article><strong id="badgeFirst">1</strong><span>Primeiro passo</span><small>Registre 1 trajeto</small></article><article><strong id="badgeCarbon">0</strong><span>Guardiao do ar</span><small>Evite 5 kg de CO2</small></article><article><strong id="badgePoints">0</strong><span>Rota verde</span><small>Alcance 100 pontos</small></article></div></section>
+    </section>
+
+    <section id="contato" class="tab-panel" aria-labelledby="contato-title">
+      <div class="page-intro"><p class="eyebrow">PARTICIPE DO PROJETO</p><h1 id="contato-title">Conte como voce se move.</h1><p>Suas respostas ajudam a comunidade a entender seus habitos e a planejar solucoes melhores.</p></div>
+      <div class="contact-layout">
+        <form id="surveyForm" class="surface form-grid"><h2>Diagnostico da mobilidade</h2><label>Qual meio voce usa com mais frequencia?<select id="usualMode" required><option value="">Selecione</option><option>Caminhada</option><option>Bicicleta</option><option>Onibus</option><option>Carona compartilhada</option><option>Carro individual</option><option>Outro</option></select></label><label>Quantos dias por semana voce se desloca?<select id="days" required><option value="">Selecione</option><option value="1-2">1 a 2 dias</option><option value="3-4">3 a 4 dias</option><option value="5+">5 ou mais dias</option></select></label><label>O que facilitaria uma escolha sustentavel?<select id="barrier" required><option value="">Selecione</option><option>Mais ciclovias</option><option>Melhor transporte publico</option><option>Seguranca no trajeto</option><option>Carona compartilhada</option><option>Informacao e incentivo</option></select></label><button class="secondary-button" type="submit">Enviar diagnostico</button><p id="surveyStatus" class="form-status" aria-live="polite"></p></form>
+        <form id="contactForm" class="contact-form"><h2>Fale com a equipe</h2><label>Seu nome<input id="contactName" maxlength="60" required></label><label>E-mail<input id="contactEmail" type="email" required></label><label>Como podemos ajudar?<textarea id="contactMessage" rows="4" maxlength="500" required></textarea></label><label class="check-label"><input id="donate" type="checkbox"><span>Quero contribuir financeiramente com o projeto</span></label><button class="primary-button" type="submit">Enviar mensagem</button><p id="contactStatus" class="form-status" aria-live="polite"></p></form>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Guias do aplicativo"><button class="active" data-tab="home">Inicio</button><button data-tab="calculo">Calculo</button><button data-tab="ranking">Ranking</button><button data-tab="contato">Contato</button></nav>
+  <footer><img src="ecomove-logo.png" alt=""><span>EcoMove - Mobilidade que transforma cidades.</span><span>ODS 11 e ODS 13</span></footer>
+  </div>
+  <script src="capacitor.js"></script><script src="app.js"></script><script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('service-worker.js');</script>
+</body>
+</html>

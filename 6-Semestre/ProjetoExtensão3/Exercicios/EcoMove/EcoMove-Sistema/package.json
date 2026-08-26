@@ -1,0 +1,23 @@
+{
+  "name": "ecomove",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Aplicativo de incentivo a mobilidade sustentavel",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test",
+    "android:sync": "cap sync android",
+    "android:open": "cap open android",
+    "android:build": "cap sync android && cd android && gradlew.bat assembleDebug"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.2.1",
+    "@capacitor/core": "^6.2.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.2.1"
+  }
+}

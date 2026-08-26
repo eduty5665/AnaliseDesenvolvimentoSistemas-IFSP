@@ -1,0 +1,17 @@
+{
+  "name": "EcoMove - Mobilidade Sustentavel",
+  "short_name": "EcoMove",
+  "description": "Registre trajetos sustentaveis, acompanhe o CO2 evitado e cumpra suas metas.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f7f8f2",
+  "theme_color": "#0f5d4e",
+  "icons": [
+    {
+      "src": "ecomove-logo.png",
+      "sizes": "1254x1254",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

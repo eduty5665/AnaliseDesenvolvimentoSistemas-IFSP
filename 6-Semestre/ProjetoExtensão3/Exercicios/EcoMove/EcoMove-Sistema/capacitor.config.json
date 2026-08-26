@@ -1,0 +1,8 @@
+{
+  "appId": "br.edu.ifsp.ecomove",
+  "appName": "EcoMove",
+  "webDir": "public",
+  "server": {
+    "androidScheme": "https"
+  }
+}
