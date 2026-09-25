@@ -1,0 +1,5 @@
+Link 1: Regressão Linear Simples.
+https://colab.research.google.com/drive/1RF3uMILZVs4_vzTcq8ee25suUK7ppnaa?usp=sharing
+
+Link 2: Regressão Linear Múltipla.
+https://drive.google.com/file/d/1jPZwihT9m2blZ84LHGGdyqcviRvWjnKN/view?usp=sharing

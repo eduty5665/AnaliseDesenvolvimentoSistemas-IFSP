@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diagnóstico — SkillWay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  body { min-height: 100vh; }
+  .diag-top {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 44px; border-bottom: 1px solid var(--border);
+  }
+  .diag-wrap { max-width: 900px; margin: 0 auto; padding: 40px 24px 80px; }
+  .diag-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .diag-head .label { font-size: 14px; font-weight: 700; color: var(--text-muted); }
+  .diag-head .pct { font-size: 14px; font-weight: 800; color: var(--teal); }
+  .diag-progress { height: 6px; border-radius: 5px; background: rgba(255,255,255,0.07); overflow: hidden; margin-bottom: 26px; }
+  .diag-progress-fill { height: 100%; background: var(--grad-diag); border-radius: 5px; transition: width .35s ease; }
+
+  .step-tabs { display: flex; gap: 8px; margin-bottom: 30px; flex-wrap: wrap; }
+  .step-tab {
+    flex: 1; min-width: 130px; padding: 12px 14px; border-radius: 10px; text-align: center;
+    font-size: 12.5px; font-weight: 700; background: var(--surface); border: 1px solid var(--border);
+    color: var(--text-faint); cursor: pointer;
+  }
+  .step-tab.done { color: var(--green); border-color: rgba(52,211,153,0.3); }
+  .step-tab.active { color: #fff; border-color: var(--teal); background: rgba(34,211,238,0.08); }
+
+  .diag-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 44px; }
+  .step-panel { display: none; flex-direction: column; gap: 24px; }
+  .step-panel.active { display: flex; }
+  .q-eyebrow { font-size: 12px; font-weight: 800; color: var(--purple); text-transform: uppercase; letter-spacing: 0.4px; }
+  .q-title { font-size: 24px; font-weight: 800; color: #fff; }
+  .q-sub { font-size: 14px; color: var(--text-muted); margin-top: -10px; }
+
+  .choice-grid { display: flex; flex-direction: column; gap: 12px; }
+  .choice-card {
+    display: flex; align-items: center; gap: 14px; padding: 18px 20px; border-radius: 12px;
+    border: 1.5px solid var(--border-strong); background: var(--surface-2); cursor: pointer;
+  }
+  .choice-card:hover { border-color: rgba(34,211,238,0.4); }
+  .choice-card.selected { border-color: var(--teal); background: rgba(34,211,238,0.07); }
+  .choice-radio { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--text-faint); flex-shrink: 0; position: relative; }
+  .choice-card.selected .choice-radio { border-color: var(--teal); }
+  .choice-card.selected .choice-radio::after { content:''; position:absolute; inset:3px; border-radius:50%; background:var(--teal); }
+  .choice-card b { font-size: 14.5px; color: #fff; display: block; }
+  .choice-card span { font-size: 12.5px; color: var(--text-faint); }
+
+  .skill-q { margin-bottom: 6px; }
+  .skill-q h4 { font-size: 15px; font-weight: 700; color: #fff; margin: 0 0 12px 0; }
+  .scale-row { display: flex; align-items: center; gap: 10px; }
+  .scale-endpoint { font-size: 11.5px; color: var(--text-faint); width: 62px; flex-shrink: 0; }
+  .scale-endpoint.right { text-align: right; }
+  .scale-options { display: flex; gap: 8px; flex: 1; }
+  .scale-opt {
+    flex: 1; height: 42px; border-radius: 9px; border: 1.5px solid var(--border-strong);
+    background: var(--surface-2); color: var(--text-muted); font-weight: 700; font-size: 14px;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+  .scale-opt.selected { background: var(--grad-diag); color: #05070F; border-color: transparent; }
+
+  .diag-actions { display: flex; justify-content: space-between; margin-top: 34px; }
+
+  .summary-row { display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+  .summary-row:last-child { border-bottom: none; }
+  .summary-row .k { color: var(--text-muted); }
+  .summary-row .v { color: #fff; font-weight: 700; text-align: right; }
+
+  .done-screen { display: none; flex-direction: column; align-items: center; text-align: center; gap: 18px; padding: 30px 10px; }
+  .done-icon { width: 74px; height: 74px; border-radius: 50%; background: var(--green-bg); display: flex; align-items: center; justify-content: center; }
+
+  @media (max-width: 700px) {
+    .diag-top { padding: 16px 20px; }
+    .diag-card { padding: 26px 20px; }
+    .scale-endpoint { display: none; }
+    .step-tabs { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="diag-top">
+  <div class="brand" style="font-size:17px;">
+    <svg viewBox="0 0 24 24" fill="none" class="brand-mark" style="width:24px;height:24px;"><path d="M3 17l5-6 4 4 8-9" stroke="url(#g1)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 2h6v6" stroke="url(#g1)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="g1" x1="3" y1="2" x2="21" y2="17"><stop stop-color="#22D3EE"/><stop offset="1" stop-color="#A855F7"/></linearGradient></defs></svg>
+    Skill<span class="way">Way</span>
+  </div>
+  <div style="display:flex; align-items:center; gap:16px;">
+    <span style="font-size:13.5px; color:var(--text-muted);">Olá, <b id="topUserName" style="color:#fff;">Marina Souza</b></span>
+    <a href="dashboard.html" class="btn btn-ghost btn-sm">Salvar e Sair</a>
+  </div>
+</div>
+
+<div class="diag-wrap">
+  <div class="diag-head">
+    <span class="label">Diagnóstico de Capacitação · Etapa <span id="stepNum">1</span> de 5</span>
+    <span class="pct" id="stepPct">0% concluído</span>
+  </div>
+  <div class="diag-progress"><div class="diag-progress-fill" id="progressFill" style="width:0%"></div></div>
+
+  <div class="step-tabs" id="stepTabs">
+    <div class="step-tab active" data-step="1">1. Área Atual</div>
+    <div class="step-tab" data-step="2">2. Objetivo</div>
+    <div class="step-tab" data-step="3">3. Autoavaliação</div>
+    <div class="step-tab" data-step="4">4. Disponibilidade</div>
+    <div class="step-tab" data-step="5">5. Fechamento</div>
+  </div>
+
+  <div class="diag-card">
+    <!-- STEP 1 -->
+    <div class="step-panel active" data-panel="1">
+      <div>
+        <div class="q-eyebrow">Sobre você</div>
+        <div class="q-title">Qual é a sua área de atuação atual?</div>
+        <p class="q-sub">Isso ajuda a IA a comparar seu perfil com o que o mercado espera do seu cargo.</p>
+      </div>
+      <div class="field" style="margin-bottom:0;">
+        <label for="areaInput">Área / cargo atual</label>
+        <input class="input" id="areaInput" placeholder="Ex.: Atendimento, Logística, TI, Vendas...">
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step-panel" data-panel="2">
+      <div>
+        <div class="q-eyebrow">Objetivo</div>
+        <div class="q-title">Você quer evoluir na sua área atual ou migrar para outra?</div>
+      </div>
+      <div class="choice-grid" id="objetivoChoices">
+        <div class="choice-card" data-value="upskilling"><div class="choice-radio"></div><div><b>Evoluir na área atual (Upskilling)</b><span>Aprofundar competências no que você já faz</span></div></div>
+        <div class="choice-card" data-value="reskilling"><div class="choice-radio"></div><div><b>Migrar de área (Reskilling)</b><span>Construir competências para uma nova área</span></div></div>
+        <div class="choice-card" data-value="indeciso"><div class="choice-radio"></div><div><b>Ainda não sei</b><span>Quero explorar as opções primeiro</span></div></div>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step-panel" data-panel="3">
+      <div>
+        <div class="q-eyebrow">Autoavaliação de competências</div>
+        <div class="q-title">Como você avalia seu nível atual nas competências abaixo?</div>
+        <p class="q-sub">1 = iniciante · 5 = avançado. Seja honesto: isso ajuda a IA a montar sua trilha ideal.</p>
+      </div>
+      <div id="skillQuestions"></div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="step-panel" data-panel="4">
+      <div>
+        <div class="q-eyebrow">Disponibilidade</div>
+        <div class="q-title">Quanto tempo por semana você pode dedicar a estudar?</div>
+      </div>
+      <div class="choice-grid" id="tempoChoices">
+        <div class="choice-card" data-value="2h"><div class="choice-radio"></div><b>Até 2 horas por semana</b></div>
+        <div class="choice-card" data-value="3-5h"><div class="choice-radio"></div><b>3 a 5 horas por semana</b></div>
+        <div class="choice-card" data-value="5h+"><div class="choice-radio"></div><b>Mais de 5 horas por semana</b></div>
+      </div>
+      <div>
+        <div class="q-title" style="font-size:18px; margin-top:10px;">Qual seu orçamento mensal para capacitação?</div>
+      </div>
+      <div class="choice-grid" id="orcamentoChoices">
+        <div class="choice-card" data-value="gratuito"><div class="choice-radio"></div><b>Somente conteúdo gratuito</b></div>
+        <div class="choice-card" data-value="ate100"><div class="choice-radio"></div><b>Até R$100</b></div>
+        <div class="choice-card" data-value="acima100"><div class="choice-radio"></div><b>Acima de R$100</b></div>
+      </div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="step-panel" data-panel="5">
+      <div id="summaryScreen">
+        <div class="q-eyebrow">Quase lá</div>
+        <div class="q-title" style="margin-bottom:20px;">Confira suas respostas</div>
+        <div id="summaryList"></div>
+      </div>
+      <div class="done-screen" id="doneScreen">
+        <div class="done-icon">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="#34D399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="q-title">Diagnóstico concluído!</div>
+        <p style="color:var(--text-muted); max-width:420px;">Sua trilha personalizada já foi atualizada no seu painel, com base nas respostas que você acabou de dar.</p>
+        <a href="dashboard.html" class="btn btn-primary">Ver meu painel atualizado →</a>
+      </div>
+    </div>
+
+    <div class="diag-actions" id="diagActions">
+      <button class="btn btn-ghost" id="btnBack">← Voltar</button>
+      <button class="btn btn-primary" id="btnNext">Continuar →</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  const user = SkillWay.requireAuth();
+  if (user) document.getElementById('topUserName').textContent = user.name;
+
+  const TOTAL_STEPS = 5;
+  let currentStep = 1;
+  let maxReached = 1;
+
+  const state = {
+    area: '',
+    objetivo: null,
+    competencias: { excel: 0, comunicacao: 0, gestao: 0, ingles: 0 },
+    tempo: null,
+    orcamento: null
+  };
+
+  const skillDefs = [
+    { key: 'excel', label: 'Excel / Ferramentas de Dados' },
+    { key: 'comunicacao', label: 'Comunicação com o Cliente' },
+    { key: 'gestao', label: 'Gestão de Projetos' },
+    { key: 'ingles', label: 'Inglês' }
+  ];
+
+  // build step 3 skill questions
+  const skillWrap = document.getElementById('skillQuestions');
+  skillDefs.forEach(function (s) {
+    const div = document.createElement('div');
+    div.className = 'skill-q';
+    div.style.marginBottom = '22px';
+    div.innerHTML = '<h4>' + s.label + '</h4>' +
+      '<div class="scale-row">' +
+        '<span class="scale-endpoint">Iniciante</span>' +
+        '<div class="scale-options" data-skill="' + s.key + '">' +
+          [1,2,3,4,5].map(function(n){ return '<div class="scale-opt" data-val="'+n+'">'+n+'</div>'; }).join('') +
+        '</div>' +
+        '<span class="scale-endpoint right">Avançado</span>' +
+      '</div>';
+    skillWrap.appendChild(div);
+  });
+  skillWrap.querySelectorAll('.scale-options').forEach(function (group) {
+    group.addEventListener('click', function (e) {
+      const opt = e.target.closest('.scale-opt');
+      if (!opt) return;
+      const key = group.getAttribute('data-skill');
+      state.competencias[key] = parseInt(opt.getAttribute('data-val'), 10);
+      group.querySelectorAll('.scale-opt').forEach(function (o) { o.classList.remove('selected'); });
+      opt.classList.add('selected');
+    });
+  });
+
+  // choice cards (objetivo, tempo, orcamento)
+  function wireChoices(containerId, stateKey) {
+    const container = document.getElementById(containerId);
+    container.querySelectorAll('.choice-card').forEach(function (card) {
+      card.addEventListener('click', function () {
+        state[stateKey] = card.getAttribute('data-value');
+        container.querySelectorAll('.choice-card').forEach(function (c) { c.classList.remove('selected'); });
+        card.classList.add('selected');
+      });
+    });
+  }
+  wireChoices('objetivoChoices', 'objetivo');
+  wireChoices('tempoChoices', 'tempo');
+  wireChoices('orcamentoChoices', 'orcamento');
+
+  document.getElementById('areaInput').addEventListener('input', function (e) {
+    state.area = e.target.value;
+  });
+
+  function validateStep(step) {
+    if (step === 1) return state.area.trim().length > 0;
+    if (step === 2) return !!state.objetivo;
+    if (step === 3) return Object.values(state.competencias).every(function (v) { return v > 0; });
+    if (step === 4) return !!state.tempo && !!state.orcamento;
+    return true;
+  }
+
+  function labelFor(map, val) { return map[val] || val; }
+
+  function renderSummary() {
+    const objetivoLabels = { upskilling: 'Evoluir na área atual', reskilling: 'Migrar de área', indeciso: 'Ainda não sei' };
+    const tempoLabels = { '2h': 'Até 2h/semana', '3-5h': '3 a 5h/semana', '5h+': 'Mais de 5h/semana' };
+    const orcLabels = { gratuito: 'Somente gratuito', ate100: 'Até R$100', acima100: 'Acima de R$100' };
+    const rows = [
+      ['Área atual', state.area || '—'],
+      ['Objetivo', labelFor(objetivoLabels, state.objetivo)],
+      ['Excel / Dados', 'Nível ' + state.competencias.excel + '/5'],
+      ['Comunicação', 'Nível ' + state.competencias.comunicacao + '/5'],
+      ['Gestão de Projetos', 'Nível ' + state.competencias.gestao + '/5'],
+      ['Inglês', 'Nível ' + state.competencias.ingles + '/5'],
+      ['Disponibilidade', labelFor(tempoLabels, state.tempo)],
+      ['Orçamento', labelFor(orcLabels, state.orcamento)]
+    ];
+    document.getElementById('summaryList').innerHTML = rows.map(function (r) {
+      return '<div class="summary-row"><span class="k">' + r[0] + '</span><span class="v">' + r[1] + '</span></div>';
+    }).join('');
+  }
+
+  function goToStep(step) {
+    currentStep = step;
+    document.querySelectorAll('.step-panel').forEach(function (p) {
+      p.classList.toggle('active', parseInt(p.getAttribute('data-panel'), 10) === step);
+    });
+    document.querySelectorAll('.step-tab').forEach(function (t) {
+      const n = parseInt(t.getAttribute('data-step'), 10);
+      t.classList.toggle('active', n === step);
+      t.classList.toggle('done', n < step || n <= maxReached && n < currentStep);
+    });
+    document.getElementById('stepNum').textContent = step;
+    document.getElementById('stepPct').textContent = Math.round((step - 1) / TOTAL_STEPS * 100) + '% concluído';
+    document.getElementById('progressFill').style.width = ((step - 1) / TOTAL_STEPS * 100) + '%';
+    document.getElementById('btnBack').style.visibility = step === 1 ? 'hidden' : 'visible';
+    document.getElementById('btnNext').textContent = step === TOTAL_STEPS ? 'Concluir Diagnóstico ✓' : 'Continuar →';
+    if (step === TOTAL_STEPS) renderSummary();
+  }
+
+  document.getElementById('btnNext').addEventListener('click', function () {
+    if (!validateStep(currentStep)) {
+      SkillWay.toast('Preencha esta etapa antes de continuar.', 'error');
+      return;
+    }
+    if (currentStep === TOTAL_STEPS) {
+      // finish
+      SkillWay.setDiagnostico(state);
+      document.getElementById('summaryScreen').style.display = 'none';
+      document.getElementById('doneScreen').style.display = 'flex';
+      document.getElementById('diagActions').style.display = 'none';
+      document.getElementById('stepTabs').style.display = 'none';
+      document.getElementById('progressFill').style.width = '100%';
+      document.getElementById('stepPct').textContent = '100% concluído';
+      SkillWay.toast('Diagnóstico salvo com sucesso!', 'success');
+      return;
+    }
+    maxReached = Math.max(maxReached, currentStep + 1);
+    goToStep(currentStep + 1);
+  });
+
+  document.getElementById('btnBack').addEventListener('click', function () {
+    if (currentStep > 1) goToStep(currentStep - 1);
+  });
+
+  document.getElementById('stepTabs').addEventListener('click', function (e) {
+    const tab = e.target.closest('.step-tab');
+    if (!tab) return;
+    const n = parseInt(tab.getAttribute('data-step'), 10);
+    if (n <= maxReached) goToStep(n);
+  });
+
+  goToStep(1);
+</script>
+</body>
+</html>

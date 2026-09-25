@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Entrar — SkillWay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  body { min-height: 100vh; }
+  .split { display: flex; min-height: 100vh; }
+  .left {
+    flex: 1; padding: 64px; display: flex; flex-direction: column; justify-content: center; gap: 34px;
+    background:
+      radial-gradient(circle at 15% 15%, rgba(168,85,247,0.12) 0%, transparent 45%),
+      radial-gradient(circle at 85% 85%, rgba(34,211,238,0.1) 0%, transparent 45%),
+      var(--bg);
+    position: relative;
+  }
+  .left h1 { font-size: 46px; font-weight: 800; line-height: 1.2; color: #fff; max-width: 560px; }
+  .left h1 .grad { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .left p.lead { font-size: 16px; color: var(--text-muted); max-width: 480px; line-height: 1.6; }
+  .feature-row { display: flex; gap: 16px; max-width: 620px; }
+  .feature-card { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; }
+  .feature-card .tag { font-size: 11px; font-weight: 800; letter-spacing: 0.4px; color: var(--teal); text-transform: uppercase; margin-bottom: 8px; }
+  .feature-card p { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin: 0; }
+  .feature-full { max-width: 620px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; }
+  .feature-full .tag { font-size: 11px; font-weight: 800; letter-spacing: 0.4px; color: var(--purple); text-transform: uppercase; margin-bottom: 8px; }
+  .feature-full p { font-size: 13px; color: var(--text-muted); margin: 0; }
+  .mini-stats { display: flex; gap: 36px; }
+  .mini-stats .s b { font-size: 26px; font-weight: 800; color: #fff; display: block; }
+  .mini-stats .s span { font-size: 12px; color: var(--text-faint); }
+
+  .right { width: 480px; flex-shrink: 0; background: var(--bg-2); border-left: 1px solid var(--border); padding: 64px 48px; display: flex; flex-direction: column; justify-content: center; }
+  .right .eyebrow { font-size: 12px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; color: var(--teal); margin-bottom: 8px; }
+  .right h2 { font-size: 26px; font-weight: 800; color: #fff; margin: 0 0 8px 0; }
+  .right .sub { font-size: 13.5px; color: var(--text-muted); margin-bottom: 30px; }
+  .divider { display: flex; align-items: center; gap: 12px; margin: 24px 0; font-size: 12px; color: var(--text-faint); }
+  .divider .line { flex: 1; height: 1px; background: var(--border-strong); }
+  .sso-row { display: flex; gap: 12px; }
+  .sso-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; }
+  .row-between { display: flex; justify-content: space-between; align-items: center; margin: 4px 0 22px 0; }
+  .link-teal { color: var(--teal); font-size: 13px; font-weight: 700; }
+  .footnote { text-align: center; font-size: 13px; color: var(--text-muted); margin-top: 26px; }
+
+  @media (max-width: 980px) {
+    .split { flex-direction: column; }
+    .left { padding: 48px 28px; }
+    .left h1 { font-size: 34px; }
+    .feature-row { flex-direction: column; }
+    .right { width: 100%; padding: 44px 28px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="split">
+  <div class="left">
+    <div class="brand" style="font-size:22px;">
+      <svg viewBox="0 0 24 24" fill="none" class="brand-mark"><path d="M3 17l5-6 4 4 8-9" stroke="url(#g1)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 2h6v6" stroke="url(#g1)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="g1" x1="3" y1="2" x2="21" y2="17"><stop stop-color="#22D3EE"/><stop offset="1" stop-color="#A855F7"/></linearGradient></defs></svg>
+      Skill<span class="way">Way</span>
+    </div>
+    <h1>As habilidades que <span class="grad">abrem caminhos.</span></h1>
+    <p class="lead">A plataforma B2B que conecta o perfil de cada colaborador ao caminho de capacitação certo — guiado pela hierarquia da sua empresa e impulsionado por inteligência artificial.</p>
+    <div class="feature-row">
+      <div class="feature-card"><div class="tag">01 · Diagnóstico</div><p>Identifique gaps de competência com avaliações personalizadas.</p></div>
+      <div class="feature-card"><div class="tag">02 · Curadoria</div><p>Trilhas com recomendações inteligentes de cursos externos e internos.</p></div>
+    </div>
+    <div class="feature-full"><div class="tag">03 · Evolução contínua</div><p>Progresso acompanhado diretamente por gestores e RH com dashboards consolidados.</p></div>
+    <div class="mini-stats">
+      <div class="s"><b>+85%</b><span>Engajamento ativo</span></div>
+      <div class="s"><b>96%</b><span>Satisfação no onboarding</span></div>
+      <div class="s"><b>-23%</b><span>Turnover médio</span></div>
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="eyebrow">Bem-vindo de volta</div>
+    <h2>Entrar na sua conta</h2>
+    <p class="sub">Acesse com o e-mail corporativo cadastrado pela sua empresa.</p>
+
+    <form id="loginForm" novalidate>
+      <div class="field" id="fieldEmail">
+        <label for="email">E-mail corporativo</label>
+        <input class="input" type="email" id="email" placeholder="marina.souza@grupoatlantico.com.br" value="marina.souza@grupoatlantico.com.br" autocomplete="username">
+        <div class="field-error">Digite um e-mail corporativo válido.</div>
+      </div>
+      <div class="field" id="fieldSenha">
+        <label for="senha">Senha</label>
+        <div class="input-wrap">
+          <input class="input" type="password" id="senha" placeholder="••••••••" value="skillway123" autocomplete="current-password">
+          <button type="button" class="input-icon-btn" id="togglePw" aria-label="Mostrar senha">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.7"/></svg>
+          </button>
+        </div>
+        <div class="field-error">Digite sua senha.</div>
+      </div>
+      <div class="row-between">
+        <label class="checkbox-row"><input type="checkbox" checked> Lembrar de mim</label>
+        <a href="#" class="link-teal" id="forgotLink">Esqueci minha senha</a>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block" id="submitBtn">Entrar</button>
+    </form>
+
+    <div class="divider"><div class="line"></div>ou continue com<div class="line"></div></div>
+    <div class="sso-row">
+      <button class="btn btn-ghost sso-btn" id="ssoGoogle">Google Workspace</button>
+      <button class="btn btn-ghost sso-btn" id="ssoMs">Microsoft SSO</button>
+    </div>
+
+    <p class="footnote">Não tem uma conta? Fale com o <a href="#" class="link-teal">RH da sua empresa</a></p>
+    <p class="footnote" style="opacity:.6; font-size:11.5px;">Demonstração: qualquer e-mail/senha preenchidos funcionam para entrar.</p>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  // If already logged in, skip straight to dashboard
+  if (SkillWay.getUser()) {
+    window.location.href = 'dashboard.html';
+  }
+
+  const form = document.getElementById('loginForm');
+  const emailEl = document.getElementById('email');
+  const senhaEl = document.getElementById('senha');
+  const fieldEmail = document.getElementById('fieldEmail');
+  const fieldSenha = document.getElementById('fieldSenha');
+  const submitBtn = document.getElementById('submitBtn');
+
+  function validEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    let ok = true;
+    fieldEmail.classList.remove('has-error');
+    fieldSenha.classList.remove('has-error');
+
+    if (!validEmail(emailEl.value.trim())) { fieldEmail.classList.add('has-error'); ok = false; }
+    if (!senhaEl.value.trim()) { fieldSenha.classList.add('has-error'); ok = false; }
+    if (!ok) return;
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Entrando…';
+
+    // Derive a display name from the e-mail (demo auth — any credentials work)
+    const local = emailEl.value.split('@')[0];
+    const name = local.split(/[.\-_]/).filter(Boolean)
+      .map(p => p.charAt(0).toUpperCase() + p.slice(1))
+      .join(' ') || 'Colaborador';
+
+    const isAdmin = emailEl.value.toLowerCase().includes('admin') || emailEl.value.toLowerCase().includes('rh');
+
+    setTimeout(function () {
+      SkillWay.setUser({
+        name: isAdmin ? 'Administrador' : name,
+        email: emailEl.value.trim(),
+        role: isAdmin ? 'Administrador' : 'Dev Front-end Jr.',
+        company: 'Grupo Atlântico Varejo',
+        isAdmin: isAdmin
+      });
+      window.location.href = isAdmin ? 'painel-admin.html' : 'dashboard.html';
+    }, 500);
+  });
+
+  document.getElementById('togglePw').addEventListener('click', function () {
+    senhaEl.type = senhaEl.type === 'password' ? 'text' : 'password';
+  });
+
+  document.getElementById('forgotLink').addEventListener('click', function (e) {
+    e.preventDefault();
+    SkillWay.toast('Em uma empresa real, isso enviaria um e-mail de redefinição de senha.');
+  });
+  ['ssoGoogle', 'ssoMs'].forEach(function (id) {
+    document.getElementById(id).addEventListener('click', function () {
+      SkillWay.toast('SSO é apenas ilustrativo nesta demonstração — use o formulário de e-mail.');
+    });
+  });
+</script>
+</body>
+</html>

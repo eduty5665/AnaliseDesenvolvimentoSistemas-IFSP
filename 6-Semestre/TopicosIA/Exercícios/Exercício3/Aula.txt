@@ -1,0 +1,14 @@
+Link 1: Código do Treinamento, teste e gravar o modelo.
+https://colab.research.google.com/drive/1eV0ksPDpvsbJA7OsWhp5zRRpBbn2S5sl?usp=sharing
+
+Link 2: Dataset: Clique no link abaixo para fazer o download do Dataset.
+https://drive.google.com/uc?export=download&id=1gHg9WDXTZwqhpxQqRUQh15Yl5CklmHJ6
+
+Link 3: Código para fazer o Delpoy
+https://colab.research.google.com/drive/1xWNF9fdoVupLyzVrPdDciAuQBiTOJv2a?usp=sharing
+
+Link 4: Estrutura do Projeto no Visual Code:
+https://drive.google.com/drive/folders/1SB07zsntt6u6d8GTqDZNdGd89imT_enr?usp=sharing
+
+Link 5: Deploy da Aplicação no Streamlit Cloud
+https://app-logistic-regression-aula-m7tiewkjsjrvvmrxbcuke5.streamlit.app/

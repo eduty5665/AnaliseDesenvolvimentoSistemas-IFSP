@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diagnóstico Individual — SkillWay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  .radar-wrap { display: flex; align-items: center; justify-content: center; padding: 10px 0; }
+  .radar-legend { display: flex; gap: 20px; justify-content: center; margin-top: 6px; }
+  .radar-legend .li { display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--text-muted); }
+  .radar-legend .dot { width: 9px; height: 9px; border-radius: 50%; }
+
+  .comp-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 14px 0; border-bottom: 1px solid var(--border); gap: 14px; }
+  .comp-row:last-child { border-bottom: none; }
+  .comp-row h4 { font-size: 14.5px; font-weight: 700; margin: 0 0 4px 0; color: #fff; }
+  .comp-row p { font-size: 12.5px; color: var(--text-faint); margin: 0; }
+
+  @media print {
+    .sidebar, .burger-btn, .no-print { display: none !important; }
+    .main { margin-left: 0 !important; }
+    body { background: #fff; color: #111; }
+    .card { background: #fff; border: 1px solid #ddd; }
+    .main-head h1, .comp-row h4, .rec-body h4 { color: #111; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none" class="brand-mark"><path d="M3 17l5-6 4 4 8-9" stroke="url(#g1)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 2h6v6" stroke="url(#g1)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="g1" x1="3" y1="2" x2="21" y2="17"><stop stop-color="#22D3EE"/><stop offset="1" stop-color="#A855F7"/></linearGradient></defs></svg>
+      Skill<span class="way">Way</span>
+    </div>
+    <div class="sidebar-scroll">
+      <div class="nav-section">
+        <a class="nav-link" href="painel-admin.html">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          Visão Geral
+        </a>
+        <a class="nav-link" href="painel-admin.html#equipe">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke="currentColor" stroke-width="1.7"/><circle cx="17" cy="9" r="2.4" stroke="currentColor" stroke-width="1.6"/><path d="M3 20c.6-3.2 3-5.2 6-5.2s5.4 2 6 5.2M15 20c.4-2 1.8-3.5 4-3.5s3.6 1.5 4 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          Minha Equipe
+        </a>
+        <a class="nav-link active" href="#">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Relatórios
+        </a>
+        <a class="nav-link" href="painel-admin.html#sugestoes">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M9.5 9.5a2.5 2.5 0 015 .7c0 1.6-2.2 1.8-2.5 3.3M12 17h.01" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          Sugestões &amp; Quizzes
+        </a>
+        <a class="nav-link" href="painel-admin.html#benchmarks">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 3l2.2 4.9 5.3.6-4 3.6 1.1 5.2-4.6-2.7-4.6 2.7 1.1-5.2-4-3.6 5.3-.6z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+          Benchmarks
+        </a>
+      </div>
+    </div>
+    <div class="nav-section" style="margin-bottom:8px;">
+      <a class="nav-link" href="#" id="logoutBtnSide">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 13.5a1.7 1.7 0 000-3l1.1-1.6-1.8-1.8-1.7 1.1a1.7 1.7 0 00-3 0l-.2-2H10.2l-.2 2a1.7 1.7 0 00-3 0L5.3 7.1 3.5 8.9l1.1 1.6a1.7 1.7 0 000 3L3.5 15.1l1.8 1.8 1.7-1.1a1.7 1.7 0 003 0l.2 2h3.6l.2-2a1.7 1.7 0 003 0l1.7 1.1 1.8-1.8-1.1-1.6z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+        Configurações
+      </a>
+    </div>
+    <div class="sidebar-bottom" id="logoutBtn" title="Clique para sair">
+      <div class="avatar" id="sbUserAvatar" style="background:linear-gradient(135deg,#A855F7,#22D3EE);">AT</div>
+      <div>
+        <div class="name" id="sbUserName">Administrador</div>
+        <div class="role" id="sbUserRole">Grupo Atlântico Varejo</div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="main-head">
+      <div style="display:flex; align-items:center; gap:14px;">
+        <button class="burger-btn no-print" id="burgerBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h16" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <div>
+          <h1 id="profileName">Marina Souza — Diagnóstico Individual</h1>
+          <p id="profileSub">Analista de Atendimento · Loja 04 · Contratação há 6 meses</p>
+        </div>
+      </div>
+      <div class="top-actions no-print" style="display:flex; gap:10px;">
+        <a href="painel-admin.html" class="btn btn-ghost">← Voltar à Equipe</a>
+        <button class="btn btn-primary" id="exportPdfBtn">Exportar PDF</button>
+      </div>
+    </div>
+
+    <div class="grid grid-2" style="align-items:start; margin-bottom:20px;">
+      <div class="card">
+        <div class="card-title"><h3>Mapeamento de Soft &amp; Hard Skills</h3></div>
+        <div class="radar-wrap"><svg id="radarSvg" width="320" height="320" viewBox="0 0 320 320"></svg></div>
+        <div class="radar-legend">
+          <div class="li"><span class="dot" style="background:#22D3EE;"></span> Comunicação</div>
+          <div class="li"><span class="dot" style="background:#A855F7;"></span> Gestão / Dados</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><h3>Status das Competências Mapeadas</h3></div>
+        <div class="comp-row">
+          <div><h4>Excel / Dados</h4><p>Meta do cargo: Nível 3 (Atualmente Nível 1)</p></div>
+          <span class="badge red">Crítico</span>
+        </div>
+        <div class="comp-row">
+          <div><h4>Comunicação Assertiva</h4><p>Meta do cargo: Nível 4 (Atualmente Nível 4)</p></div>
+          <span class="badge green">OK</span>
+        </div>
+        <div class="comp-row">
+          <div><h4>Gestão de Tempo</h4><p>Meta do cargo: Nível 3 (Atualmente Nível 2)</p></div>
+          <span class="badge yellow">Atenção</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><h3 id="trilhasTitle">Trilhas Recomendadas pela IA para Marina</h3></div>
+      <div class="grid grid-3">
+        <div class="rec-card">
+          <div class="rec-thumb" style="background:linear-gradient(135deg,#0EA5B7,#0B4A57); height:110px;">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="14" rx="2" stroke="#fff" stroke-width="1.6"/><path d="M8 20h8" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </div>
+          <div class="rec-body"><h4>UI Design para Devs</h4><p style="font-size:12px; color:var(--text-muted); margin:4px 0 8px;">Focado em prototipação e boas práticas visuais rápidas.</p><span style="color:var(--teal); font-weight:700;">6 horas · Alura</span></div>
+        </div>
+        <div class="rec-card">
+          <div class="rec-thumb" style="background:linear-gradient(135deg,#3B5BDB,#1B2A6B); height:110px;">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M8 10h.01M12 10h.01M16 10h.01M4 4h16v12H8l-4 4V4z" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="rec-body"><h4>Inglês para Atendimento</h4><p style="font-size:12px; color:var(--text-muted); margin:4px 0 8px;">Vocabulário prático de suporte e comunicação global.</p><span style="color:var(--purple); font-weight:700;">4 horas · Coursera</span></div>
+        </div>
+        <div class="rec-card">
+          <div class="rec-thumb" style="background:linear-gradient(135deg,#1F8A5C,#0B3D28); height:110px;">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M4 19l4-9 4 5 3-4 5 8" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="rec-body"><h4>Excel Básico ao Avançado</h4><p style="font-size:12px; color:var(--text-muted); margin:4px 0 8px;">Fórmulas e tabelas dinâmicas para gestão operacional diária.</p><span style="color:var(--green); font-weight:700;">12 horas · Udemy</span></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  const user = SkillWay.requireAuth();
+  if (user) {
+    if (!user.isAdmin) { window.location.href = 'dashboard.html'; }
+    SkillWay.renderUserBlock(user, user.company);
+    document.getElementById('logoutBtnSide').addEventListener('click', function(e){ e.preventDefault(); SkillWay.logout(); });
+  }
+
+  // Personalize from query string (set by painel-admin.html row click)
+  const params = new URLSearchParams(window.location.search);
+  const nome = params.get('nome') || 'Marina Souza';
+  const cargo = params.get('cargo') || 'Atendimento';
+  document.getElementById('profileName').textContent = nome + ' — Diagnóstico Individual';
+  document.getElementById('profileSub').textContent = 'Analista de ' + cargo + ' · Loja 04 · Contratação há 6 meses';
+  document.getElementById('trilhasTitle').textContent = 'Trilhas Recomendadas pela IA para ' + nome.split(' ')[0];
+
+  document.getElementById('exportPdfBtn').addEventListener('click', function () {
+    window.print();
+  });
+
+  // ---------- Functional SVG radar chart ----------
+  function drawRadar(svgId, axes, seriesA, seriesB, colorA, colorB) {
+    const svg = document.getElementById(svgId);
+    const size = 320, cx = size / 2, cy = size / 2, R = 105;
+    const n = axes.length;
+    const ns = 'http://www.w3.org/2000/svg';
+
+    function pointFor(i, value) {
+      const angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+      const r = (value / 100) * R;
+      return [cx + r * Math.cos(angle), cy + r * Math.sin(angle)];
+    }
+
+    // grid rings
+    [0.25, 0.5, 0.75, 1].forEach(function (frac) {
+      const pts = axes.map(function (_, i) { return pointFor(i, frac * 100).join(','); }).join(' ');
+      const poly = document.createElementNS(ns, 'polygon');
+      poly.setAttribute('points', pts);
+      poly.setAttribute('fill', 'none');
+      poly.setAttribute('stroke', 'rgba(255,255,255,0.08)');
+      svg.appendChild(poly);
+    });
+
+    // axis lines + labels
+    axes.forEach(function (label, i) {
+      const [x, y] = pointFor(i, 100);
+      const line = document.createElementNS(ns, 'line');
+      line.setAttribute('x1', cx); line.setAttribute('y1', cy);
+      line.setAttribute('x2', x); line.setAttribute('y2', y);
+      line.setAttribute('stroke', 'rgba(255,255,255,0.1)');
+      svg.appendChild(line);
+
+      const [lx, ly] = pointFor(i, 122);
+      const text = document.createElementNS(ns, 'text');
+      text.setAttribute('x', lx); text.setAttribute('y', ly);
+      text.setAttribute('fill', '#8890A6'); text.setAttribute('font-size', '10.5');
+      text.setAttribute('text-anchor', 'middle'); text.setAttribute('dominant-baseline', 'middle');
+      text.textContent = label;
+      svg.appendChild(text);
+    });
+
+    function drawSeries(values, color) {
+      const pts = values.map(function (v, i) { return pointFor(i, v).join(','); }).join(' ');
+      const poly = document.createElementNS(ns, 'polygon');
+      poly.setAttribute('points', pts);
+      poly.setAttribute('fill', color); poly.setAttribute('fill-opacity', '0.18');
+      poly.setAttribute('stroke', color); poly.setAttribute('stroke-width', '2');
+      svg.appendChild(poly);
+      values.forEach(function (v, i) {
+        const [x, y] = pointFor(i, v);
+        const dot = document.createElementNS(ns, 'circle');
+        dot.setAttribute('cx', x); dot.setAttribute('cy', y); dot.setAttribute('r', '3.5');
+        dot.setAttribute('fill', color);
+        svg.appendChild(dot);
+      });
+    }
+    drawSeries(seriesA, colorA);
+    drawSeries(seriesB, colorB);
+  }
+
+  // Use the person's diagnostic data if it's the logged-in employee's own record; otherwise sample data
+  const diag = SkillWay.getDiagnostico();
+  let seriesComunicacao = [70, 55, 80, 65, 60];
+  let seriesGestao = [30, 75, 40, 50, 35];
+  if (diag && diag.competencias) {
+    seriesComunicacao = [diag.competencias.comunicacao * 20, 55, diag.competencias.ingles * 20, 65, 60];
+    seriesGestao = [diag.competencias.excel * 20, 75, diag.competencias.gestao * 20, 50, 35];
+  }
+  drawRadar('radarSvg', ['Comunicação', 'Gestão de Tempo', 'Excel / Dados', 'Trabalho em Equipe', 'Proatividade'], seriesComunicacao, seriesGestao, '#22D3EE', '#A855F7');
+</script>
+</body>
+</html>
