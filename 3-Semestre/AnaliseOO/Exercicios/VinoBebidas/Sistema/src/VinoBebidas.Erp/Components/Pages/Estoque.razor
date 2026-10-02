@@ -1,0 +1,104 @@
+@page "/estoque"
+@inject ApiClient Api
+@inject Avisos Avisos
+
+<div class="cabecalho-pagina">
+    <h1>Saldos de estoque</h1>
+</div>
+
+<div class="filtros cartao">
+    <select @bind="depositoId">
+        <option value="">Todos os depósitos</option>
+        @foreach (var d in depositos) { <option value="@d.Id">@d.Nome</option> }
+    </select>
+    <input class="largo" placeholder="Produto, SKU ou código de barras" @bind="busca" @onkeydown="@(e => e.Key == "Enter" ? Carregar() : Task.CompletedTask)" />
+    <label class="check"><input type="checkbox" @bind="abaixoMinimo" /> Somente abaixo do mínimo</label>
+    <label class="check"><input type="checkbox" @bind="agrupar" /> Agrupar por produto</label>
+    <button class="btn primario" @onclick="Carregar">Filtrar</button>
+</div>
+
+@if (saldos is null)
+{
+    <div class="carregando"><div class="spinner"></div></div>
+}
+else
+{
+    <div class="kpis">
+        <div class="kpi"><span>Unidades em estoque</span><strong>@Fmt.Num(saldos.Sum(s => s.Quantidade))</strong></div>
+        <div class="kpi"><span>Reservadas (pedidos online)</span><strong>@Fmt.Num(saldos.Sum(s => s.Reservado))</strong></div>
+        <div class="kpi"><span>Valor a custo</span><strong>@Fmt.Moeda(saldos.Sum(s => s.Quantidade * s.CustoUnitario))</strong></div>
+        <div class="kpi"><span>Linhas abaixo do mínimo</span><strong class="negativo">@saldos.Count(s => s.AbaixoMinimo)</strong></div>
+    </div>
+
+    <div class="cartao">
+        @if (agrupar)
+        {
+            <table class="tabela">
+                <thead><tr><th>Produto</th>@foreach (var d in DepositosVisiveis) { <th class="num">@d.Nome</th> }<th class="num">Total disp.</th></tr></thead>
+                <tbody>
+                    @foreach (var g in saldos.GroupBy(s => (s.ProdutoId, s.Produto, s.Sku)))
+                    {
+                        <tr>
+                            <td><strong>@g.Key.Produto</strong><div class="sub">@g.Key.Sku</div></td>
+                            @foreach (var d in DepositosVisiveis)
+                            {
+                                var s = g.FirstOrDefault(x => x.DepositoId == d.Id);
+                                <td class="num @(s?.AbaixoMinimo == true ? "negativo" : "")">@(s?.Disponivel.ToString() ?? "—")@(s?.Reservado > 0 ? $" (+{s.Reservado} res.)" : "")</td>
+                            }
+                            <td class="num"><strong>@g.Sum(x => x.Disponivel)</strong></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <table class="tabela">
+                <thead><tr><th>Produto</th><th>Depósito</th><th class="num">Físico</th><th class="num">Reservado</th><th class="num">Disponível</th><th class="num">Mínimo</th><th class="num">Valor custo</th></tr></thead>
+                <tbody>
+                    @foreach (var s in saldos)
+                    {
+                        <tr>
+                            <td><strong>@s.Produto</strong><div class="sub">@s.Sku · @s.Categoria</div></td>
+                            <td>@s.Deposito</td>
+                            <td class="num">@s.Quantidade</td>
+                            <td class="num">@s.Reservado</td>
+                            <td class="num @(s.AbaixoMinimo ? "negativo" : "")"><strong>@s.Disponivel</strong></td>
+                            <td class="num">@s.EstoqueMinimo</td>
+                            <td class="num">@Fmt.Moeda(s.Quantidade * s.CustoUnitario)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+}
+
+@code {
+    private List<DepositoDto> depositos = [];
+    private List<SaldoDto>? saldos;
+    private int? depositoId;
+    private string busca = "";
+    private bool abaixoMinimo;
+    private bool agrupar = true;
+
+    private IEnumerable<DepositoDto> DepositosVisiveis => depositos.Where(d => depositoId is null || d.Id == depositoId);
+
+    protected override async Task OnInitializedAsync()
+    {
+        try { depositos = await Api.GetAsync<List<DepositoDto>>("api/depositos"); }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+        await Carregar();
+    }
+
+    private async Task Carregar()
+    {
+        try
+        {
+            var url = $"api/estoque/saldos?abaixoMinimo={abaixoMinimo.ToString().ToLower()}&busca={Uri.EscapeDataString(busca)}";
+            if (depositoId is not null) url += $"&depositoId={depositoId}";
+            saldos = await Api.GetAsync<List<SaldoDto>>(url);
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+    }
+}

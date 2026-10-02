@@ -1,0 +1,97 @@
+@page "/"
+@inject ApiClient Api
+@inject Sessao Sessao
+@inject Avisos Avisos
+
+<div class="cabecalho-pagina">
+    <h1>Olá, @(Sessao.Atual?.Nome.Split(' ')[0])</h1>
+</div>
+
+<div class="atalhos">
+    @if (Sessao.PodeVender)
+    {
+        <a class="atalho" href="pdv"><span>▣</span><strong>Frente de caixa</strong><small>Registrar venda no balcão</small></a>
+    }
+    <a class="atalho" href="pedidos"><span>⧉</span><strong>Pedidos online</strong><small>Reservas e compras da loja</small></a>
+    @if (Sessao.PodeEstoque)
+    {
+        <a class="atalho" href="movimentacoes"><span>⇄</span><strong>Movimentar estoque</strong><small>Entrada, saída, transferência</small></a>
+    }
+    <a class="atalho" href="estoque"><span>▤</span><strong>Consultar saldos</strong><small>Por loja e depósito</small></a>
+    @if (Sessao.PodeFinanceiro)
+    {
+        <a class="atalho" href="financeiro"><span>$</span><strong>Financeiro</strong><small>Contas e alertas</small></a>
+    }
+</div>
+
+@if (painel is not null)
+{
+    var k = painel.Kpis;
+    <div class="kpis">
+        <div class="kpi"><span>Faturamento hoje</span><strong>@Fmt.Moeda(k.FaturamentoHoje)</strong><small>@k.VendasHoje vendas</small></div>
+        <div class="kpi"><span>Faturamento no mês</span><strong>@Fmt.Moeda(k.FaturamentoMes)</strong>
+            <small class="@(k.VariacaoMesPercentual >= 0 ? "positivo" : "negativo")">@(k.VariacaoMesPercentual >= 0 ? "▲" : "▼") @Fmt.Pct(Math.Abs(k.VariacaoMesPercentual)) vs mês anterior</small></div>
+        <div class="kpi"><span>Previsão de fechamento</span><strong>@Fmt.Moeda(k.PrevisaoFechamentoMes)</strong><small>@painel.Projecao.Metodo.Split(' ')[0] com sazonalidade semanal</small></div>
+        <div class="kpi"><span>Ticket médio</span><strong>@Fmt.Moeda(k.TicketMedioMes)</strong><small>margem bruta @Fmt.Pct(k.MargemBrutaMesPercentual)</small></div>
+        <div class="kpi"><span>Pedidos online abertos</span><strong>@k.PedidosPendentes</strong><small><a href="pedidos">ver fila</a></small></div>
+    </div>
+
+    <div class="grade-2">
+        <section class="cartao">
+            <h2>Risco de ruptura</h2>
+            @if (painel.EstoqueCritico.Count == 0)
+            {
+                <div class="vazio">Nenhum produto com cobertura crítica.</div>
+            }
+            else
+            {
+                <table class="tabela compacta">
+                    <thead><tr><th>Produto</th><th class="num">Disp.</th><th class="num">Venda/dia</th><th class="num">Acaba em</th><th class="num">Comprar</th></tr></thead>
+                    <tbody>
+                        @foreach (var c in painel.EstoqueCritico)
+                        {
+                            <tr>
+                                <td>@c.Nome</td>
+                                <td class="num">@c.Disponivel</td>
+                                <td class="num">@Fmt.Num(c.MediaDiaria, 1)</td>
+                                <td class="num">@(c.DiasCobertura is null ? "—" : $"{Fmt.Num(c.DiasCobertura.Value, 0)} dias")</td>
+                                <td class="num"><strong>@c.SugestaoCompra</strong></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </section>
+        <section class="cartao">
+            <h2>Contas a vencer (7 dias)</h2>
+            @if (painel.AlertasFinanceiros.Count == 0)
+            {
+                <div class="vazio">Nada vencendo nos próximos dias.</div>
+            }
+            else
+            {
+                <ul class="lista-alertas">
+                    @foreach (var a in painel.AlertasFinanceiros)
+                    {
+                        <li class="@(a.Atrasado ? "atrasado" : "")">
+                            <div><strong>@a.Descricao</strong><small>@(a.Atrasado ? $"Atrasada há {-a.DiasParaVencer} dia(s)" : a.DiasParaVencer == 0 ? "Vence hoje" : $"Vence em {a.DiasParaVencer} dia(s)") · @Fmt.Data(a.Vencimento)</small></div>
+                            <span class="@(a.Tipo == TipoLancamento.Receita ? "positivo" : "")">@Fmt.Moeda(a.Valor)</span>
+                        </li>
+                    }
+                </ul>
+            }
+        </section>
+    </div>
+    <p class="nota">O painel completo com gráficos e projeções ao vivo fica na área administrativa da loja web (<code>/admin</code>).</p>
+}
+
+@code {
+    private DashboardDto? painel;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Sessao.PodeGestao) return;
+        try { painel = await Api.GetAsync<DashboardDto>("api/painel?dias=30"); }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+    }
+}

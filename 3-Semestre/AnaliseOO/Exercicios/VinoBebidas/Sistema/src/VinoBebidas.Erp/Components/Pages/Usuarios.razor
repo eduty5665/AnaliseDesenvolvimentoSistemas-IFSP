@@ -1,0 +1,176 @@
+@page "/usuarios"
+@inject ApiClient Api
+@inject Avisos Avisos
+
+<div class="cabecalho-pagina">
+    <h1>Usuários e acessos</h1>
+    <div class="acoes">
+        <div class="segmentado">
+            <button class="@(aba == 0 ? "ativo" : "")" @onclick="() => aba = 0">Usuários</button>
+            <button class="@(aba == 1 ? "ativo" : "")" @onclick="AbrirAcessos">Registro de acessos</button>
+        </div>
+        @if (aba == 0) { <button class="btn primario" @onclick="Novo">+ Novo usuário</button> }
+    </div>
+</div>
+
+@if (aba == 0)
+{
+    <div class="cartao">
+        <table class="tabela">
+            <thead><tr><th>Nome</th><th>Login</th><th>Perfil</th><th>Setor</th><th class="num">Salário</th><th>Último acesso</th><th></th></tr></thead>
+            <tbody>
+                @foreach (var u in usuarios)
+                {
+                    <tr class="@(!u.Ativo ? "inativo" : "")">
+                        <td><strong>@u.Nome @u.Sobrenome</strong><div class="sub">@u.Cargo</div></td>
+                        <td>@u.Login<div class="sub">CPF @FormatarCpf(u.Cpf)</div></td>
+                        <td><span class="badge neutro">@Fmt.Texto(u.Perfil)</span></td>
+                        <td>@(u.Setor ?? "—")</td>
+                        <td class="num">@Fmt.Moeda(u.Salario)</td>
+                        <td>@(u.UltimoAcesso is null ? "Nunca" : Fmt.DataHora(u.UltimoAcesso.Value))</td>
+                        <td><button class="btn fantasma pequeno" @onclick="() => Editar(u)">Editar</button></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="cartao">
+        <p class="nota">Cada tentativa de login (ERP, loja e API) é registrada com data, hora e IP — serve para auditoria de acessos não autorizados e conferência de jornada (RF02).</p>
+        <table class="tabela compacta">
+            <thead><tr><th>Data/hora</th><th>Login informado</th><th>Usuário</th><th>Origem</th><th>IP</th><th>Resultado</th></tr></thead>
+            <tbody>
+                @foreach (var a in acessos)
+                {
+                    <tr>
+                        <td>@Fmt.DataHora(a.DataHora)</td>
+                        <td>@a.LoginInformado</td>
+                        <td>@(a.Usuario ?? "—")</td>
+                        <td>@a.Origem</td>
+                        <td>@a.Ip</td>
+                        <td><span class="badge @(a.Sucesso ? "ok" : "erro")">@(a.Sucesso ? "Sucesso" : "Falhou")</span></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<Modal Aberto="@(form is not null)" Titulo="@(editandoId is null ? "Novo usuário" : "Editar usuário")" OnFechar="() => form = null" Largo="true">
+    <ChildContent>
+        @if (form is not null)
+        {
+            <div class="form-grade">
+                <label>Nome* <input @bind="form.Nome" /></label>
+                <label>Sobrenome <input @bind="form.Sobrenome" /></label>
+                <label>CPF* <input @bind="form.Cpf" /></label>
+                <label>Data de nascimento <input type="date" @bind="form.DataNascimento" /></label>
+                <label>E-mail* <input type="email" @bind="form.Email" /></label>
+                <label>Telefone <input @bind="form.Telefone" /></label>
+                <label>Login* <input @bind="form.Login" /></label>
+                <label>@(editandoId is null ? "Senha*" : "Nova senha (opcional)") <input type="password" @bind="form.Senha" /></label>
+                <label>Perfil
+                    <select @bind="form.Perfil">
+                        @foreach (var p in Enum.GetValues<PerfilUsuario>()) { <option value="@p">@Fmt.Texto(p)</option> }
+                    </select>
+                </label>
+                <label>Setor
+                    <select @bind="form.SetorId">
+                        <option value="">—</option>
+                        @foreach (var s in setores) { <option value="@s.Id">@s.Nome</option> }
+                    </select>
+                </label>
+                <label>Cargo <input @bind="form.Cargo" /></label>
+                <label>Salário <input type="number" step="0.01" @bind="form.Salario" /></label>
+                <label>Horas semanais <input type="number" @bind="form.HorasSemanais" /></label>
+                <label class="check"><input type="checkbox" @bind="form.Ativo" /> Ativo</label>
+            </div>
+        }
+    </ChildContent>
+    <Rodape>
+        <button class="btn fantasma" @onclick="() => form = null">Cancelar</button>
+        <button class="btn primario" @onclick="Salvar">Salvar</button>
+    </Rodape>
+</Modal>
+
+@code {
+    private class FormUsuario
+    {
+        public string Nome { get; set; } = "";
+        public string Sobrenome { get; set; } = "";
+        public string Cpf { get; set; } = "";
+        public string Email { get; set; } = "";
+        public string Login { get; set; } = "";
+        public string? Senha { get; set; }
+        public PerfilUsuario Perfil { get; set; } = PerfilUsuario.Caixa;
+        public string? Cargo { get; set; }
+        public decimal Salario { get; set; }
+        public int HorasSemanais { get; set; } = 44;
+        public string? Telefone { get; set; }
+        public DateOnly? DataNascimento { get; set; }
+        public int? SetorId { get; set; }
+        public bool Ativo { get; set; } = true;
+    }
+
+    private int aba;
+    private List<UsuarioDto> usuarios = [];
+    private List<SetorDto> setores = [];
+    private List<RegistroAcessoDto> acessos = [];
+    private FormUsuario? form;
+    private int? editandoId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try { setores = await Api.GetAsync<List<SetorDto>>("api/setores"); }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+        await Carregar();
+    }
+
+    private async Task Carregar()
+    {
+        try { usuarios = await Api.GetAsync<List<UsuarioDto>>("api/usuarios"); }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+    }
+
+    private async Task AbrirAcessos()
+    {
+        aba = 1;
+        try { acessos = await Api.GetAsync<List<RegistroAcessoDto>>("api/usuarios/acessos?limite=300"); }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+    }
+
+    private static string FormatarCpf(string c) => c.Length == 11 ? $"{c[..3]}.{c[3..6]}.{c[6..9]}-{c[9..]}" : c;
+
+    private void Novo() { editandoId = null; form = new FormUsuario(); }
+
+    private void Editar(UsuarioDto u)
+    {
+        editandoId = u.Id;
+        form = new FormUsuario
+        {
+            Nome = u.Nome, Sobrenome = u.Sobrenome, Cpf = u.Cpf, Email = u.Email, Login = u.Login, Perfil = u.Perfil, Cargo = u.Cargo,
+            Salario = u.Salario, HorasSemanais = u.HorasSemanais, Telefone = u.Telefone, DataNascimento = u.DataNascimento,
+            SetorId = u.SetorId, Ativo = u.Ativo
+        };
+    }
+
+    private async Task Salvar()
+    {
+        if (form is null) return;
+        var req = new UsuarioSalvarRequest(form.Nome, form.Sobrenome, form.Cpf, form.Email, form.Login, form.Perfil,
+            string.IsNullOrWhiteSpace(form.Senha) ? null : form.Senha, form.Cargo, form.Salario, form.HorasSemanais, form.Telefone,
+            form.DataNascimento, form.SetorId, form.Ativo);
+        try
+        {
+            _ = editandoId is null
+                ? await Api.PostAsync<UsuarioDto>("api/usuarios", req)
+                : await Api.PutAsync<UsuarioDto>($"api/usuarios/{editandoId}", req);
+            Avisos.Sucesso("Usuário salvo.");
+            form = null;
+            await Carregar();
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+    }
+}

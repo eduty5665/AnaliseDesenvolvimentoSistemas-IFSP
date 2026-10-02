@@ -1,0 +1,109 @@
+@page "/fornecedores"
+@inject ApiClient Api
+@inject Sessao Sessao
+@inject Avisos Avisos
+
+<div class="cabecalho-pagina">
+    <h1>Fornecedores</h1>
+    <div class="acoes">
+        @if (Sessao.PodeEstoque) { <button class="btn primario" @onclick="Novo">+ Novo fornecedor</button> }
+    </div>
+</div>
+
+@if (lista is null)
+{
+    <div class="carregando"><div class="spinner"></div></div>
+}
+else
+{
+    <div class="cartao">
+        <table class="tabela">
+            <thead><tr><th>Razão social</th><th>CNPJ</th><th>Contato</th><th>E-mail / telefone</th><th></th></tr></thead>
+            <tbody>
+                @foreach (var f in lista)
+                {
+                    <tr class="@(!f.Ativo ? "inativo" : "")">
+                        <td><strong>@f.RazaoSocial</strong><div class="sub">@f.NomeFantasia</div></td>
+                        <td>@FormatarCnpj(f.Cnpj)</td>
+                        <td>@f.Contato</td>
+                        <td>@f.Email<div class="sub">@f.Telefone</div></td>
+                        <td>@if (Sessao.PodeEstoque) { <button class="btn fantasma pequeno" @onclick="() => Editar(f)">Editar</button> }</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<Modal Aberto="@(form is not null)" Titulo="@(editandoId is null ? "Novo fornecedor" : "Editar fornecedor")" OnFechar="() => form = null">
+    <ChildContent>
+        @if (form is not null)
+        {
+            <div class="form-grade">
+                <label class="col-2">Razão social* <input @bind="form.RazaoSocial" /></label>
+                <label>Nome fantasia <input @bind="form.NomeFantasia" /></label>
+                <label>CNPJ* <input @bind="form.Cnpj" /></label>
+                <label>Contato <input @bind="form.Contato" /></label>
+                <label>Telefone <input @bind="form.Telefone" /></label>
+                <label class="col-2">E-mail <input type="email" @bind="form.Email" /></label>
+                <label class="check"><input type="checkbox" @bind="form.Ativo" /> Ativo</label>
+            </div>
+        }
+    </ChildContent>
+    <Rodape>
+        <button class="btn fantasma" @onclick="() => form = null">Cancelar</button>
+        <button class="btn primario" @onclick="Salvar">Salvar</button>
+    </Rodape>
+</Modal>
+
+@code {
+    private class FormFornecedor
+    {
+        public string RazaoSocial { get; set; } = "";
+        public string? NomeFantasia { get; set; }
+        public string Cnpj { get; set; } = "";
+        public string? Email { get; set; }
+        public string? Telefone { get; set; }
+        public string? Contato { get; set; }
+        public bool Ativo { get; set; } = true;
+    }
+
+    private List<FornecedorDto>? lista;
+    private FormFornecedor? form;
+    private int? editandoId;
+
+    protected override Task OnInitializedAsync() => Carregar();
+
+    private async Task Carregar()
+    {
+        try { lista = await Api.GetAsync<List<FornecedorDto>>("api/fornecedores"); }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+    }
+
+    private static string FormatarCnpj(string c) =>
+        c.Length == 14 ? $"{c[..2]}.{c[2..5]}.{c[5..8]}/{c[8..12]}-{c[12..]}" : c;
+
+    private void Novo() { editandoId = null; form = new FormFornecedor(); }
+
+    private void Editar(FornecedorDto f)
+    {
+        editandoId = f.Id;
+        form = new FormFornecedor { RazaoSocial = f.RazaoSocial, NomeFantasia = f.NomeFantasia, Cnpj = f.Cnpj, Email = f.Email, Telefone = f.Telefone, Contato = f.Contato, Ativo = f.Ativo };
+    }
+
+    private async Task Salvar()
+    {
+        if (form is null) return;
+        var req = new FornecedorSalvarRequest(form.RazaoSocial, form.Cnpj, form.NomeFantasia, form.Email, form.Telefone, form.Contato, form.Ativo);
+        try
+        {
+            _ = editandoId is null
+                ? await Api.PostAsync<FornecedorDto>("api/fornecedores", req)
+                : await Api.PutAsync<FornecedorDto>($"api/fornecedores/{editandoId}", req);
+            Avisos.Sucesso("Fornecedor salvo.");
+            form = null;
+            await Carregar();
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+    }
+}

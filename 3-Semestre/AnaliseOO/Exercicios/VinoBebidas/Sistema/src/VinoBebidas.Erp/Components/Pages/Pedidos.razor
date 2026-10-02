@@ -1,0 +1,121 @@
+@page "/pedidos"
+@inject ApiClient Api
+@inject Avisos Avisos
+
+<div class="cabecalho-pagina">
+    <h1>Pedidos online</h1>
+    <div class="acoes">
+        <div class="segmentado">
+            <button class="@(somenteAbertos ? "ativo" : "")" @onclick="() => Filtrar(true)">Em aberto</button>
+            <button class="@(!somenteAbertos ? "ativo" : "")" @onclick="() => Filtrar(false)">Todos</button>
+        </div>
+        <button class="btn fantasma" @onclick="Carregar">Atualizar</button>
+    </div>
+</div>
+
+@if (pedidos is null)
+{
+    <div class="carregando"><div class="spinner"></div></div>
+}
+else if (pedidos.Count == 0)
+{
+    <div class="vazio cartao">Nenhum pedido @(somenteAbertos ? "em aberto" : "encontrado").</div>
+}
+else
+{
+    <div class="grade-pedidos">
+        @foreach (var p in pedidos)
+        {
+            <article class="cartao pedido">
+                <header>
+                    <div>
+                        <strong>@p.Numero</strong>
+                        <span class="badge @(p.Tipo == TipoPedido.Reserva ? "info" : "ok")">@Fmt.Texto(p.Tipo)</span>
+                        <span class="badge neutro">@Fmt.Texto(p.Modalidade)</span>
+                    </div>
+                    <span class="badge @Fmt.ClasseStatus(p.Status)">@Fmt.Texto(p.Status)</span>
+                </header>
+                <div class="pedido-cliente">
+                    <strong>@p.Cliente</strong> @if (p.ClienteTelefone is not null) { <span>· @p.ClienteTelefone</span> }
+                    <small>@Fmt.DataHora(p.Data) · @p.Deposito</small>
+                    @if (p.EnderecoEntrega is not null) { <small>Entregar em: @p.EnderecoEntrega</small> }
+                    @if (p.ValidoAte is not null && p.Status is not (StatusPedido.Concluido or StatusPedido.Cancelado or StatusPedido.Expirado))
+                    {
+                        <small class="alerta-texto">Reserva válida até @Fmt.DataHora(p.ValidoAte.Value)</small>
+                    }
+                </div>
+                <ul class="pedido-itens">
+                    @foreach (var i in p.Itens)
+                    {
+                        <li><span>@i.Quantidade× @i.Produto</span><span>@Fmt.Moeda(i.Total)</span></li>
+                    }
+                    @if (p.TaxaEntrega > 0) { <li><span>Taxa de entrega</span><span>@Fmt.Moeda(p.TaxaEntrega)</span></li> }
+                </ul>
+                <div class="pedido-total">
+                    <span>@Fmt.Texto(p.FormaPagamento)</span>
+                    <strong>@Fmt.Moeda(p.Total)</strong>
+                </div>
+                @if (p.ProximosStatus.Count > 0)
+                {
+                    <footer>
+                        @foreach (var s in p.ProximosStatus.Where(s => s != StatusPedido.Expirado))
+                        {
+                            <button class="btn @(s == StatusPedido.Cancelado ? "perigo-fantasma" : s == StatusPedido.Concluido ? "primario" : "fantasma") pequeno"
+                                    disabled="@(ocupado == p.Id)" @onclick="() => Mudar(p, s)">
+                                @Acao(s, p.Modalidade)
+                            </button>
+                        }
+                    </footer>
+                }
+            </article>
+        }
+    </div>
+}
+
+@code {
+    private List<PedidoDto>? pedidos;
+    private bool somenteAbertos = true;
+    private int? ocupado;
+
+    protected override Task OnInitializedAsync() => Carregar();
+
+    private async Task Filtrar(bool abertos)
+    {
+        somenteAbertos = abertos;
+        await Carregar();
+    }
+
+    private async Task Carregar()
+    {
+        try { pedidos = await Api.GetAsync<List<PedidoDto>>($"api/pedidos?abertos={somenteAbertos}&limite=150"); }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+    }
+
+    private static string Acao(StatusPedido s, ModalidadeEntrega m) => s switch
+    {
+        StatusPedido.Confirmado => "Confirmar",
+        StatusPedido.EmSeparacao => "Separar",
+        StatusPedido.ProntoParaRetirada => "Pronto p/ retirada",
+        StatusPedido.EmRota => "Saiu para entrega",
+        StatusPedido.Concluido => m == ModalidadeEntrega.Retirada ? "Cliente retirou" : "Entregue",
+        StatusPedido.Cancelado => "Cancelar",
+        _ => Fmt.Texto(s)
+    };
+
+    private async Task Mudar(PedidoDto p, StatusPedido s)
+    {
+        ocupado = p.Id;
+        try
+        {
+            var atualizado = await Api.PostAsync<PedidoDto>($"api/pedidos/{p.Id}/status", new AlterarStatusPedidoRequest(s));
+            var idx = pedidos!.FindIndex(x => x.Id == p.Id);
+            if (somenteAbertos && atualizado.ProximosStatus.Count == 0) pedidos.RemoveAt(idx);
+            else pedidos[idx] = atualizado;
+            Avisos.Sucesso(s == StatusPedido.Concluido
+                ? $"Pedido {p.Numero} concluído e registrado como venda online."
+                : $"Pedido {p.Numero}: {Fmt.Texto(s)}.");
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+        finally { ocupado = null; }
+    }
+}

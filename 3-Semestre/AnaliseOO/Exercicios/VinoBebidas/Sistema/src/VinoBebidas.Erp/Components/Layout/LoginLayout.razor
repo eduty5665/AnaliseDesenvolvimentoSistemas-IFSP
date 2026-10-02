@@ -1,0 +1,17 @@
+@inherits LayoutComponentBase
+@implements IDisposable
+@inject Avisos Avisos
+
+<div class="login-fundo">@Body</div>
+<div class="avisos">
+    @foreach (var a in Avisos.Lista)
+    {
+        <div class="aviso @(a.Erro ? "erro" : "")">@a.Texto</div>
+    }
+</div>
+
+@code {
+    protected override void OnInitialized() => Avisos.Mudou += Atualizar;
+    private void Atualizar() => _ = InvokeAsync(StateHasChanged);
+    public void Dispose() => Avisos.Mudou -= Atualizar;
+}

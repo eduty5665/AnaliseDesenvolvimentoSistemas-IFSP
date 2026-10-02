@@ -1,0 +1,52 @@
+@inject ApiClient Api
+@inject Avisos Avisos
+
+<div class="seletor-produto">
+    <input id="@Id" placeholder="@Placeholder" @bind="termo" @bind:event="oninput" @onkeydown="Tecla" autocomplete="off" />
+    @if (resultados.Count > 0)
+    {
+        <ul class="sugestoes">
+            @foreach (var p in resultados)
+            {
+                <li @onclick="() => Escolher(p)">
+                    <span class="nome">@p.Nome</span>
+                    <span class="meta">@p.Sku · @Fmt.Moeda(p.PrecoAtual) · disp. @p.EstoqueDisponivel</span>
+                </li>
+            }
+        </ul>
+    }
+</div>
+
+@code {
+    [Parameter] public string Id { get; set; } = "busca-produto";
+    [Parameter] public string Placeholder { get; set; } = "Código de barras, SKU ou nome (Enter)";
+    [Parameter] public EventCallback<ProdutoDto> AoEscolher { get; set; }
+
+    private string termo = "";
+    private List<ProdutoDto> resultados = [];
+
+    private async Task Tecla(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape") { resultados.Clear(); return; }
+        if (e.Key != "Enter" || string.IsNullOrWhiteSpace(termo)) return;
+        try
+        {
+            // 1) leitura exata (leitor de código de barras)
+            var exato = await Api.GetOuNuloAsync<ProdutoDto>($"api/produtos/codigo/{Uri.EscapeDataString(termo.Trim())}");
+            if (exato is not null) { await Escolher(exato); return; }
+            // 2) busca por nome
+            var pagina = await Api.GetAsync<PaginaDto<ProdutoDto>>($"api/produtos?ativo=true&tamanho=12&busca={Uri.EscapeDataString(termo.Trim())}");
+            resultados = pagina.Itens.ToList();
+            if (resultados.Count == 1) await Escolher(resultados[0]);
+            else if (resultados.Count == 0) Avisos.Erro($"Nenhum produto encontrado para \"{termo}\".");
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+    }
+
+    private async Task Escolher(ProdutoDto p)
+    {
+        resultados.Clear();
+        termo = "";
+        await AoEscolher.InvokeAsync(p);
+    }
+}

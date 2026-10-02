@@ -1,0 +1,54 @@
+@page "/login"
+@layout LoginLayout
+@inject ApiClient Api
+@inject Sessao Sessao
+@inject NavigationManager Nav
+
+<div class="login-card">
+    <div class="login-marca">
+        <img src="favicon.svg" alt="" />
+        <h1>Vino Bebidas</h1>
+        <p>ERP · Frente de caixa · Estoque · Financeiro</p>
+    </div>
+    <form @onsubmit="Entrar" @onsubmit:preventDefault>
+        <label>Login ou CPF
+            <input @bind="login" autocomplete="username" autofocus />
+        </label>
+        <label>Senha
+            <input type="password" @bind="senha" autocomplete="current-password" />
+        </label>
+        @if (erro is not null)
+        {
+            <div class="alerta-erro">@erro</div>
+        }
+        <button class="btn primario grande" type="submit" disabled="@enviando">@(enviando ? "Entrando..." : "Entrar")</button>
+    </form>
+    <p class="dica">Ambiente de demonstração: <code>admin</code>, <code>gerente</code>, <code>caixa</code>, <code>estoque</code>, <code>financeiro</code>, <code>estagiario</code> — senha <code>Vino@123</code></p>
+</div>
+
+@code {
+    private string login = "";
+    private string senha = "";
+    private string? erro;
+    private bool enviando;
+
+    private async Task Entrar()
+    {
+        erro = null;
+        enviando = true;
+        try
+        {
+            var s = await Api.PostAsync<SessaoDto>("api/auth/funcionarios/login", new LoginFuncionarioRequest(login, senha));
+            await Sessao.EntrarAsync(s);
+            Nav.NavigateTo(Sessao.PodeVender && !Sessao.PodeGestao ? "pdv" : "");
+        }
+        catch (ApiException ex)
+        {
+            erro = ex.Message;
+        }
+        finally
+        {
+            enviando = false;
+        }
+    }
+}

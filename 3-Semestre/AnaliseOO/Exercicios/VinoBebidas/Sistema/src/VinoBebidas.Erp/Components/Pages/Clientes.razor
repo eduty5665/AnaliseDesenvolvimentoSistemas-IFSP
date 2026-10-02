@@ -1,0 +1,132 @@
+@page "/clientes"
+@inject ApiClient Api
+@inject Avisos Avisos
+
+<div class="cabecalho-pagina">
+    <h1>Clientes</h1>
+    <div class="acoes"><button class="btn primario" @onclick="Novo">+ Novo cliente</button></div>
+</div>
+
+<div class="filtros cartao">
+    <input class="largo" placeholder="Nome, e-mail ou CPF/CNPJ" @bind="busca" @onkeydown="@(e => e.Key == "Enter" ? Carregar() : Task.CompletedTask)" />
+    <button class="btn primario" @onclick="Carregar">Buscar</button>
+</div>
+
+@if (clientes is null)
+{
+    <div class="carregando"><div class="spinner"></div></div>
+}
+else
+{
+    <div class="cartao">
+        <table class="tabela">
+            <thead><tr><th>Nome</th><th>CPF/CNPJ</th><th>Contato</th><th>Cidade</th><th>Loja online</th><th></th></tr></thead>
+            <tbody>
+                @foreach (var c in clientes)
+                {
+                    <tr class="@(!c.Ativo ? "inativo" : "")">
+                        <td><strong>@c.Nome</strong>@if (c.DataNascimento is not null) { <div class="sub">nasc. @Fmt.Data(c.DataNascimento)</div> }</td>
+                        <td>@(c.CpfCnpj ?? "—")</td>
+                        <td>@c.Email<div class="sub">@c.Telefone</div></td>
+                        <td>@c.Endereco.Cidade @(c.Endereco.Uf is not null ? $"/{c.Endereco.Uf}" : "")</td>
+                        <td>@(c.PossuiContaOnline ? "Com conta" : "—")</td>
+                        <td><button class="btn fantasma pequeno" @onclick="() => Editar(c)">Editar</button></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        @if (clientes.Count == 100) { <p class="nota">Mostrando os 100 primeiros. Refine a busca.</p> }
+    </div>
+}
+
+<Modal Aberto="@(form is not null)" Titulo="@(editandoId is null ? "Novo cliente" : "Editar cliente")" OnFechar="() => form = null" Largo="true">
+    <ChildContent>
+        @if (form is not null)
+        {
+            <div class="form-grade">
+                <label class="col-2">Nome* <input @bind="form.Nome" /></label>
+                <label>CPF/CNPJ <input @bind="form.CpfCnpj" /></label>
+                <label>Data de nascimento <input type="date" @bind="form.DataNascimento" /></label>
+                <label>E-mail <input type="email" @bind="form.Email" /></label>
+                <label>Telefone <input @bind="form.Telefone" /></label>
+                <label>CEP <input @bind="form.Cep" /></label>
+                <label>Logradouro <input @bind="form.Logradouro" /></label>
+                <label>Número <input @bind="form.Numero" /></label>
+                <label>Complemento <input @bind="form.Complemento" /></label>
+                <label>Bairro <input @bind="form.Bairro" /></label>
+                <label>Cidade <input @bind="form.Cidade" /></label>
+                <label>UF <input maxlength="2" @bind="form.Uf" /></label>
+                <label class="check"><input type="checkbox" @bind="form.AceitaMarketing" /> Aceita receber ofertas</label>
+                <label class="check"><input type="checkbox" @bind="form.Ativo" /> Ativo</label>
+            </div>
+        }
+    </ChildContent>
+    <Rodape>
+        <button class="btn fantasma" @onclick="() => form = null">Cancelar</button>
+        <button class="btn primario" @onclick="Salvar">Salvar</button>
+    </Rodape>
+</Modal>
+
+@code {
+    private class FormCliente
+    {
+        public string Nome { get; set; } = "";
+        public string? CpfCnpj { get; set; }
+        public string? Email { get; set; }
+        public string? Telefone { get; set; }
+        public DateOnly? DataNascimento { get; set; }
+        public string? Cep { get; set; }
+        public string? Logradouro { get; set; }
+        public string? Numero { get; set; }
+        public string? Complemento { get; set; }
+        public string? Bairro { get; set; }
+        public string? Cidade { get; set; } = "Catanduva";
+        public string? Uf { get; set; } = "SP";
+        public bool AceitaMarketing { get; set; }
+        public bool Ativo { get; set; } = true;
+    }
+
+    private List<ClienteDto>? clientes;
+    private string busca = "";
+    private FormCliente? form;
+    private int? editandoId;
+
+    protected override Task OnInitializedAsync() => Carregar();
+
+    private async Task Carregar()
+    {
+        try { clientes = await Api.GetAsync<List<ClienteDto>>($"api/clientes?limite=100&busca={Uri.EscapeDataString(busca)}"); }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+    }
+
+    private void Novo() { editandoId = null; form = new FormCliente(); }
+
+    private void Editar(ClienteDto c)
+    {
+        editandoId = c.Id;
+        form = new FormCliente
+        {
+            Nome = c.Nome, CpfCnpj = c.CpfCnpj, Email = c.Email, Telefone = c.Telefone, DataNascimento = c.DataNascimento,
+            Cep = c.Endereco.Cep, Logradouro = c.Endereco.Logradouro, Numero = c.Endereco.Numero, Complemento = c.Endereco.Complemento,
+            Bairro = c.Endereco.Bairro, Cidade = c.Endereco.Cidade, Uf = c.Endereco.Uf, AceitaMarketing = c.AceitaMarketing, Ativo = c.Ativo
+        };
+    }
+
+    private async Task Salvar()
+    {
+        if (form is null) return;
+        var req = new ClienteSalvarRequest(form.Nome, form.CpfCnpj, form.Email, form.Telefone, form.DataNascimento,
+            new EnderecoDto(form.Cep, form.Logradouro, form.Numero, form.Complemento, form.Bairro, form.Cidade, form.Uf),
+            form.AceitaMarketing, form.Ativo);
+        try
+        {
+            _ = editandoId is null
+                ? await Api.PostAsync<ClienteDto>("api/clientes", req)
+                : await Api.PutAsync<ClienteDto>($"api/clientes/{editandoId}", req);
+            Avisos.Sucesso("Cliente salvo.");
+            form = null;
+            await Carregar();
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+    }
+}

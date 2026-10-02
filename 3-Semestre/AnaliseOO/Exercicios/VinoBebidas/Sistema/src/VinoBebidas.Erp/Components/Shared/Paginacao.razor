@@ -1,0 +1,17 @@
+@if (Total > Tamanho)
+{
+    <div class="paginacao">
+        <button class="btn fantasma pequeno" disabled="@(Pagina <= 1)" @onclick="() => Ir(Pagina - 1)">‹ Anterior</button>
+        <span>Página @Pagina de @TotalPaginas · @Total registros</span>
+        <button class="btn fantasma pequeno" disabled="@(Pagina >= TotalPaginas)" @onclick="() => Ir(Pagina + 1)">Próxima ›</button>
+    </div>
+}
+
+@code {
+    [Parameter] public int Pagina { get; set; }
+    [Parameter] public int Tamanho { get; set; }
+    [Parameter] public int Total { get; set; }
+    [Parameter] public EventCallback<int> AoMudar { get; set; }
+    private int TotalPaginas => Math.Max(1, (int)Math.Ceiling(Total / (double)Math.Max(1, Tamanho)));
+    private Task Ir(int p) => AoMudar.InvokeAsync(p);
+}

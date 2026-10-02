@@ -1,0 +1,147 @@
+@page "/vendas"
+@inject ApiClient Api
+@inject Sessao Sessao
+@inject Avisos Avisos
+
+<div class="cabecalho-pagina">
+    <h1>Vendas</h1>
+</div>
+
+<div class="filtros cartao">
+    <label>De <input type="date" @bind="de" /></label>
+    <label>Até <input type="date" @bind="ate" /></label>
+    <label>Canal
+        <select @bind="canal">
+            <option value="">Todos</option>
+            @foreach (var c in Enum.GetValues<CanalVenda>()) { <option value="@c">@Fmt.Texto(c)</option> }
+        </select>
+    </label>
+    <label>Status
+        <select @bind="status">
+            <option value="">Todos</option>
+            @foreach (var s in Enum.GetValues<StatusVenda>()) { <option value="@s">@Fmt.Texto(s)</option> }
+        </select>
+    </label>
+    <button class="btn primario" @onclick="() => Carregar(1)">Filtrar</button>
+</div>
+
+@if (pagina is null)
+{
+    <div class="carregando"><div class="spinner"></div></div>
+}
+else
+{
+    <div class="cartao">
+        <div class="resumo-linha">
+            <span>@pagina.Total vendas no filtro</span>
+            <span>Total desta página: <strong>@Fmt.Moeda(pagina.Itens.Where(v => v.Status == StatusVenda.Concluida).Sum(v => v.Total))</strong></span>
+        </div>
+        <table class="tabela">
+            <thead><tr><th>Número</th><th>Data</th><th>Canal</th><th>Cliente</th><th class="num">Itens</th><th class="num">Total</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+                @foreach (var v in pagina.Itens)
+                {
+                    <tr>
+                        <td><strong>@v.Numero</strong></td>
+                        <td>@Fmt.DataHora(v.Data)</td>
+                        <td>@Fmt.Texto(v.Canal)</td>
+                        <td>@(v.Cliente ?? "—")</td>
+                        <td class="num">@v.Itens</td>
+                        <td class="num">@Fmt.Moeda(v.Total)</td>
+                        <td><span class="badge @Fmt.ClasseStatus(v.Status)">@Fmt.Texto(v.Status)</span></td>
+                        <td><button class="btn fantasma pequeno" @onclick="() => Abrir(v.Id)">Detalhes</button></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <Paginacao Pagina="pagina.Pagina" Tamanho="pagina.TamanhoPagina" Total="pagina.Total" AoMudar="Carregar" />
+    </div>
+}
+
+<Modal Aberto="@(detalhe is not null)" Titulo="@($"Venda {detalhe?.Numero}")" OnFechar="() => detalhe = null" Largo="true">
+    <ChildContent>
+        @if (detalhe is not null)
+        {
+            <div class="info-grade">
+                <div><span>Data</span>@Fmt.DataHora(detalhe.Data)</div>
+                <div><span>Loja</span>@detalhe.Deposito</div>
+                <div><span>Canal</span>@Fmt.Texto(detalhe.Canal)</div>
+                <div><span>Vendedor</span>@(detalhe.Vendedor ?? "—")</div>
+                <div><span>Cliente</span>@(detalhe.Cliente ?? "Não identificado")</div>
+                <div><span>Status</span><span class="badge @Fmt.ClasseStatus(detalhe.Status)">@Fmt.Texto(detalhe.Status)</span></div>
+            </div>
+            <table class="tabela compacta">
+                <thead><tr><th>Produto</th><th class="num">Qtd</th><th class="num">Unitário</th><th class="num">Desc.</th><th class="num">Total</th></tr></thead>
+                <tbody>
+                    @foreach (var i in detalhe.Itens)
+                    {
+                        <tr><td>@i.Produto</td><td class="num">@i.Quantidade</td><td class="num">@Fmt.Moeda(i.PrecoUnitario)</td><td class="num">@Fmt.Moeda(i.Desconto)</td><td class="num">@Fmt.Moeda(i.Total)</td></tr>
+                    }
+                </tbody>
+            </table>
+            <dl class="totais">
+                <dt>Subtotal</dt><dd>@Fmt.Moeda(detalhe.Subtotal)</dd>
+                <dt>Desconto</dt><dd>@Fmt.Moeda(detalhe.Desconto)</dd>
+                <dt class="total">Total</dt><dd class="total">@Fmt.Moeda(detalhe.Total)</dd>
+                @foreach (var p in detalhe.Pagamentos) { <dt>@Fmt.Texto(p.Forma)</dt><dd>@Fmt.Moeda(p.Valor)</dd> }
+            </dl>
+            @if (detalhe.MotivoCancelamento is not null)
+            {
+                <div class="alerta-erro">Cancelada: @detalhe.MotivoCancelamento</div>
+            }
+            @if (detalhe.Status == StatusVenda.Concluida && Sessao.PodeGestao)
+            {
+                <div class="campo">
+                    <label>Motivo do cancelamento</label>
+                    <div class="linha">
+                        <input @bind="motivo" placeholder="Ex.: produto avariado, erro de digitação" />
+                        <button class="btn perigo" @onclick="Cancelar" disabled="@string.IsNullOrWhiteSpace(motivo)">Cancelar venda</button>
+                    </div>
+                </div>
+            }
+        }
+    </ChildContent>
+</Modal>
+
+@code {
+    private PaginaDto<VendaResumoDto>? pagina;
+    private DateOnly? de = Fmt.Hoje.AddDays(-7);
+    private DateOnly? ate = Fmt.Hoje;
+    private CanalVenda? canal;
+    private StatusVenda? status;
+    private VendaDto? detalhe;
+    private string motivo = "";
+
+    protected override Task OnInitializedAsync() => Carregar(1);
+
+    private async Task Carregar(int p)
+    {
+        try
+        {
+            var url = $"api/vendas?pagina={p}&tamanho=30&de={de:yyyy-MM-dd}&ate={ate:yyyy-MM-dd}";
+            if (canal is not null) url += $"&canal={canal}";
+            if (status is not null) url += $"&status={status}";
+            pagina = await Api.GetAsync<PaginaDto<VendaResumoDto>>(url);
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+    }
+
+    private async Task Abrir(int id)
+    {
+        motivo = "";
+        try { detalhe = await Api.GetAsync<VendaDto>($"api/vendas/{id}"); }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+    }
+
+    private async Task Cancelar()
+    {
+        if (detalhe is null) return;
+        try
+        {
+            detalhe = await Api.PostAsync<VendaDto>($"api/vendas/{detalhe.Id}/cancelar", new CancelarVendaRequest(motivo));
+            Avisos.Sucesso("Venda cancelada; estoque devolvido e receita estornada.");
+            await Carregar(pagina?.Pagina ?? 1);
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+    }
+}

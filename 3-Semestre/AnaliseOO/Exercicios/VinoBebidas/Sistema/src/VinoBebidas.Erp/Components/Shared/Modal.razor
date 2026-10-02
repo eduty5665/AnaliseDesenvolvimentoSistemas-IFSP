@@ -1,0 +1,27 @@
+@if (Aberto)
+{
+    <div class="modal-fundo" @onclick="Fechar">
+        <div class="modal @(Largo ? "largo" : "")" @onclick:stopPropagation="true">
+            <header>
+                <h2>@Titulo</h2>
+                <button class="btn fantasma pequeno" @onclick="Fechar">✕</button>
+            </header>
+            <div class="modal-corpo">@ChildContent</div>
+            @if (Rodape is not null)
+            {
+                <footer>@Rodape</footer>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Aberto { get; set; }
+    [Parameter] public string Titulo { get; set; } = "";
+    [Parameter] public bool Largo { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? Rodape { get; set; }
+    [Parameter] public EventCallback OnFechar { get; set; }
+
+    private Task Fechar() => OnFechar.InvokeAsync();
+}

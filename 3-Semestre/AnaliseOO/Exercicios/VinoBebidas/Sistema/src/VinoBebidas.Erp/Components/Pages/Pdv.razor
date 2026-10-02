@@ -1,0 +1,284 @@
+@page "/pdv"
+@inject ApiClient Api
+@inject Sessao Sessao
+@inject Avisos Avisos
+@inject IJSRuntime JS
+
+<div class="cabecalho-pagina">
+    <h1>Frente de caixa</h1>
+    <div class="acoes">
+        <label class="inline">Loja
+            <select @bind="depositoId" @bind:after="LojaMudou">
+                @foreach (var d in depositos)
+                {
+                    <option value="@d.Id">@d.Nome</option>
+                }
+            </select>
+        </label>
+        <button class="btn fantasma" @onclick="NovaVenda" disabled="@(itens.Count == 0)">Limpar venda</button>
+    </div>
+</div>
+
+<div class="pdv">
+    <section class="pdv-itens cartao">
+        <SeletorProduto Id="pdv-busca" AoEscolher="Adicionar" />
+        @if (itens.Count == 0)
+        {
+            <div class="vazio">Leia o código de barras ou digite o nome do produto.</div>
+        }
+        else
+        {
+            <table class="tabela">
+                <thead>
+                    <tr><th>Produto</th><th class="num">Qtd</th><th class="num">Unitário</th><th class="num">Desconto</th><th class="num">Total</th><th></th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var i in itens)
+                    {
+                        <tr class="@(i.Quantidade > i.Produto.EstoqueDisponivel ? "linha-alerta" : "")">
+                            <td>
+                                <strong>@i.Produto.Nome</strong>
+                                <div class="sub">@i.Produto.Sku · disponível @i.Produto.EstoqueDisponivel</div>
+                            </td>
+                            <td class="num">
+                                <div class="qtd">
+                                    <button @onclick="() => Alterar(i, -1)">−</button>
+                                    <input type="number" min="1" @bind="i.Quantidade" />
+                                    <button @onclick="() => Alterar(i, 1)">+</button>
+                                </div>
+                            </td>
+                            <td class="num">@Fmt.Moeda(i.Produto.PrecoAtual)</td>
+                            <td class="num"><input class="curto" type="number" min="0" step="0.01" @bind="i.Desconto" /></td>
+                            <td class="num"><strong>@Fmt.Moeda(i.Total)</strong></td>
+                            <td><button class="btn fantasma pequeno" @onclick="() => itens.Remove(i)">✕</button></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </section>
+
+    <aside class="pdv-resumo cartao">
+        <div class="campo">
+            <label>Cliente (opcional)</label>
+            @if (cliente is null)
+            {
+                <div class="linha">
+                    <input placeholder="Nome, CPF ou e-mail" @bind="buscaCliente" @onkeydown="BuscarClienteEnter" />
+                    <button class="btn fantasma" @onclick="BuscarCliente">Buscar</button>
+                </div>
+                @if (clientesEncontrados.Count > 0)
+                {
+                    <ul class="sugestoes estatica">
+                        @foreach (var c in clientesEncontrados)
+                        {
+                            <li @onclick="() => { cliente = c; clientesEncontrados.Clear(); }">
+                                <span class="nome">@c.Nome</span><span class="meta">@c.CpfCnpj @c.Email</span>
+                            </li>
+                        }
+                    </ul>
+                }
+            }
+            else
+            {
+                <div class="chip">@cliente.Nome <button @onclick="() => cliente = null">✕</button></div>
+            }
+        </div>
+
+        <dl class="totais">
+            <dt>Itens</dt><dd>@itens.Sum(i => i.Quantidade)</dd>
+            <dt>Subtotal</dt><dd>@Fmt.Moeda(Subtotal)</dd>
+            <dt>Desconto geral</dt><dd><input class="curto" type="number" min="0" step="0.01" @bind="descontoGeral" /></dd>
+            <dt class="total">Total</dt><dd class="total">@Fmt.Moeda(Total)</dd>
+        </dl>
+
+        <div class="campo">
+            <label>Pagamento</label>
+            <div class="formas">
+                @foreach (var f in new[] { FormaPagamento.Dinheiro, FormaPagamento.Pix, FormaPagamento.CartaoDebito, FormaPagamento.CartaoCredito })
+                {
+                    <button class="btn fantasma" @onclick="() => AdicionarPagamento(f)" disabled="@(Restante <= 0)">@Fmt.Texto(f)</button>
+                }
+            </div>
+            @foreach (var p in pagamentos)
+            {
+                <div class="linha pagamento">
+                    <span>@Fmt.Texto(p.Forma)</span>
+                    <input type="number" min="0" step="0.01" @bind="p.Valor" />
+                    <button class="btn fantasma pequeno" @onclick="() => pagamentos.Remove(p)">✕</button>
+                </div>
+            }
+            <dl class="totais">
+                @if (Restante > 0)
+                {
+                    <dt>Falta pagar</dt><dd class="negativo">@Fmt.Moeda(Restante)</dd>
+                }
+                else if (Troco > 0)
+                {
+                    <dt>Troco</dt><dd class="positivo">@Fmt.Moeda(Troco)</dd>
+                }
+            </dl>
+        </div>
+
+        <button class="btn primario grande" @onclick="Finalizar" disabled="@(!PodeFinalizar || enviando)">
+            @(enviando ? "Registrando..." : $"Finalizar venda · {Fmt.Moeda(Total)}")
+        </button>
+    </aside>
+</div>
+
+<Modal Aberto="@(cupom is not null)" Titulo="Venda registrada" OnFechar="NovaVenda">
+    <ChildContent>
+        @if (cupom is not null)
+        {
+            <div class="cupom" id="cupom">
+                <div class="centro"><strong>VINO BEBIDAS</strong><br />@cupom.Deposito<br />CUPOM NÃO FISCAL</div>
+                <div class="linha-cupom"><span>Venda @cupom.Numero</span><span>@Fmt.DataHora(cupom.Data)</span></div>
+                @if (cupom.Cliente is not null) { <div>Cliente: @cupom.Cliente</div> }
+                <hr />
+                @foreach (var i in cupom.Itens)
+                {
+                    <div>@i.Produto</div>
+                    <div class="linha-cupom"><span>@i.Quantidade x @Fmt.Moeda(i.PrecoUnitario)@(i.Desconto > 0 ? $" (-{Fmt.Moeda(i.Desconto)})" : "")</span><span>@Fmt.Moeda(i.Total)</span></div>
+                }
+                <hr />
+                <div class="linha-cupom"><span>Subtotal</span><span>@Fmt.Moeda(cupom.Subtotal)</span></div>
+                @if (cupom.Desconto > 0) { <div class="linha-cupom"><span>Desconto</span><span>-@Fmt.Moeda(cupom.Desconto)</span></div> }
+                <div class="linha-cupom total"><span>TOTAL</span><span>@Fmt.Moeda(cupom.Total)</span></div>
+                @foreach (var p in cupom.Pagamentos)
+                {
+                    <div class="linha-cupom"><span>@Fmt.Texto(p.Forma)</span><span>@Fmt.Moeda(p.Valor)</span></div>
+                }
+                @if (cupom.Troco > 0) { <div class="linha-cupom"><span>Troco</span><span>@Fmt.Moeda(cupom.Troco)</span></div> }
+                <div class="centro">Obrigado pela preferência! Beba com moderação.</div>
+            </div>
+        }
+    </ChildContent>
+    <Rodape>
+        <button class="btn fantasma" @onclick="Imprimir">Imprimir</button>
+        <button class="btn primario" @onclick="NovaVenda">Nova venda</button>
+    </Rodape>
+</Modal>
+
+@code {
+    private class Linha
+    {
+        public required ProdutoDto Produto { get; init; }
+        public int Quantidade { get; set; } = 1;
+        public decimal Desconto { get; set; }
+        public decimal Total => Math.Max(0, Produto.PrecoAtual * Quantidade - Desconto);
+    }
+
+    private class Pagto
+    {
+        public FormaPagamento Forma { get; init; }
+        public decimal Valor { get; set; }
+    }
+
+    private List<DepositoDto> depositos = [];
+    private int depositoId;
+    private readonly List<Linha> itens = [];
+    private readonly List<Pagto> pagamentos = [];
+    private decimal descontoGeral;
+    private ClienteDto? cliente;
+    private string buscaCliente = "";
+    private List<ClienteDto> clientesEncontrados = [];
+    private VendaDto? cupom;
+    private bool enviando;
+
+    private decimal Subtotal => itens.Sum(i => i.Total);
+    private decimal Total => Math.Max(0, Subtotal - descontoGeral);
+    private decimal Pago => pagamentos.Sum(p => p.Valor);
+    private decimal Restante => Math.Max(0, Total - Pago);
+    private decimal Troco => Math.Max(0, Pago - Total);
+    private bool PodeFinalizar => itens.Count > 0 && Total > 0 && Restante == 0 && itens.All(i => i.Quantidade > 0);
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            depositos = (await Api.GetAsync<List<DepositoDto>>("api/depositos")).Where(d => d.Ativo && d.Tipo == TipoDeposito.Loja).ToList();
+            depositoId = Sessao.DepositoPadraoId ?? depositos.FirstOrDefault()?.Id ?? 0;
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender) await JS.InvokeVoidAsync("vino.focar", "pdv-busca");
+    }
+
+    private void LojaMudou() => Sessao.DepositoPadraoId = depositoId;
+
+    private async Task Adicionar(ProdutoDto p)
+    {
+        // Saldo do produto na loja selecionada
+        var saldos = await Api.GetAsync<List<SaldoDto>>($"api/estoque/saldos?depositoId={depositoId}&busca={Uri.EscapeDataString(p.Sku)}");
+        var disponivel = saldos.FirstOrDefault(s => s.ProdutoId == p.Id)?.Disponivel ?? 0;
+        var produtoNaLoja = p with { EstoqueDisponivel = disponivel };
+
+        var existente = itens.FirstOrDefault(i => i.Produto.Id == p.Id);
+        if (existente is not null) existente.Quantidade++;
+        else itens.Insert(0, new Linha { Produto = produtoNaLoja });
+
+        if (disponivel <= 0) Avisos.Erro($"{p.Nome}: sem estoque disponível nesta loja.");
+        await JS.InvokeVoidAsync("vino.focar", "pdv-busca");
+    }
+
+    private void Alterar(Linha l, int delta)
+    {
+        l.Quantidade = Math.Max(1, l.Quantidade + delta);
+    }
+
+    private void AdicionarPagamento(FormaPagamento forma)
+    {
+        pagamentos.Add(new Pagto { Forma = forma, Valor = Restante });
+    }
+
+    private async Task BuscarClienteEnter(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") await BuscarCliente();
+    }
+
+    private async Task BuscarCliente()
+    {
+        if (string.IsNullOrWhiteSpace(buscaCliente)) return;
+        try
+        {
+            clientesEncontrados = await Api.GetAsync<List<ClienteDto>>($"api/clientes?limite=8&busca={Uri.EscapeDataString(buscaCliente)}");
+            if (clientesEncontrados.Count == 0) Avisos.Erro("Cliente não encontrado. Cadastre-o na tela Clientes.");
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+    }
+
+    private async Task Finalizar()
+    {
+        if (!PodeFinalizar) return;
+        enviando = true;
+        try
+        {
+            var req = new VendaRequest(
+                depositoId,
+                itens.Select(i => new ItemVendaRequest(i.Produto.Id, i.Quantidade, i.Desconto)).ToList(),
+                pagamentos.Select(p => new PagamentoRequest(p.Forma, p.Valor)).ToList(),
+                cliente?.Id,
+                descontoGeral);
+            cupom = await Api.PostAsync<VendaDto>("api/vendas", req);
+            Avisos.Sucesso($"Venda {cupom.Numero} registrada.");
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+        finally { enviando = false; }
+    }
+
+    private async Task Imprimir() => await JS.InvokeVoidAsync("vino.imprimir");
+
+    private async Task NovaVenda()
+    {
+        cupom = null;
+        itens.Clear();
+        pagamentos.Clear();
+        descontoGeral = 0;
+        cliente = null;
+        buscaCliente = "";
+        await JS.InvokeVoidAsync("vino.focar", "pdv-busca");
+    }
+}

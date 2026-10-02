@@ -1,0 +1,214 @@
+@page "/documentos"
+@inject ApiClient Api
+@inject Avisos Avisos
+
+<div class="cabecalho-pagina">
+    <h1>Documentos dos setores (OCR)</h1>
+</div>
+
+<div class="grade-2 largura-desigual">
+    <section class="cartao">
+        <h2>Receber documento</h2>
+        <p class="nota">Fluxo do diagrama de estado: <span class="badge erro">Bloqueado</span> → verificação de padrão →
+            <span class="badge info">Disponível</span> → análise gerada → <span class="badge ok">Analisado</span> (vira conta no financeiro).</p>
+        <div class="form-grade">
+            <label>Tipo
+                <select @bind="tipo">
+                    @foreach (var t in Enum.GetValues<TipoDocumento>()) { <option value="@t">@Fmt.Texto(t)</option> }
+                </select>
+            </label>
+            <label>Setor de origem
+                <select @bind="setorId">
+                    <option value="">—</option>
+                    @foreach (var s in setores) { <option value="@s.Id">@s.Nome</option> }
+                </select>
+            </label>
+            <label class="col-2">Descrição <input @bind="descricao" placeholder="Ex.: Conta de energia 09/2026" /></label>
+            <label class="col-2">Arquivo (PDF, imagem ou TXT)
+                <InputFile OnChange="Selecionar" accept=".pdf,.png,.jpg,.jpeg,.txt" />
+            </label>
+        </div>
+        <div class="acoes-form">
+            <button class="btn primario" @onclick="Enviar" disabled="@(arquivo is null || enviando)">@(enviando ? "Processando..." : "Digitalizar e extrair texto")</button>
+        </div>
+    </section>
+
+    <aside class="cartao ajuda">
+        <h2>Sobre o OCR</h2>
+        <p>O serviço <code>IOcrService</code> extrai texto de TXT e de PDFs com texto embutido. Para imagens e PDFs escaneados,
+            troque a implementação por um motor de OCR (Tesseract, Azure AI Vision, AWS Textract) sem mexer no restante do sistema.</p>
+        <p>Depois de enviado, confira os dados extraídos e clique em <strong>Verificar</strong>. Se estiver completo, o sistema
+            gera a análise: um lançamento no financeiro, filtrado por tipo (despesa, venda ou compra).</p>
+    </aside>
+</div>
+
+<div class="cartao">
+    <table class="tabela">
+        <thead><tr><th>Documento</th><th>Tipo</th><th>Setor</th><th>Recebido</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+            @foreach (var d in documentos)
+            {
+                <tr>
+                    <td><strong>@d.Nome</strong><div class="sub">@(d.Pendencias ?? (d.LancamentoId is not null ? $"Lançamento #{d.LancamentoId}" : ""))</div></td>
+                    <td>@Fmt.Texto(d.Tipo)</td>
+                    <td>@(d.Setor ?? "—")</td>
+                    <td>@Fmt.DataHora(d.DataDigitalizacao)<div class="sub">@d.Responsavel</div></td>
+                    <td><span class="badge @Fmt.ClasseStatus(d.Status)">@Fmt.Texto(d.Status)</span></td>
+                    <td class="acoes-linha">
+                        <button class="btn fantasma pequeno" @onclick="() => Baixar(d)">Baixar</button>
+                        @if (d.Status != StatusDocumento.Analisado)
+                        {
+                            <button class="btn fantasma pequeno" @onclick="() => AbrirVerificacao(d)">Verificar</button>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    @if (documentos.Count == 0) { <div class="vazio">Nenhum documento recebido ainda.</div> }
+</div>
+
+<Modal Aberto="@(verificando is not null)" Titulo="Verificação de padrão" OnFechar="() => verificando = null" Largo="true">
+    <ChildContent>
+        @if (verificando is not null)
+        {
+            <div class="grade-2">
+                <div>
+                    <h3>Texto extraído</h3>
+                    <pre class="texto-ocr">@(verificando.ConteudoExtraido ?? "(nenhum texto extraído — preencha manualmente)")</pre>
+                </div>
+                <div class="form-grade uma-coluna">
+                    <label>Tipo
+                        <select @bind="vTipo">
+                            @foreach (var t in Enum.GetValues<TipoDocumento>()) { <option value="@t">@Fmt.Texto(t)</option> }
+                        </select>
+                    </label>
+                    <label>Categoria
+                        <select @bind="vCategoria">
+                            <option value="">Automática</option>
+                            @foreach (var c in Enum.GetValues<CategoriaLancamento>()) { <option value="@c">@Fmt.Texto(c)</option> }
+                        </select>
+                    </label>
+                    <label>Setor
+                        <select @bind="vSetorId">
+                            <option value="">—</option>
+                            @foreach (var s in setores) { <option value="@s.Id">@s.Nome</option> }
+                        </select>
+                    </label>
+                    <label>Descrição <input @bind="vDescricao" /></label>
+                    <label>Valor <input type="number" step="0.01" @bind="vValor" /></label>
+                    <label>Vencimento <input type="date" @bind="vVencimento" /></label>
+                </div>
+            </div>
+        }
+    </ChildContent>
+    <Rodape>
+        <button class="btn fantasma" @onclick="() => verificando = null">Fechar</button>
+        <button class="btn primario" @onclick="Verificar">Verificar e gerar análise</button>
+    </Rodape>
+</Modal>
+
+@code {
+    private List<DocumentoDto> documentos = [];
+    private List<SetorDto> setores = [];
+    private TipoDocumento tipo = TipoDocumento.Despesa;
+    private int? setorId;
+    private string? descricao;
+    private IBrowserFile? arquivo;
+    private bool enviando;
+
+    private DocumentoDto? verificando;
+    private TipoDocumento vTipo;
+    private CategoriaLancamento? vCategoria;
+    private int? vSetorId;
+    private string? vDescricao;
+    private decimal? vValor;
+    private DateOnly? vVencimento;
+
+    [Inject] private IJSRuntime JS { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try { setores = await Api.GetAsync<List<SetorDto>>("api/setores"); }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+        await Carregar();
+    }
+
+    private async Task Carregar()
+    {
+        try { documentos = await Api.GetAsync<List<DocumentoDto>>("api/documentos"); }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+    }
+
+    // Caso de uso BaixarDoc: o ERP busca o arquivo na API (com o token) e entrega ao navegador via JS
+    private async Task Baixar(DocumentoDto d)
+    {
+        try
+        {
+            var bytes = await Api.GetBytesAsync($"api/documentos/{d.Id}/arquivo");
+            using var streamRef = new DotNetStreamReference(new MemoryStream(bytes));
+            await JS.InvokeVoidAsync("vino.baixar", d.Nome, streamRef);
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+    }
+
+    private void Selecionar(InputFileChangeEventArgs e) => arquivo = e.File;
+
+    private async Task Enviar()
+    {
+        if (arquivo is null) return;
+        enviando = true;
+        try
+        {
+            using var conteudo = new MultipartFormDataContent();
+            var stream = new StreamContent(arquivo.OpenReadStream(20 * 1024 * 1024));
+            stream.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(string.IsNullOrEmpty(arquivo.ContentType) ? "application/octet-stream" : arquivo.ContentType);
+            conteudo.Add(stream, "arquivo", arquivo.Name);
+            conteudo.Add(new StringContent(tipo.ToString()), "tipo");
+            if (setorId is not null) conteudo.Add(new StringContent(setorId.Value.ToString()), "setorId");
+            if (!string.IsNullOrWhiteSpace(descricao)) conteudo.Add(new StringContent(descricao), "descricao");
+            var doc = await Api.PostMultipartAsync<DocumentoDto>("api/documentos", conteudo);
+            Avisos.Sucesso("Documento recebido. Confira os dados e verifique.");
+            arquivo = null;
+            descricao = null;
+            await Carregar();
+            AbrirVerificacao(doc);
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+        catch (IOException ex) { Avisos.Erro($"Falha ao ler o arquivo: {ex.Message}"); }
+        finally { enviando = false; }
+    }
+
+    private void AbrirVerificacao(DocumentoDto d)
+    {
+        verificando = d;
+        vTipo = d.Tipo;
+        vSetorId = d.SetorId;
+        vDescricao = d.Nome;
+        vCategoria = null;
+        vValor = null;
+        vVencimento = null;
+    }
+
+    private async Task Verificar()
+    {
+        if (verificando is null) return;
+        try
+        {
+            var r = await Api.PostAsync<DocumentoDto>($"api/documentos/{verificando.Id}/verificar",
+                new VerificarDocumentoRequest(vTipo, vSetorId, vValor, vVencimento, vDescricao, vCategoria));
+            if (r.Status == StatusDocumento.Analisado)
+            {
+                Avisos.Sucesso($"Análise gerada: lançamento #{r.LancamentoId} criado no financeiro.");
+                verificando = null;
+            }
+            else
+            {
+                Avisos.Erro($"Documento continua bloqueado: {r.Pendencias}");
+                verificando = r;
+            }
+            await Carregar();
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+    }
+}

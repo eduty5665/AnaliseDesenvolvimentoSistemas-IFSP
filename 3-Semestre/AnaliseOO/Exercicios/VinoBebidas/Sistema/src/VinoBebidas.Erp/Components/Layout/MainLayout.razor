@@ -1,0 +1,119 @@
+@inherits LayoutComponentBase
+@implements IDisposable
+@inject Sessao Sessao
+@inject NavigationManager Nav
+@inject Avisos Avisos
+
+@if (!Sessao.Carregada)
+{
+    <div class="carregando-tela"><div class="spinner"></div></div>
+}
+else if (!Sessao.Autenticado)
+{
+    <div class="carregando-tela"><div class="spinner"></div></div>
+}
+else
+{
+    <div class="app @(menuAberto ? "menu-aberto" : "")">
+        <aside class="sidebar">
+            <div class="marca">
+                <img src="favicon.svg" alt="" />
+                <div>
+                    <strong>Vino Bebidas</strong>
+                    <span>ERP · PDV</span>
+                </div>
+            </div>
+            <nav @onclick="() => menuAberto = false">
+                <NavLink href="" Match="NavLinkMatch.All"><span class="ic">◎</span> Início</NavLink>
+                @if (Sessao.PodeVender)
+                {
+                    <div class="grupo">Vendas</div>
+                    <NavLink href="pdv"><span class="ic">▣</span> Frente de caixa</NavLink>
+                    <NavLink href="vendas"><span class="ic">≡</span> Vendas</NavLink>
+                }
+                <NavLink href="pedidos"><span class="ic">⧉</span> Pedidos online</NavLink>
+                <NavLink href="clientes"><span class="ic">☺</span> Clientes</NavLink>
+                <div class="grupo">Estoque</div>
+                <NavLink href="produtos"><span class="ic">◇</span> Produtos</NavLink>
+                <NavLink href="estoque"><span class="ic">▤</span> Saldos</NavLink>
+                @if (Sessao.PodeEstoque)
+                {
+                    <NavLink href="movimentacoes"><span class="ic">⇄</span> Movimentações</NavLink>
+                }
+                <NavLink href="fornecedores"><span class="ic">⌂</span> Fornecedores</NavLink>
+                @if (Sessao.PodeFinanceiro)
+                {
+                    <div class="grupo">Financeiro</div>
+                    <NavLink href="financeiro"><span class="ic">$</span> Contas</NavLink>
+                    <NavLink href="documentos"><span class="ic">⎙</span> Documentos (OCR)</NavLink>
+                }
+                @if (Sessao.EhAdmin)
+                {
+                    <div class="grupo">Administração</div>
+                    <NavLink href="usuarios"><span class="ic">⚙</span> Usuários e acessos</NavLink>
+                }
+            </nav>
+            <div class="rodape-menu">
+                <div class="usuario">
+                    <strong>@Sessao.Atual?.Nome</strong>
+                    <span>@(Sessao.Perfil is { } p ? Fmt.Texto(p) : "")</span>
+                </div>
+                <button class="btn fantasma pequeno" @onclick="Sair">Sair</button>
+            </div>
+        </aside>
+        <div class="conteudo">
+            <header class="topo">
+                <button class="btn fantasma menu-mobile" @onclick="() => menuAberto = !menuAberto">☰</button>
+                <span class="data-topo">@Fmt.Local(DateTime.UtcNow).ToString("dddd, dd 'de' MMMM", Fmt.PtBr)</span>
+            </header>
+            <main>@Body</main>
+        </div>
+    </div>
+}
+
+<div class="avisos">
+    @foreach (var a in Avisos.Lista)
+    {
+        <div class="aviso @(a.Erro ? "erro" : "")">@a.Texto</div>
+    }
+</div>
+
+@code {
+    private bool menuAberto;
+
+    protected override void OnInitialized()
+    {
+        Sessao.Mudou += Atualizar;
+        Avisos.Mudou += Atualizar;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Sessao.CarregarAsync();
+            if (!Sessao.Autenticado) Nav.NavigateTo("login");
+        }
+    }
+
+    private void Atualizar()
+    {
+        _ = InvokeAsync(() =>
+        {
+            if (Sessao.Carregada && !Sessao.Autenticado) Nav.NavigateTo("login");
+            StateHasChanged();
+        });
+    }
+
+    private async Task Sair()
+    {
+        await Sessao.SairAsync();
+        Nav.NavigateTo("login");
+    }
+
+    public void Dispose()
+    {
+        Sessao.Mudou -= Atualizar;
+        Avisos.Mudou -= Atualizar;
+    }
+}

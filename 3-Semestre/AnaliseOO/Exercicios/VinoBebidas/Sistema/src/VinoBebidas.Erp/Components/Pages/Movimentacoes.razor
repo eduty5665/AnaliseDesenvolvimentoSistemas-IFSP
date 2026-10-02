@@ -1,0 +1,260 @@
+@page "/movimentacoes"
+@inject ApiClient Api
+@inject Avisos Avisos
+
+<div class="cabecalho-pagina">
+    <h1>Movimentações de estoque</h1>
+    <div class="segmentado">
+        <button class="@(aba == 0 ? "ativo" : "")" @onclick="() => aba = 0">Nova movimentação</button>
+        <button class="@(aba == 1 ? "ativo" : "")" @onclick="AbrirHistorico">Histórico (kardex)</button>
+    </div>
+</div>
+
+@if (aba == 0)
+{
+    <div class="grade-2 largura-desigual">
+        <section class="cartao">
+            <div class="tipos-mov">
+                @foreach (var t in new[] { TipoMovimentacao.Entrada, TipoMovimentacao.Transferencia, TipoMovimentacao.Saida, TipoMovimentacao.Ajuste })
+                {
+                    <button class="@(tipo == t ? "ativo" : "")" @onclick="() => TrocarTipo(t)">
+                        <strong>@Fmt.Texto(t)</strong>
+                        <small>@Explicacao(t)</small>
+                    </button>
+                }
+            </div>
+
+            <div class="form-grade">
+                @if (tipo != TipoMovimentacao.Entrada)
+                {
+                    <label>@(tipo == TipoMovimentacao.Transferencia ? "Depósito de origem" : "Depósito")
+                        <select @bind="origemId">
+                            <option value="">Selecione</option>
+                            @foreach (var d in depositos) { <option value="@d.Id">@d.Nome</option> }
+                        </select>
+                    </label>
+                }
+                @if (tipo is TipoMovimentacao.Entrada or TipoMovimentacao.Transferencia)
+                {
+                    <label>Depósito de destino
+                        <select @bind="destinoId">
+                            <option value="">Selecione</option>
+                            @foreach (var d in depositos) { <option value="@d.Id">@d.Nome</option> }
+                        </select>
+                    </label>
+                }
+                @if (tipo == TipoMovimentacao.Entrada)
+                {
+                    <label>Fornecedor
+                        <select @bind="fornecedorId">
+                            <option value="">—</option>
+                            @foreach (var f in fornecedores) { <option value="@f.Id">@(f.NomeFantasia ?? f.RazaoSocial)</option> }
+                        </select>
+                    </label>
+                }
+                <label>@(tipo == TipoMovimentacao.Entrada ? "Número da NF" : "Documento de referência") <input @bind="numeroDocumento" /></label>
+                <label class="col-2">Observação <input @bind="observacao" placeholder="@(tipo == TipoMovimentacao.Saida ? "Motivo: quebra, degustação, uso interno..." : "")" /></label>
+                @if (tipo == TipoMovimentacao.Entrada)
+                {
+                    <label class="check"><input type="checkbox" @bind="gerarConta" /> Gerar conta a pagar no financeiro</label>
+                    @if (gerarConta)
+                    {
+                        <label>Vencimento <input type="date" @bind="vencimento" /></label>
+                    }
+                }
+            </div>
+
+            <h3>Itens</h3>
+            <SeletorProduto Id="mov-busca" AoEscolher="Adicionar" />
+            @if (itens.Count > 0)
+            {
+                <table class="tabela compacta">
+                    <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th class="num">@(tipo == TipoMovimentacao.Ajuste ? "Qtd contada" : "Quantidade")</th>
+                            @if (tipo == TipoMovimentacao.Entrada) { <th class="num">Custo unit.</th><th class="num">Subtotal</th> }
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var i in itens)
+                        {
+                            <tr>
+                                <td>@i.Nome<div class="sub">@i.Sku</div></td>
+                                <td class="num"><input class="curto" type="number" min="0" @bind="i.Quantidade" /></td>
+                                @if (tipo == TipoMovimentacao.Entrada)
+                                {
+                                    <td class="num"><input class="curto" type="number" min="0" step="0.01" @bind="i.Custo" /></td>
+                                    <td class="num">@Fmt.Moeda(i.Custo * i.Quantidade)</td>
+                                }
+                                <td><button class="btn fantasma pequeno" @onclick="() => itens.Remove(i)">✕</button></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                @if (tipo == TipoMovimentacao.Entrada)
+                {
+                    <div class="resumo-linha"><span></span><span>Total da nota: <strong>@Fmt.Moeda(itens.Sum(i => i.Custo * i.Quantidade))</strong></span></div>
+                }
+            }
+            <div class="acoes-form">
+                <button class="btn primario" @onclick="Registrar" disabled="@(itens.Count == 0 || enviando)">Registrar @Fmt.Texto(tipo).ToLower()</button>
+            </div>
+        </section>
+
+        <aside class="cartao ajuda">
+            <h2>Como funciona</h2>
+            <p><strong>Entrada</strong>: recebimento de nota fiscal do fornecedor. Atualiza o custo médio do produto e pode gerar a conta a pagar.</p>
+            <p><strong>Transferência</strong>: move mercadoria entre CD e lojas. O sistema impede transferir mais que o disponível (descontando reservas).</p>
+            <p><strong>Saída</strong>: baixas avulsas — quebra, degustação, brinde, uso interno.</p>
+            <p><strong>Ajuste</strong>: inventário. Informe a quantidade <em>contada</em>; o sistema lança a diferença.</p>
+            <p>Vendas do PDV e pedidos online concluídos geram movimentação automaticamente.</p>
+        </aside>
+    </div>
+}
+else
+{
+    <div class="filtros cartao">
+        <select @bind="filtroTipo">
+            <option value="">Todos os tipos</option>
+            @foreach (var t in Enum.GetValues<TipoMovimentacao>()) { <option value="@t">@Fmt.Texto(t)</option> }
+        </select>
+        <select @bind="filtroDeposito">
+            <option value="">Todos os depósitos</option>
+            @foreach (var d in depositos) { <option value="@d.Id">@d.Nome</option> }
+        </select>
+        <button class="btn primario" @onclick="() => CarregarHistorico(1)">Filtrar</button>
+    </div>
+    @if (historico is not null)
+    {
+        <div class="cartao">
+            <table class="tabela">
+                <thead><tr><th>Data</th><th>Tipo</th><th>Origem → Destino</th><th>Documento</th><th>Itens</th><th class="num">Valor</th><th>Usuário</th></tr></thead>
+                <tbody>
+                    @foreach (var m in historico.Itens)
+                    {
+                        <tr>
+                            <td>@Fmt.DataHora(m.Data)</td>
+                            <td><span class="badge @(m.Tipo is TipoMovimentacao.Entrada or TipoMovimentacao.CancelamentoVenda ? "ok" : m.Tipo == TipoMovimentacao.Transferencia ? "info" : "alerta")">@Fmt.Texto(m.Tipo)</span></td>
+                            <td>@(m.DepositoOrigem ?? "—") → @(m.DepositoDestino ?? "—")</td>
+                            <td>@m.NumeroDocumento @if (m.Fornecedor is not null) { <div class="sub">@m.Fornecedor</div> }</td>
+                            <td>
+                                @foreach (var i in m.Itens.Take(3)) { <div class="sub">@(i.Quantidade > 0 ? "+" : "")@i.Quantidade @i.Produto</div> }
+                                @if (m.Itens.Count > 3) { <div class="sub">+ @(m.Itens.Count - 3) item(ns)</div> }
+                            </td>
+                            <td class="num">@Fmt.Moeda(m.ValorTotal)</td>
+                            <td>@(m.Usuario ?? "—")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <Paginacao Pagina="historico.Pagina" Tamanho="historico.TamanhoPagina" Total="historico.Total" AoMudar="CarregarHistorico" />
+        </div>
+    }
+}
+
+@code {
+    private class Item
+    {
+        public int ProdutoId { get; init; }
+        public string Nome { get; init; } = "";
+        public string Sku { get; init; } = "";
+        public int Quantidade { get; set; } = 1;
+        public decimal Custo { get; set; }
+    }
+
+    private int aba;
+    private TipoMovimentacao tipo = TipoMovimentacao.Entrada;
+    private List<DepositoDto> depositos = [];
+    private List<FornecedorDto> fornecedores = [];
+    private int? origemId, destinoId, fornecedorId;
+    private string? numeroDocumento, observacao;
+    private bool gerarConta = true;
+    private DateOnly? vencimento = Fmt.Hoje.AddDays(30);
+    private readonly List<Item> itens = [];
+    private bool enviando;
+
+    private PaginaDto<MovimentacaoDto>? historico;
+    private TipoMovimentacao? filtroTipo;
+    private int? filtroDeposito;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            depositos = (await Api.GetAsync<List<DepositoDto>>("api/depositos")).Where(d => d.Ativo).ToList();
+            fornecedores = await Api.GetAsync<List<FornecedorDto>>("api/fornecedores");
+            destinoId = depositos.FirstOrDefault(d => d.Tipo == TipoDeposito.CentroDistribuicao)?.Id;
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+    }
+
+    private static string Explicacao(TipoMovimentacao t) => t switch
+    {
+        TipoMovimentacao.Entrada => "Nota do fornecedor",
+        TipoMovimentacao.Transferencia => "Entre CD e lojas",
+        TipoMovimentacao.Saida => "Quebra, degustação...",
+        TipoMovimentacao.Ajuste => "Contagem de inventário",
+        _ => ""
+    };
+
+    private void TrocarTipo(TipoMovimentacao t)
+    {
+        tipo = t;
+        if (t == TipoMovimentacao.Transferencia)
+        {
+            origemId = depositos.FirstOrDefault(d => d.Tipo == TipoDeposito.CentroDistribuicao)?.Id;
+            destinoId = depositos.FirstOrDefault(d => d.Tipo == TipoDeposito.Loja)?.Id;
+        }
+    }
+
+    private void Adicionar(ProdutoDto p)
+    {
+        var existente = itens.FirstOrDefault(i => i.ProdutoId == p.Id);
+        if (existente is not null) existente.Quantidade++;
+        else itens.Add(new Item { ProdutoId = p.Id, Nome = p.Nome, Sku = p.Sku, Custo = p.PrecoCusto });
+    }
+
+    private async Task Registrar()
+    {
+        enviando = true;
+        try
+        {
+            var req = new MovimentacaoRequest(
+                tipo,
+                itens.Select(i => new ItemMovimentacaoRequest(i.ProdutoId, i.Quantidade, tipo == TipoMovimentacao.Entrada ? i.Custo : null)).ToList(),
+                tipo == TipoMovimentacao.Entrada ? null : origemId,
+                tipo is TipoMovimentacao.Entrada or TipoMovimentacao.Transferencia ? destinoId : null,
+                tipo == TipoMovimentacao.Entrada ? fornecedorId : null,
+                numeroDocumento,
+                observacao,
+                tipo == TipoMovimentacao.Entrada && gerarConta,
+                vencimento);
+            var mov = await Api.PostAsync<MovimentacaoDto>("api/estoque/movimentacoes", req);
+            Avisos.Sucesso($"{Fmt.Texto(mov.Tipo)} registrada com {mov.Itens.Count} item(ns).");
+            itens.Clear();
+            numeroDocumento = observacao = null;
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+        finally { enviando = false; }
+    }
+
+    private async Task AbrirHistorico()
+    {
+        aba = 1;
+        await CarregarHistorico(1);
+    }
+
+    private async Task CarregarHistorico(int p)
+    {
+        try
+        {
+            var url = $"api/estoque/movimentacoes?pagina={p}&tamanho=30";
+            if (filtroTipo is not null) url += $"&tipo={filtroTipo}";
+            if (filtroDeposito is not null) url += $"&depositoId={filtroDeposito}";
+            historico = await Api.GetAsync<PaginaDto<MovimentacaoDto>>(url);
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+    }
+}

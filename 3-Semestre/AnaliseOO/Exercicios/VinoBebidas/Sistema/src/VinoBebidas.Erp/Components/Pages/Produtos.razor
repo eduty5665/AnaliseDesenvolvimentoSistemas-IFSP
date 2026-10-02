@@ -1,0 +1,215 @@
+@page "/produtos"
+@inject ApiClient Api
+@inject Sessao Sessao
+@inject Avisos Avisos
+
+<div class="cabecalho-pagina">
+    <h1>Produtos</h1>
+    <div class="acoes">
+        @if (Sessao.PodeEstoque)
+        {
+            <button class="btn primario" @onclick="Novo">+ Novo produto</button>
+        }
+    </div>
+</div>
+
+<div class="filtros cartao">
+    <input class="largo" placeholder="Buscar por nome, SKU ou código de barras" @bind="busca" @onkeydown="@(e => e.Key == "Enter" ? Carregar(1) : Task.CompletedTask)" />
+    <select @bind="categoriaId">
+        <option value="">Todas as categorias</option>
+        @foreach (var c in categorias) { <option value="@c.Id">@c.Nome</option> }
+    </select>
+    <select @bind="filtroLoja">
+        <option value="">Loja online: todos</option>
+        <option value="true">Visíveis na loja</option>
+        <option value="false">Somente balcão</option>
+    </select>
+    <button class="btn primario" @onclick="() => Carregar(1)">Filtrar</button>
+</div>
+
+@if (pagina is null)
+{
+    <div class="carregando"><div class="spinner"></div></div>
+}
+else
+{
+    <div class="cartao">
+        <table class="tabela">
+            <thead><tr><th>Produto</th><th>Categoria</th><th class="num">Custo</th><th class="num">Venda</th><th class="num">Margem</th><th class="num">Estoque</th><th>Loja</th><th></th></tr></thead>
+            <tbody>
+                @foreach (var p in pagina.Itens)
+                {
+                    <tr class="@(!p.Ativo ? "inativo" : "")">
+                        <td>
+                            <span class="bolinha" style="background:@p.CorCategoria"></span>
+                            <strong>@p.Nome</strong>
+                            <div class="sub">@p.Sku @(p.Safra is not null ? $"· safra {p.Safra}" : "") @(p.Pais is not null ? $"· {p.Pais}" : "")</div>
+                        </td>
+                        <td>@p.Categoria</td>
+                        <td class="num">@Fmt.Moeda(p.PrecoCusto)</td>
+                        <td class="num">
+                            @if (p.PrecoPromocional is not null)
+                            {
+                                <s class="sub">@Fmt.Moeda(p.PrecoVenda)</s><br />
+                            }
+                            <strong>@Fmt.Moeda(p.PrecoAtual)</strong>
+                        </td>
+                        <td class="num">@Fmt.Pct(p.MargemPercentual)</td>
+                        <td class="num @(p.EstoqueDisponivel < p.EstoqueMinimo ? "negativo" : "")">@p.EstoqueDisponivel <span class="sub">/ @p.EstoqueTotal</span></td>
+                        <td>@(p.VisivelLoja ? "✓" : "—") @(p.Destaque ? "★" : "")</td>
+                        <td>
+                            @if (Sessao.PodeEstoque)
+                            {
+                                <button class="btn fantasma pequeno" @onclick="() => Editar(p)">Editar</button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <Paginacao Pagina="pagina.Pagina" Tamanho="pagina.TamanhoPagina" Total="pagina.Total" AoMudar="Carregar" />
+    </div>
+}
+
+<Modal Aberto="@(form is not null)" Titulo="@(editandoId is null ? "Novo produto" : "Editar produto")" OnFechar="() => form = null" Largo="true">
+    <ChildContent>
+        @if (form is not null)
+        {
+            <div class="form-grade">
+                <label>SKU* <input @bind="form.Sku" /></label>
+                <label>Código de barras (EAN) <input @bind="form.CodigoBarras" /></label>
+                <label class="col-2">Nome* <input @bind="form.Nome" /></label>
+                <label>Categoria*
+                    <select @bind="form.CategoriaId">
+                        @foreach (var c in categorias) { <option value="@c.Id">@c.Nome</option> }
+                    </select>
+                </label>
+                <label>Volume (ml) <input type="number" @bind="form.VolumeMl" /></label>
+                <label>Preço de custo* <input type="number" step="0.01" @bind="form.PrecoCusto" /></label>
+                <label>Preço de venda* <input type="number" step="0.01" @bind="form.PrecoVenda" /></label>
+                <label>Preço promocional <input type="number" step="0.01" @bind="form.PrecoPromocional" /></label>
+                <label>Estoque mínimo <input type="number" @bind="form.EstoqueMinimo" /></label>
+                <label>Produtor <input @bind="form.Produtor" /></label>
+                <label>Uva(s) <input @bind="form.Uva" /></label>
+                <label>País <input @bind="form.Pais" /></label>
+                <label>Região <input @bind="form.Regiao" /></label>
+                <label>Safra <input type="number" @bind="form.Safra" /></label>
+                <label>Teor alcoólico (%) <input type="number" step="0.1" @bind="form.TeorAlcoolico" /></label>
+                <label>Pontuação (crítica) <input type="number" @bind="form.Pontuacao" /></label>
+                <label>Temperatura de serviço <input @bind="form.TemperaturaServico" /></label>
+                <label class="col-2">Harmonização <input @bind="form.Harmonizacao" /></label>
+                <label class="col-2">Descrição <textarea rows="3" @bind="form.Descricao"></textarea></label>
+                <label class="col-2">URL da imagem <input @bind="form.ImagemUrl" placeholder="https://..." /></label>
+                <label class="check"><input type="checkbox" @bind="form.VisivelLoja" /> Exibir na loja online e no app (vinhos especiais)</label>
+                <label class="check"><input type="checkbox" @bind="form.Destaque" /> Destaque na vitrine</label>
+                <label class="check"><input type="checkbox" @bind="form.Ativo" /> Ativo</label>
+            </div>
+            @if (form.PrecoVenda > 0)
+            {
+                <p class="nota">Margem sobre o preço atual: <strong>@Fmt.Pct(Math.Round(((form.PrecoPromocional ?? form.PrecoVenda) - form.PrecoCusto) / (form.PrecoPromocional ?? form.PrecoVenda) * 100, 1))</strong></p>
+            }
+        }
+    </ChildContent>
+    <Rodape>
+        <button class="btn fantasma" @onclick="() => form = null">Cancelar</button>
+        <button class="btn primario" @onclick="Salvar" disabled="@salvando">Salvar</button>
+    </Rodape>
+</Modal>
+
+@code {
+    private class FormProduto
+    {
+        public string Sku { get; set; } = "";
+        public string? CodigoBarras { get; set; }
+        public string Nome { get; set; } = "";
+        public int CategoriaId { get; set; }
+        public decimal PrecoCusto { get; set; }
+        public decimal PrecoVenda { get; set; }
+        public decimal? PrecoPromocional { get; set; }
+        public int EstoqueMinimo { get; set; }
+        public string? Descricao { get; set; }
+        public string? Produtor { get; set; }
+        public string? Pais { get; set; }
+        public string? Regiao { get; set; }
+        public string? Uva { get; set; }
+        public int? Safra { get; set; }
+        public decimal? TeorAlcoolico { get; set; }
+        public int VolumeMl { get; set; } = 750;
+        public string? Harmonizacao { get; set; }
+        public string? TemperaturaServico { get; set; }
+        public int? Pontuacao { get; set; }
+        public string? ImagemUrl { get; set; }
+        public bool Ativo { get; set; } = true;
+        public bool VisivelLoja { get; set; }
+        public bool Destaque { get; set; }
+
+        public ProdutoSalvarRequest ParaRequest() => new(Sku, Nome, CategoriaId, PrecoCusto, PrecoVenda, CodigoBarras, Descricao, Produtor,
+            Pais, Regiao, Uva, Safra, TeorAlcoolico, VolumeMl, Harmonizacao, TemperaturaServico, Pontuacao,
+            PrecoPromocional is > 0 ? PrecoPromocional : null, EstoqueMinimo, ImagemUrl, Ativo, VisivelLoja, Destaque);
+    }
+
+    private PaginaDto<ProdutoDto>? pagina;
+    private List<CategoriaDto> categorias = [];
+    private string busca = "";
+    private int? categoriaId;
+    private bool? filtroLoja;
+    private FormProduto? form;
+    private int? editandoId;
+    private bool salvando;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try { categorias = await Api.GetAsync<List<CategoriaDto>>("api/categorias"); }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+        await Carregar(1);
+    }
+
+    private async Task Carregar(int p)
+    {
+        try
+        {
+            var url = $"api/produtos?pagina={p}&tamanho=40&busca={Uri.EscapeDataString(busca)}";
+            if (categoriaId is not null) url += $"&categoriaId={categoriaId}";
+            if (filtroLoja is not null) url += $"&visivelLoja={filtroLoja.Value.ToString().ToLower()}";
+            pagina = await Api.GetAsync<PaginaDto<ProdutoDto>>(url);
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+    }
+
+    private void Novo()
+    {
+        editandoId = null;
+        form = new FormProduto { CategoriaId = categorias.FirstOrDefault()?.Id ?? 0, VisivelLoja = true };
+    }
+
+    private void Editar(ProdutoDto p)
+    {
+        editandoId = p.Id;
+        form = new FormProduto
+        {
+            Sku = p.Sku, CodigoBarras = p.CodigoBarras, Nome = p.Nome, CategoriaId = p.CategoriaId, PrecoCusto = p.PrecoCusto,
+            PrecoVenda = p.PrecoVenda, PrecoPromocional = p.PrecoPromocional, EstoqueMinimo = p.EstoqueMinimo, Descricao = p.Descricao,
+            Produtor = p.Produtor, Pais = p.Pais, Regiao = p.Regiao, Uva = p.Uva, Safra = p.Safra, TeorAlcoolico = p.TeorAlcoolico,
+            VolumeMl = p.VolumeMl, Harmonizacao = p.Harmonizacao, TemperaturaServico = p.TemperaturaServico, Pontuacao = p.Pontuacao,
+            ImagemUrl = p.ImagemUrl, Ativo = p.Ativo, VisivelLoja = p.VisivelLoja, Destaque = p.Destaque
+        };
+    }
+
+    private async Task Salvar()
+    {
+        if (form is null) return;
+        salvando = true;
+        try
+        {
+            var req = form.ParaRequest();
+            _ = editandoId is null
+                ? await Api.PostAsync<ProdutoDto>("api/produtos", req)
+                : await Api.PutAsync<ProdutoDto>($"api/produtos/{editandoId}", req);
+            Avisos.Sucesso("Produto salvo.");
+            form = null;
+            await Carregar(pagina?.Pagina ?? 1);
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+        finally { salvando = false; }
+    }
+}

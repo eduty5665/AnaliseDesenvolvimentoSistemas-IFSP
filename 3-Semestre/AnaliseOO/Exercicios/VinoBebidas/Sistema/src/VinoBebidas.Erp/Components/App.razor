@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+    <title>Vino Bebidas · ERP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" />
+    <link rel="stylesheet" href="@Assets["app.css"]" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <HeadOutlet @rendermode="InteractiveServer" />
+</head>
+<body>
+    <Routes @rendermode="InteractiveServer" />
+    <script src="_framework/blazor.web.js"></script>
+    <script>
+        window.vino = {
+            imprimir: () => window.print(),
+            focar: (id) => { const el = document.getElementById(id); if (el) { el.focus(); el.select && el.select(); } },
+            baixar: async (nome, streamRef) => {
+                const blob = new Blob([await streamRef.arrayBuffer()]);
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.download = nome ?? 'arquivo';
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+        };
+    </script>
+</body>
+</html>

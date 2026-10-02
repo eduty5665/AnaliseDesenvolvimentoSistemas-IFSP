@@ -1,0 +1,272 @@
+@page "/financeiro"
+@inject ApiClient Api
+@inject Avisos Avisos
+
+<div class="cabecalho-pagina">
+    <h1>Financeiro</h1>
+    <div class="acoes"><button class="btn primario" @onclick="Novo">+ Nova conta</button></div>
+</div>
+
+@if (resumo is not null)
+{
+    <div class="kpis">
+        <div class="kpi"><span>Receitas do mês</span><strong class="positivo">@Fmt.Moeda(resumo.ReceitasMes)</strong></div>
+        <div class="kpi"><span>Despesas do mês</span><strong>@Fmt.Moeda(resumo.DespesasMes)</strong></div>
+        <div class="kpi"><span>Resultado</span><strong class="@(resumo.ResultadoMes >= 0 ? "positivo" : "negativo")">@Fmt.Moeda(resumo.ResultadoMes)</strong></div>
+        <div class="kpi"><span>A pagar (em aberto)</span><strong>@Fmt.Moeda(resumo.APagar)</strong><small class="negativo">@(resumo.Atrasado > 0 ? $"{Fmt.Moeda(resumo.Atrasado)} atrasado" : "nada atrasado")</small></div>
+        <div class="kpi"><span>A receber</span><strong>@Fmt.Moeda(resumo.AReceber)</strong></div>
+    </div>
+}
+
+<div class="grade-2 largura-desigual">
+    <section class="cartao">
+        <div class="filtros">
+            <select @bind="filtroTipo">
+                <option value="">Pagar e receber</option>
+                <option value="@TipoLancamento.Despesa">Contas a pagar</option>
+                <option value="@TipoLancamento.Receita">Contas a receber</option>
+            </select>
+            <select @bind="filtroStatus">
+                <option value="">Todos os status</option>
+                @foreach (var s in Enum.GetValues<StatusLancamento>()) { <option value="@s">@Fmt.Texto(s)</option> }
+            </select>
+            <select @bind="filtroCategoria">
+                <option value="">Todas as categorias</option>
+                @foreach (var c in Enum.GetValues<CategoriaLancamento>()) { <option value="@c">@Fmt.Texto(c)</option> }
+            </select>
+            <label>Venc. de <input type="date" @bind="de" /></label>
+            <label>até <input type="date" @bind="ate" /></label>
+            <label class="check"><input type="checkbox" @bind="atrasados" /> Só atrasados</label>
+            <button class="btn primario" @onclick="() => Carregar(1)">Filtrar</button>
+        </div>
+        @if (pagina is not null)
+        {
+            <table class="tabela">
+                <thead><tr><th>Vencimento</th><th>Descrição</th><th>Categoria / setor</th><th class="num">Valor</th><th>Status</th><th></th></tr></thead>
+                <tbody>
+                    @foreach (var l in pagina.Itens)
+                    {
+                        <tr class="@(l.Atrasado ? "linha-alerta" : "")">
+                            <td>@Fmt.Data(l.Vencimento)</td>
+                            <td>
+                                <strong>@l.Descricao</strong>
+                                @if (l.Fornecedor is not null) { <div class="sub">@l.Fornecedor</div> }
+                                @if (l.ConsumoQuantidade is not null) { <div class="sub">Consumo: @Fmt.Num(l.ConsumoQuantidade.Value) @l.ConsumoUnidade</div> }
+                            </td>
+                            <td>@Fmt.Texto(l.Categoria)<div class="sub">@l.Setor</div></td>
+                            <td class="num @(l.Tipo == TipoLancamento.Receita ? "positivo" : "")">@(l.Tipo == TipoLancamento.Despesa ? "−" : "+")@Fmt.Moeda(l.Valor)</td>
+                            <td>
+                                <span class="badge @(l.Atrasado ? "erro" : Fmt.ClasseStatus(l.Status))">@(l.Atrasado ? "Atrasado" : Fmt.Texto(l.Status))</span>
+                                @if (l.DataPagamento is not null) { <div class="sub">em @Fmt.Data(l.DataPagamento)</div> }
+                            </td>
+                            <td class="acoes-linha">
+                                @if (l.Status == StatusLancamento.Aberto)
+                                {
+                                    <button class="btn fantasma pequeno" @onclick="() => Pagar(l)">@(l.Tipo == TipoLancamento.Despesa ? "Pagar" : "Receber")</button>
+                                    <button class="btn fantasma pequeno" @onclick="() => Editar(l)">Editar</button>
+                                    <button class="btn perigo-fantasma pequeno" @onclick="() => Cancelar(l)">✕</button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <Paginacao Pagina="pagina.Pagina" Tamanho="pagina.TamanhoPagina" Total="pagina.Total" AoMudar="Carregar" />
+        }
+    </section>
+
+    <aside class="cartao">
+        <h2>Alertas de vencimento</h2>
+        @if (alertas.Count == 0)
+        {
+            <div class="vazio">Sem contas vencendo nos próximos 10 dias.</div>
+        }
+        else
+        {
+            <ul class="lista-alertas">
+                @foreach (var a in alertas)
+                {
+                    <li class="@(a.Atrasado ? "atrasado" : "")">
+                        <div><strong>@a.Descricao</strong><small>@(a.Atrasado ? $"Atrasada há {-a.DiasParaVencer} dia(s)" : a.DiasParaVencer == 0 ? "Vence hoje" : $"Vence em {a.DiasParaVencer} dia(s)")</small></div>
+                        <span>@Fmt.Moeda(a.Valor)</span>
+                    </li>
+                }
+            </ul>
+        }
+        @if (resumo is not null && resumo.DespesasPorCategoria.Count > 0)
+        {
+            <h2>Despesas do mês por categoria</h2>
+            var max = resumo.DespesasPorCategoria.Max(x => x.Valor);
+            <div class="barras">
+                @foreach (var c in resumo.DespesasPorCategoria)
+                {
+                    <div class="barra">
+                        <span>@c.Nome</span>
+                        <div class="trilho"><div style="width:@((max == 0 ? 0 : c.Valor / max * 100).ToString("0.#", System.Globalization.CultureInfo.InvariantCulture))%"></div></div>
+                        <strong>@Fmt.Moeda(c.Valor)</strong>
+                    </div>
+                }
+            </div>
+        }
+    </aside>
+</div>
+
+<Modal Aberto="@(form is not null)" Titulo="@(editandoId is null ? "Nova conta" : "Editar conta")" OnFechar="() => form = null" Largo="true">
+    <ChildContent>
+        @if (form is not null)
+        {
+            <div class="form-grade">
+                <label>Tipo
+                    <select @bind="form.Tipo">
+                        <option value="@TipoLancamento.Despesa">A pagar (despesa)</option>
+                        <option value="@TipoLancamento.Receita">A receber (receita)</option>
+                    </select>
+                </label>
+                <label>Categoria
+                    <select @bind="form.Categoria">
+                        @foreach (var c in Enum.GetValues<CategoriaLancamento>()) { <option value="@c">@Fmt.Texto(c)</option> }
+                    </select>
+                </label>
+                <label class="col-2">Descrição* <input @bind="form.Descricao" /></label>
+                <label>Valor* <input type="number" step="0.01" @bind="form.Valor" /></label>
+                <label>Vencimento* <input type="date" @bind="form.Vencimento" /></label>
+                <label>Setor
+                    <select @bind="form.SetorId">
+                        <option value="">—</option>
+                        @foreach (var s in setores) { <option value="@s.Id">@s.Nome</option> }
+                    </select>
+                </label>
+                <label>Fornecedor
+                    <select @bind="form.FornecedorId">
+                        <option value="">—</option>
+                        @foreach (var f in fornecedores) { <option value="@f.Id">@(f.NomeFantasia ?? f.RazaoSocial)</option> }
+                    </select>
+                </label>
+                @if (form.Categoria is CategoriaLancamento.EnergiaEletrica or CategoriaLancamento.Agua)
+                {
+                    <label>Consumo (@(form.Categoria == CategoriaLancamento.Agua ? "m³" : "kWh")) <input type="number" step="0.01" @bind="form.Consumo" /></label>
+                }
+                <label class="col-2">Observação <input @bind="form.Observacao" /></label>
+            </div>
+        }
+    </ChildContent>
+    <Rodape>
+        <button class="btn fantasma" @onclick="() => form = null">Cancelar</button>
+        <button class="btn primario" @onclick="Salvar">Salvar</button>
+    </Rodape>
+</Modal>
+
+@code {
+    private class FormConta
+    {
+        public TipoLancamento Tipo { get; set; } = TipoLancamento.Despesa;
+        public CategoriaLancamento Categoria { get; set; } = CategoriaLancamento.Outros;
+        public string Descricao { get; set; } = "";
+        public decimal Valor { get; set; }
+        public DateOnly Vencimento { get; set; } = Fmt.Hoje.AddDays(7);
+        public int? SetorId { get; set; }
+        public int? FornecedorId { get; set; }
+        public decimal? Consumo { get; set; }
+        public string? Observacao { get; set; }
+    }
+
+    private ResumoFinanceiroDto? resumo;
+    private List<AlertaFinanceiroDto> alertas = [];
+    private PaginaDto<LancamentoDto>? pagina;
+    private List<SetorDto> setores = [];
+    private List<FornecedorDto> fornecedores = [];
+    private TipoLancamento? filtroTipo = TipoLancamento.Despesa;
+    private StatusLancamento? filtroStatus = StatusLancamento.Aberto;
+    private CategoriaLancamento? filtroCategoria;
+    private DateOnly? de, ate;
+    private bool atrasados;
+    private FormConta? form;
+    private int? editandoId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            setores = await Api.GetAsync<List<SetorDto>>("api/setores");
+            fornecedores = await Api.GetAsync<List<FornecedorDto>>("api/fornecedores");
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+        await Atualizar();
+    }
+
+    private async Task Atualizar()
+    {
+        try
+        {
+            resumo = await Api.GetAsync<ResumoFinanceiroDto>("api/financeiro/resumo");
+            alertas = await Api.GetAsync<List<AlertaFinanceiroDto>>("api/financeiro/alertas?dias=10");
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+        await Carregar(pagina?.Pagina ?? 1);
+    }
+
+    private async Task Carregar(int p)
+    {
+        try
+        {
+            var url = $"api/financeiro/lancamentos?pagina={p}&tamanho=40&atrasados={atrasados.ToString().ToLower()}&de={de:yyyy-MM-dd}&ate={ate:yyyy-MM-dd}";
+            if (filtroTipo is not null) url += $"&tipo={filtroTipo}";
+            if (filtroStatus is not null) url += $"&status={filtroStatus}";
+            if (filtroCategoria is not null) url += $"&categoria={filtroCategoria}";
+            pagina = await Api.GetAsync<PaginaDto<LancamentoDto>>(url);
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+    }
+
+    private void Novo() { editandoId = null; form = new FormConta(); }
+
+    private void Editar(LancamentoDto l)
+    {
+        editandoId = l.Id;
+        form = new FormConta
+        {
+            Tipo = l.Tipo, Categoria = l.Categoria, Descricao = l.Descricao, Valor = l.Valor, Vencimento = l.Vencimento,
+            SetorId = l.SetorId, FornecedorId = l.FornecedorId, Consumo = l.ConsumoQuantidade, Observacao = l.Observacao
+        };
+    }
+
+    private async Task Salvar()
+    {
+        if (form is null) return;
+        var unidade = form.Categoria switch { CategoriaLancamento.Agua => "m³", CategoriaLancamento.EnergiaEletrica => "kWh", _ => null };
+        var req = new LancamentoSalvarRequest(form.Tipo, form.Categoria, form.Descricao, form.Valor, form.Vencimento, null, form.SetorId,
+            form.FornecedorId, unidade is null ? null : form.Consumo, unidade, form.Observacao);
+        try
+        {
+            _ = editandoId is null
+                ? await Api.PostAsync<LancamentoDto>("api/financeiro/lancamentos", req)
+                : await Api.PutAsync<LancamentoDto>($"api/financeiro/lancamentos/{editandoId}", req);
+            Avisos.Sucesso("Conta salva.");
+            form = null;
+            await Atualizar();
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+    }
+
+    private async Task Pagar(LancamentoDto l)
+    {
+        try
+        {
+            await Api.PostAsync<LancamentoDto>($"api/financeiro/lancamentos/{l.Id}/pagar", new PagarLancamentoRequest());
+            Avisos.Sucesso($"Baixa registrada: {l.Descricao}");
+            await Atualizar();
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+    }
+
+    private async Task Cancelar(LancamentoDto l)
+    {
+        try
+        {
+            await Api.PostAsync<LancamentoDto>($"api/financeiro/lancamentos/{l.Id}/cancelar", null);
+            Avisos.Sucesso("Lançamento cancelado.");
+            await Atualizar();
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+    }
+}

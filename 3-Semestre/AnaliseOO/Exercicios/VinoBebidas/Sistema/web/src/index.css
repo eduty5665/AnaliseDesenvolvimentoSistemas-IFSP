@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Cormorant Garamond", Georgia, serif;
+
+  --color-vinho-50: #fbf3f5;
+  --color-vinho-100: #f5e3e8;
+  --color-vinho-200: #ebc5cf;
+  --color-vinho-300: #d995a7;
+  --color-vinho-400: #c2627d;
+  --color-vinho-500: #9e2a4b;
+  --color-vinho-600: #7b1e3a;
+  --color-vinho-700: #5a1427;
+  --color-vinho-800: #3d0f1e;
+  --color-vinho-900: #2a0a14;
+  --color-vinho-950: #17050b;
+
+  --color-ouro-300: #e8d08a;
+  --color-ouro-400: #d9b440;
+  --color-ouro-500: #c9a227;
+  --color-ouro-600: #a6841c;
+
+  --color-creme: #f8f4ef;
+  --color-papel: #fffdfa;
+  --color-tinta: #1f1a1c;
+  --color-tinta-2: #6b6166;
+}
+
+html { background: var(--color-creme); color: var(--color-tinta); }
+body { margin: 0; font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+@utility titulo { font-family: var(--font-serif); letter-spacing: -0.01em; }
+
+@utility btn { @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vinho-500; }
+@utility btn-primario { @apply btn bg-vinho-600 text-white hover:bg-vinho-700; }
+@utility btn-ouro { @apply btn bg-ouro-500 text-vinho-900 hover:bg-ouro-400; }
+@utility btn-contorno { @apply btn border border-vinho-200 bg-white text-vinho-700 hover:bg-vinho-50; }
+@utility campo { @apply w-full rounded-xl border border-vinho-100 bg-white px-3.5 py-2.5 text-sm text-tinta outline-none transition placeholder:text-tinta-2/60 focus:border-vinho-400 focus:ring-2 focus:ring-vinho-100; }
+@utility rotulo { @apply mb-1 block text-xs font-semibold tracking-wide text-tinta-2 uppercase; }
+@utility cartao { @apply rounded-2xl border border-vinho-100/70 bg-papel shadow-[0_1px_2px_rgba(42,10,20,.05),0_8px_24px_rgba(42,10,20,.04)]; }
+
+@keyframes surgir { from { opacity: 0; transform: translateY(6px); } }
+.surgir { animation: surgir .35s ease-out both; }
