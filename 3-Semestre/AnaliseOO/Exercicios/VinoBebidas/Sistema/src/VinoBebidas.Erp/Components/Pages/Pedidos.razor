@@ -1,6 +1,8 @@
 @page "/pedidos"
 @inject ApiClient Api
 @inject Avisos Avisos
+@inject DadosEmpresa DadosEmpresa
+@inject IJSRuntime JS
 
 <div class="cabecalho-pagina">
     <h1>Pedidos online</h1>
@@ -55,6 +57,10 @@ else
                     <span>@Fmt.Texto(p.FormaPagamento)</span>
                     <strong>@Fmt.Moeda(p.Total)</strong>
                 </div>
+                @if (p.OrdemSeparacaoId is not null)
+                {
+                    <button class="link-botao" @onclick="() => AbrirOrdem(p.OrdemSeparacaoId.Value)">⎙ Ordem de separação OS@(p.OrdemSeparacaoId.Value.ToString("D6"))</button>
+                }
                 @if (p.ProximosStatus.Count > 0)
                 {
                     <footer>
@@ -72,7 +78,38 @@ else
     </div>
 }
 
+<Modal Aberto="@(ordem is not null)" Titulo="Ordem de separação emitida" OnFechar="() => ordem = null" Largo="true">
+    <ChildContent>
+        @if (ordem is not null && empresa is not null)
+        {
+            <OrdemSeparacaoDocumento Ordem="ordem" Empresa="empresa" />
+        }
+    </ChildContent>
+    <Rodape>
+        <button class="btn fantasma" @onclick="() => ordem = null">Fechar</button>
+        <button class="btn primario" @onclick="ImprimirOrdem">Imprimir</button>
+    </Rodape>
+</Modal>
+
 @code {
+    private OrdemSeparacaoDto? ordem;
+    private EmpresaDto? empresa;
+
+    private async Task AbrirOrdem(int id)
+    {
+        try
+        {
+            empresa ??= await DadosEmpresa.ObterAsync();
+            ordem = await Api.GetAsync<OrdemSeparacaoDto>($"api/ordens-separacao/{id}");
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+    }
+
+    private async Task ImprimirOrdem()
+    {
+        try { await JS.InvokeVoidAsync("vino.imprimir", "ordem-separacao"); } catch (JSException) { }
+    }
+
     private List<PedidoDto>? pedidos;
     private bool somenteAbertos = true;
     private int? ocupado;
@@ -94,7 +131,7 @@ else
     private static string Acao(StatusPedido s, ModalidadeEntrega m) => s switch
     {
         StatusPedido.Confirmado => "Confirmar",
-        StatusPedido.EmSeparacao => "Separar",
+        StatusPedido.EmSeparacao => "Separar (emitir ordem)",
         StatusPedido.ProntoParaRetirada => "Pronto p/ retirada",
         StatusPedido.EmRota => "Saiu para entrega",
         StatusPedido.Concluido => m == ModalidadeEntrega.Retirada ? "Cliente retirou" : "Entregue",
@@ -113,7 +150,10 @@ else
             else pedidos[idx] = atualizado;
             Avisos.Sucesso(s == StatusPedido.Concluido
                 ? $"Pedido {p.Numero} concluído e registrado como venda online."
+                : s == StatusPedido.EmSeparacao ? $"Ordem de separação do pedido {p.Numero} emitida."
                 : $"Pedido {p.Numero}: {Fmt.Texto(s)}.");
+            // Clicar em "Separar" emite a Ordem de Separação e já abre para impressão
+            if (s == StatusPedido.EmSeparacao && atualizado.OrdemSeparacaoId is { } ordemId) await AbrirOrdem(ordemId);
         }
         catch (ApiException ex) { Avisos.Erro(ex.Message); }
         finally { ocupado = null; }

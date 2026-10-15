@@ -1,0 +1,75 @@
+@* Relatório de fechamento de caixa (leitura Z gerencial). *@
+<div class="documento" id="@Id">
+    <header class="doc-cabecalho">
+        <div>
+            <strong class="doc-empresa">@Empresa.NomeFantasia</strong>
+            <span>@Empresa.RazaoSocial · CNPJ @Fmt.CpfCnpj(Empresa.Cnpj)</span>
+        </div>
+        <div class="doc-titulo">
+            <h2>FECHAMENTO DE CAIXA</h2>
+            <strong>@Caixa.Numero</strong>
+            <span>@Caixa.Deposito</span>
+        </div>
+    </header>
+
+    <div class="doc-grade">
+        <div><span>Operador</span>@Caixa.Operador</div>
+        <div><span>Situação</span>@Fmt.Texto(Caixa.Status)</div>
+        <div><span>Abertura</span>@Fmt.DataHora(Caixa.AbertoEm)</div>
+        <div><span>Fechamento</span>@(Caixa.FechadoEm is { } fechadoEm ? Fmt.DataHora(fechadoEm) : "—")</div>
+        <div><span>Vendas</span>@Caixa.QuantidadeVendas@(Caixa.VendasCanceladas > 0 ? $" (+{Caixa.VendasCanceladas} cancelada(s))" : "")</div>
+        <div><span>Total vendido</span><strong>@Fmt.Moeda(Caixa.TotalVendas)</strong></div>
+    </div>
+
+    <table class="doc-tabela">
+        <thead><tr><th>Forma de pagamento</th><th class="num">Qtd</th><th class="num">Valor</th></tr></thead>
+        <tbody>
+            @foreach (var f in Caixa.PorForma)
+            {
+                <tr><td>@Fmt.Texto(f.Forma)@(f.Forma == FormaPagamento.Dinheiro ? " (líquido de troco)" : "")</td><td class="num">@f.Quantidade</td><td class="num">@Fmt.Moeda(f.Valor)</td></tr>
+            }
+            @if (Caixa.PorForma.Count == 0) { <tr><td colspan="3">Nenhuma venda neste caixa.</td></tr> }
+        </tbody>
+        <tfoot><tr><td colspan="2">Total</td><td class="num"><strong>@Fmt.Moeda(Caixa.PorForma.Sum(f => f.Valor))</strong></td></tr></tfoot>
+    </table>
+
+    @if (Caixa.Movimentos.Count > 0)
+    {
+        <table class="doc-tabela">
+            <thead><tr><th>Hora</th><th>Movimento</th><th>Motivo</th><th class="num">Valor</th></tr></thead>
+            <tbody>
+                @foreach (var m in Caixa.Movimentos)
+                {
+                    <tr><td>@Fmt.Hora(m.Quando)</td><td>@Fmt.Texto(m.Tipo)</td><td>@m.Motivo</td><td class="num">@(m.Tipo == TipoMovimentoCaixa.Sangria ? "−" : "+")@Fmt.Moeda(m.Valor)</td></tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    <table class="doc-tabela conferencia">
+        <tbody>
+            <tr><td>Fundo de troco (abertura)</td><td class="num">@Fmt.Moeda(Caixa.ValorAbertura)</td></tr>
+            <tr><td>(+) Vendas em dinheiro</td><td class="num">@Fmt.Moeda(Caixa.PorForma.Where(f => f.Forma == FormaPagamento.Dinheiro).Sum(f => f.Valor))</td></tr>
+            <tr><td>(+) Suprimentos</td><td class="num">@Fmt.Moeda(Caixa.Suprimentos)</td></tr>
+            <tr><td>(−) Sangrias</td><td class="num">@Fmt.Moeda(Caixa.Sangrias)</td></tr>
+            <tr class="destaque"><td>Dinheiro esperado na gaveta</td><td class="num">@Fmt.Moeda(Caixa.DinheiroEsperado)</td></tr>
+            @if (Caixa.ValorContado is not null)
+            {
+                <tr><td>Dinheiro contado</td><td class="num">@Fmt.Moeda(Caixa.ValorContado)</td></tr>
+                <tr class="destaque"><td>Diferença</td><td class="num">@(Caixa.Diferenca == 0 ? "Confere" : Caixa.Diferenca > 0 ? $"Sobra {Fmt.Moeda(Caixa.Diferenca)}" : $"Falta {Fmt.Moeda(-Caixa.Diferenca)}")</td></tr>
+            }
+        </tbody>
+    </table>
+    @if (Caixa.Observacao is not null) { <p>Observação: @Caixa.Observacao</p> }
+
+    <div class="doc-assinaturas">
+        <div><span></span>Operador: @Caixa.Operador</div>
+        <div><span></span>Conferido por (gerência)</div>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public CaixaDto Caixa { get; set; } = default!;
+    [Parameter, EditorRequired] public EmpresaDto Empresa { get; set; } = default!;
+    [Parameter] public string Id { get; set; } = "fechamento-caixa";
+}

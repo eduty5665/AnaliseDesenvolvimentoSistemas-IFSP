@@ -16,6 +16,7 @@ namespace VinoBebidas.Infrastructure.Seed;
 public class DadosIniciais(AppDbContext db, SenhaService senhas, Calendario calendario, ILogger<DadosIniciais> log)
 {
     public const string SenhaDemo = "Vino@123";
+    private const int DiasDesdeImplantacao = 30;
     private readonly Random _rnd = new(2026);
 
     public async Task ExecutarAsync(bool incluirHistorico, CancellationToken ct = default)
@@ -34,15 +35,25 @@ public class DadosIniciais(AppDbContext db, SenhaService senhas, Calendario cale
         var clientes = CriarClientes();
         await db.SaveChangesAsync(ct);
 
-        CriarSaldos(produtos, depositos, usuarios["estoque"]);
+        // O sistema "entrou em produção" há 30 dias: dali em diante há kardex, caixas e ordens de separação.
+        var implantacao = calendario.InicioDoDiaUtc(calendario.Hoje.AddDays(-DiasDesdeImplantacao)).AddHours(8);
+        var recentes = new List<Venda>();
+        if (incluirHistorico)
+            recentes = await CriarHistoricoVendasAsync(produtos, depositos, clientes, usuarios, implantacao, ct);
+
+        CriarSaldos(produtos, depositos, usuarios["estoque"], recentes, implantacao);
         await db.SaveChangesAsync(ct);
 
         if (incluirHistorico)
         {
-            await CriarHistoricoVendasAsync(produtos, depositos, clientes, usuarios, ct);
+            CriarKardexDasVendas(recentes, usuarios);
+            await db.SaveChangesAsync(ct);
+            db.ChangeTracker.Clear();
+            await CriarEventosDeEstoqueAsync(produtos, depositos, fornecedores, usuarios, ct);
+            await CriarCaixasAsync(depositos, usuarios, ct);
             CriarLancamentos(setores, fornecedores);
             await db.SaveChangesAsync(ct);
-            await CriarPedidosAbertosAsync(produtos, depositos, clientes, ct);
+            await CriarPedidosAbertosAsync(produtos, depositos, clientes, usuarios, ct);
         }
 
         log.LogInformation("Dados iniciais criados. Usuário: admin / senha: {Senha}", SenhaDemo);
@@ -62,14 +73,14 @@ public class DadosIniciais(AppDbContext db, SenhaService senhas, Calendario cale
     {
         var lista = new[]
         {
-            new Categoria { Nome = "Tinto", EhVinho = true, Cor = "#7b1e3a", Descricao = "Vinhos tintos" },
-            new Categoria { Nome = "Branco", EhVinho = true, Cor = "#c9a227", Descricao = "Vinhos brancos" },
-            new Categoria { Nome = "Rosé", EhVinho = true, Cor = "#e07a8e", Descricao = "Vinhos rosés" },
-            new Categoria { Nome = "Espumante", EhVinho = true, Cor = "#b8a06a", Descricao = "Espumantes e champagnes" },
-            new Categoria { Nome = "Fortificado", EhVinho = true, Cor = "#8a4b2a", Descricao = "Portos, Madeiras e vinhos de sobremesa" },
-            new Categoria { Nome = "Cervejas", EhVinho = false, Cor = "#d88c1a", Descricao = "Cervejas especiais" },
-            new Categoria { Nome = "Destilados", EhVinho = false, Cor = "#5b6470", Descricao = "Gin, whisky, cachaça" },
-            new Categoria { Nome = "Sem álcool", EhVinho = false, Cor = "#2f8fb3", Descricao = "Águas, sucos e refrigerantes" },
+            new Categoria { Nome = "Tinto", Alcoolico = true, TributosAproximados = 54.7m, EhVinho = true, Cor = "#7b1e3a", Descricao = "Vinhos tintos" },
+            new Categoria { Nome = "Branco", Alcoolico = true, TributosAproximados = 54.7m, EhVinho = true, Cor = "#c9a227", Descricao = "Vinhos brancos" },
+            new Categoria { Nome = "Rosé", Alcoolico = true, TributosAproximados = 54.7m, EhVinho = true, Cor = "#e07a8e", Descricao = "Vinhos rosés" },
+            new Categoria { Nome = "Espumante", Alcoolico = true, TributosAproximados = 59.5m, EhVinho = true, Cor = "#b8a06a", Descricao = "Espumantes e champagnes" },
+            new Categoria { Nome = "Fortificado", Alcoolico = true, TributosAproximados = 62.3m, EhVinho = true, Cor = "#8a4b2a", Descricao = "Portos, Madeiras e vinhos de sobremesa" },
+            new Categoria { Nome = "Cervejas", Alcoolico = true, TributosAproximados = 55.6m, EhVinho = false, Cor = "#d88c1a", Descricao = "Cervejas especiais" },
+            new Categoria { Nome = "Destilados", Alcoolico = true, TributosAproximados = 67.0m, EhVinho = false, Cor = "#5b6470", Descricao = "Gin, whisky, cachaça" },
+            new Categoria { Nome = "Sem álcool", Alcoolico = false, TributosAproximados = 37.4m, EhVinho = false, Cor = "#2f8fb3", Descricao = "Águas, sucos e refrigerantes" },
         };
         db.Categorias.AddRange(lista);
         return lista.ToDictionary(c => c.Nome);
@@ -286,9 +297,8 @@ public class DadosIniciais(AppDbContext db, SenhaService senhas, Calendario cale
         return lista;
     }
 
-    private void CriarSaldos(List<Produto> produtos, Dictionary<string, Deposito> depositos, Usuario estoquista)
+    private void CriarSaldos(List<Produto> produtos, Dictionary<string, Deposito> depositos, Usuario estoquista, List<Venda> vendasDesdeImplantacao, DateTime dataImplantacao)
     {
-        var dataImplantacao = calendario.InicioDoDiaUtc(calendario.Hoje.AddDays(-1)).AddHours(8);
         var movs = depositos.Values.ToDictionary(d => d.Id, d => new Movimentacao
         {
             Tipo = TipoMovimentacao.Entrada,
@@ -296,11 +306,18 @@ public class DadosIniciais(AppDbContext db, SenhaService senhas, Calendario cale
             DepositoDestinoId = d.Id,
             UsuarioId = estoquista.Id,
             NumeroDocumento = "IMPLANTACAO",
-            Observacao = "Saldo inicial de implantação do sistema"
+            Observacao = "Saldo inicial de implantação do sistema (inventário de abertura)"
         });
+
+        // O que foi vendido depois da implantação precisa estar no saldo de abertura para o kardex fechar
+        var vendido = vendasDesdeImplantacao.SelectMany(v => v.Itens.Select(i => (v.DepositoId, i.ProdutoId, i.Quantidade)))
+            .GroupBy(x => (x.DepositoId, x.ProdutoId)).ToDictionary(g => g.Key, g => g.Sum(x => x.Quantidade));
+        var corredores = produtos.Select(p => p.CategoriaId).Distinct().OrderBy(c => c).Select((c, i) => (c, Letra: (char)('A' + i))).ToDictionary(x => x.c, x => x.Letra);
+        var posicao = 0;
 
         foreach (var p in produtos)
         {
+            posicao++;
             var caro = p.PrecoVenda > 300;
             // Alguns itens propositalmente baixos para aparecerem no alerta de ruptura
             var baixo = _rnd.NextDouble() < 0.15;
@@ -310,22 +327,231 @@ public class DadosIniciais(AppDbContext db, SenhaService senhas, Calendario cale
                 ["centro"] = baixo ? _rnd.Next(0, 4) : caro ? _rnd.Next(3, 10) : _rnd.Next(12, 48),
                 ["shopping"] = baixo ? _rnd.Next(0, 3) : caro ? _rnd.Next(2, 8) : _rnd.Next(8, 36),
             };
-            foreach (var (chave, qtd) in qtds)
+            foreach (var (chave, qtdFinal) in qtds)
             {
                 var dep = depositos[chave];
-                db.Saldos.Add(new SaldoEstoque { ProdutoId = p.Id, DepositoId = dep.Id, Quantidade = qtd, AtualizadoEm = dataImplantacao });
-                if (qtd > 0)
-                    movs[dep.Id].Itens.Add(new ItemMovimentacao { ProdutoId = p.Id, Quantidade = qtd, CustoUnitario = p.PrecoCusto });
+                var abertura = qtdFinal + vendido.GetValueOrDefault((dep.Id, p.Id));
+                // Endereço: no CD corredor-prateleira-nível; nas lojas, gôndola-posição
+                var local = chave == "cd"
+                    ? $"{corredores[p.CategoriaId]}-{1 + posicao % 12:D2}-{1 + posicao % 4}"
+                    : $"G{1 + posicao % 6}-{1 + posicao % 9:D2}";
+                db.Saldos.Add(new SaldoEstoque { ProdutoId = p.Id, DepositoId = dep.Id, Quantidade = qtdFinal, Localizacao = local, AtualizadoEm = dataImplantacao });
+                if (abertura > 0)
+                    movs[dep.Id].Itens.Add(new ItemMovimentacao { ProdutoId = p.Id, Quantidade = abertura, CustoUnitario = p.PrecoCusto });
             }
         }
         db.Movimentacoes.AddRange(movs.Values.Where(m => m.Itens.Count > 0));
     }
 
-    // ───────────────────────── Histórico de vendas ─────────────────────────
+    /// <summary>Movimentação de estoque (tipo Venda) para cada venda feita depois da implantação.</summary>
+    private void CriarKardexDasVendas(List<Venda> vendas, Dictionary<string, Usuario> usuarios)
+    {
+        foreach (var v in vendas)
+        {
+            db.Movimentacoes.Add(new Movimentacao
+            {
+                Tipo = TipoMovimentacao.Venda,
+                Data = v.Data,
+                DepositoOrigemId = v.DepositoId,
+                UsuarioId = v.UsuarioId,
+                VendaId = v.Id,
+                NumeroDocumento = Mapeamentos.NumeroVenda(v.Id),
+                Itens = v.Itens.Select(i => new ItemMovimentacao { ProdutoId = i.ProdutoId, Quantidade = -i.Quantidade, CustoUnitario = i.CustoUnitario }).ToList()
+            });
+        }
+    }
 
-    private async Task CriarHistoricoVendasAsync(List<Produto> produtos, Dictionary<string, Deposito> depositos, List<Cliente> clientes,
+    /// <summary>Notas de entrada, saídas avulsas e transferências por ordem de separação nas últimas semanas.</summary>
+    private async Task CriarEventosDeEstoqueAsync(List<Produto> produtos, Dictionary<string, Deposito> depositos, List<Fornecedor> fornecedores,
         Dictionary<string, Usuario> usuarios, CancellationToken ct)
     {
+        var hoje = calendario.Hoje;
+        var estoquista = usuarios["estoque"].Id;
+        var vinhos = produtos.Where(p => p.VisivelLoja).ToList();
+        DateTime Momento(int diasAtras, int hora) => calendario.InicioDoDiaUtc(hoje.AddDays(-diasAtras)).AddHours(hora).AddMinutes(_rnd.Next(0, 50));
+        async Task<SaldoEstoque> Saldo(int produtoId, string dep) =>
+            db.Saldos.Local.FirstOrDefault(s => s.ProdutoId == produtoId && s.DepositoId == depositos[dep].Id)
+            ?? await db.Saldos.FirstAsync(s => s.ProdutoId == produtoId && s.DepositoId == depositos[dep].Id, ct);
+
+        // ── Notas fiscais de entrada no CD ──
+        foreach (var (diasAtras, fornecedor) in new[] { (21, fornecedores[0]), (12, fornecedores[1]), (5, fornecedores[2]) })
+        {
+            var data = Momento(diasAtras, 10);
+            var emissao = hoje.AddDays(-diasAtras - 2);
+            var numero = _rnd.Next(10000, 99999).ToString();
+            var mov = new Movimentacao
+            {
+                Tipo = TipoMovimentacao.Entrada, Data = data, DepositoDestinoId = depositos["cd"].Id, FornecedorId = fornecedor.Id,
+                NumeroDocumento = numero, Serie = "1", DataEmissao = emissao, ValorFrete = _rnd.Next(180, 620), UsuarioId = estoquista,
+                ChaveAcesso = GerarChaveNfe(fornecedor.Cnpj, emissao, numero),
+                Observacao = "Conferido no recebimento"
+            };
+            foreach (var p in vinhos.OrderBy(_ => _rnd.Next()).Take(_rnd.Next(5, 9)))
+            {
+                var qtd = 12 * _rnd.Next(1, 5);
+                (await Saldo(p.Id, "cd")).Entrar(qtd);
+                mov.Itens.Add(new ItemMovimentacao { ProdutoId = p.Id, Quantidade = qtd, CustoUnitario = p.PrecoCusto });
+            }
+            db.Movimentacoes.Add(mov);
+            for (var n = 1; n <= 2; n++)
+            {
+                var venc = emissao.AddDays(28 * n);
+                var l = new LancamentoFinanceiro
+                {
+                    Tipo = TipoLancamento.Despesa, Categoria = CategoriaLancamento.CompraMercadoria,
+                    Descricao = $"NF {numero}/1 - {fornecedor.NomeFantasia} ({n}/2)", Valor = Math.Round(mov.ValorTotal / 2, 2),
+                    Competencia = new DateOnly(emissao.Year, emissao.Month, 1), Vencimento = venc, FornecedorId = fornecedor.Id
+                };
+                if (venc < hoje) l.Pagar(venc);
+                db.Lancamentos.Add(l);
+            }
+        }
+
+        // ── Saídas avulsas com motivo ──
+        var saidas = new[]
+        {
+            (18, "centro", MotivoSaida.Degustacao, "Degustação de sábado com clientes", 3),
+            (11, "cd", MotivoSaida.Quebra, "Caixa caiu da empilhadeira no recebimento", 6),
+            (7, "shopping", MotivoSaida.Brinde, "Brinde para cliente corporativo", 2),
+            (3, "centro", MotivoSaida.Avaria, "Rolha ressecada identificada na conferência", 1),
+        };
+        foreach (var (diasAtras, dep, motivo, obs, qtd) in saidas)
+        {
+            foreach (var p in vinhos.OrderBy(_ => _rnd.Next()))
+            {
+                var saldo = await Saldo(p.Id, dep);
+                if (saldo.Disponivel < qtd + 2) continue;
+                saldo.Retirar(qtd, p.Nome);
+                db.Movimentacoes.Add(new Movimentacao
+                {
+                    Tipo = TipoMovimentacao.Saida, Data = Momento(diasAtras, 15), DepositoOrigemId = depositos[dep].Id, Motivo = motivo,
+                    Observacao = obs, UsuarioId = estoquista,
+                    Itens = [new ItemMovimentacao { ProdutoId = p.Id, Quantidade = -qtd, CustoUnitario = p.PrecoCusto }]
+                });
+                break;
+            }
+        }
+        await db.SaveChangesAsync(ct);
+
+        // ── Transferências por ordem de separação: duas concluídas, uma em trânsito, uma aguardando separação ──
+        var cenarios = new[]
+        {
+            (10, "centro", StatusOrdemSeparacao.Concluida),
+            (6, "shopping", StatusOrdemSeparacao.Concluida),
+            (1, "shopping", StatusOrdemSeparacao.Expedida),
+            (0, "centro", StatusOrdemSeparacao.Aberta),
+        };
+        foreach (var (diasAtras, destino, status) in cenarios)
+        {
+            var emitida = diasAtras == 0 ? calendario.AgoraUtc.AddHours(-2) : Momento(diasAtras, 9);
+            var ordem = new OrdemSeparacao
+            {
+                Tipo = TipoOrdemSeparacao.Transferencia, DepositoOrigemId = depositos["cd"].Id, DepositoDestinoId = depositos[destino].Id,
+                SolicitanteId = usuarios["gerente"].Id, CriadoEm = emitida, Observacao = "Reposição semanal da loja"
+            };
+            foreach (var p in vinhos.OrderBy(_ => _rnd.Next()))
+            {
+                if (ordem.Itens.Count >= 5) break;
+                var saldo = await Saldo(p.Id, "cd");
+                if (saldo.Disponivel < 18) continue;
+                saldo.Reservar(6, p.Nome);
+                ordem.Itens.Add(new ItemOrdemSeparacao { ProdutoId = p.Id, Quantidade = 6, Localizacao = saldo.Localizacao });
+            }
+            if (ordem.Itens.Count == 0) continue;
+            db.OrdensSeparacao.Add(ordem);
+            await db.SaveChangesAsync(ct);
+            if (status == StatusOrdemSeparacao.Aberta) continue;
+
+            ordem.MarcarSeparada(estoquista, emitida.AddMinutes(40));
+            ordem.MarcarExpedida(emitida.AddHours(1));
+            var expedicao = new Movimentacao
+            {
+                Tipo = TipoMovimentacao.Transferencia, Data = emitida.AddHours(1), DepositoOrigemId = ordem.DepositoOrigemId,
+                DepositoDestinoId = ordem.DepositoDestinoId, UsuarioId = estoquista, OrdemSeparacaoId = ordem.Id,
+                NumeroDocumento = Mapeamentos.NumeroOrdem(ordem.Id), Observacao = "Expedição — mercadoria em trânsito"
+            };
+            foreach (var item in ordem.Itens)
+            {
+                var p = produtos.First(x => x.Id == item.ProdutoId);
+                (await Saldo(item.ProdutoId, "cd")).BaixarReserva(6);
+                expedicao.Itens.Add(new ItemMovimentacao { ProdutoId = item.ProdutoId, Quantidade = -6, CustoUnitario = p.PrecoCusto });
+            }
+            db.Movimentacoes.Add(expedicao);
+
+            if (status == StatusOrdemSeparacao.Concluida)
+            {
+                var recebimento = new Movimentacao
+                {
+                    Tipo = TipoMovimentacao.RecebimentoTransferencia, Data = emitida.AddHours(4), DepositoOrigemId = ordem.DepositoOrigemId,
+                    DepositoDestinoId = ordem.DepositoDestinoId, UsuarioId = usuarios["caixa"].Id, OrdemSeparacaoId = ordem.Id,
+                    NumeroDocumento = Mapeamentos.NumeroOrdem(ordem.Id), Observacao = "Recebido conforme"
+                };
+                foreach (var item in ordem.Itens)
+                {
+                    var p = produtos.First(x => x.Id == item.ProdutoId);
+                    item.QuantidadeRecebida = 6;
+                    (await Saldo(item.ProdutoId, destino)).Entrar(6);
+                    recebimento.Itens.Add(new ItemMovimentacao { ProdutoId = item.ProdutoId, Quantidade = 6, CustoUnitario = p.PrecoCusto });
+                }
+                ordem.MarcarConcluida(emitida.AddHours(4));
+                db.Movimentacoes.Add(recebimento);
+            }
+            await db.SaveChangesAsync(ct);
+        }
+        db.ChangeTracker.Clear();
+    }
+
+    /// <summary>Sessões de caixa fechadas dos últimos 14 dias, uma por loja e por dia, com as vendas de balcão vinculadas.</summary>
+    private async Task CriarCaixasAsync(Dictionary<string, Deposito> depositos, Dictionary<string, Usuario> usuarios, CancellationToken ct)
+    {
+        var hoje = calendario.Hoje;
+        foreach (var (chave, operador) in new[] { ("centro", usuarios["caixa"]), ("shopping", usuarios["vendedor"]) })
+        {
+            var deposito = depositos[chave];
+            for (var d = 14; d >= 1; d--)
+            {
+                var dia = hoje.AddDays(-d);
+                var ini = calendario.InicioDoDiaUtc(dia);
+                var fim = calendario.InicioDoDiaUtc(dia.AddDays(1));
+                var vendas = await db.Vendas.Include(v => v.Pagamentos)
+                    .Where(v => v.DepositoId == deposito.Id && v.Canal != CanalVenda.Online && v.Data >= ini && v.Data < fim).ToListAsync(ct);
+                if (vendas.Count == 0) continue;
+
+                var sessao = new CaixaSessao
+                {
+                    DepositoId = deposito.Id, OperadorId = operador.Id, ValorAbertura = 200, AbertoEm = ini.AddHours(8).AddMinutes(45), CriadoEm = ini.AddHours(8).AddMinutes(45)
+                };
+                var dinheiro = vendas.SelectMany(v => v.Pagamentos).Where(p => p.Forma == FormaPagamento.Dinheiro).Sum(p => p.Valor);
+                decimal sangria = 0;
+                if (dinheiro > 600)
+                {
+                    sangria = Math.Floor(dinheiro / 100) * 100 - 200;
+                    sessao.Movimentar(TipoMovimentoCaixa.Sangria, sangria, "Recolhimento para o cofre", operador.Id, ini.AddHours(17));
+                }
+                var esperado = 200 + dinheiro - sangria;
+                // De vez em quando o caixa não bate por alguns reais (troco errado)
+                var diferenca = _rnd.NextDouble() < 0.25 ? _rnd.Next(-5, 6) : 0;
+                sessao.Fechar(esperado, esperado + diferenca, diferenca == 0 ? null : "Diferença de troco", ini.AddHours(22).AddMinutes(10));
+                db.CaixasSessao.Add(sessao);
+                await db.SaveChangesAsync(ct);
+                foreach (var v in vendas)
+                {
+                    v.CaixaSessaoId = sessao.Id;
+                    v.UsuarioId = operador.Id;
+                }
+                await db.SaveChangesAsync(ct);
+                db.ChangeTracker.Clear();
+            }
+        }
+    }
+
+    // ───────────────────────── Histórico de vendas ─────────────────────────
+
+    private async Task<List<Venda>> CriarHistoricoVendasAsync(List<Produto> produtos, Dictionary<string, Deposito> depositos, List<Cliente> clientes,
+        Dictionary<string, Usuario> usuarios, DateTime implantacao, CancellationToken ct)
+    {
+        var recentes = new List<Venda>();
+        var atendentes = new[] { usuarios["vendedor"].Id, usuarios["caixa"].Id, usuarios["vendedor"].Id, usuarios["gerente"].Id };
         const int dias = 180;
         var hoje = calendario.Hoje;
         var agoraLocal = calendario.AgoraLocal;
@@ -366,7 +592,8 @@ public class DadosIniciais(AppDbContext db, SenhaService senhas, Calendario cale
                     Data = TimeZoneInfo.ConvertTimeToUtc(momentoLocal, calendario.Fuso),
                     Canal = canal,
                     DepositoId = deposito.Id,
-                    UsuarioId = canal == CanalVenda.Consultor ? usuarios["vendedor"].Id : usuarios["caixa"].Id,
+                    UsuarioId = canal == CanalVenda.Online ? null : deposito == depositos["shopping"] ? usuarios["vendedor"].Id : usuarios["caixa"].Id,
+                    VendedorId = canal == CanalVenda.Online ? null : canal == CanalVenda.Consultor ? usuarios["vendedor"].Id : atendentes[_rnd.Next(atendentes.Length)],
                     ClienteId = canal == CanalVenda.Online || _rnd.NextDouble() < 0.5 ? clientes[_rnd.Next(clientes.Count)].Id : null
                 };
 
@@ -389,7 +616,9 @@ public class DadosIniciais(AppDbContext db, SenhaService senhas, Calendario cale
                 }
                 venda.CalcularTotais();
                 venda.Pagamentos.Add(new PagamentoVenda { Forma = SortearForma(canal), Valor = venda.Total });
+                if (venda.Pagamentos[0].Forma == FormaPagamento.CartaoCredito && venda.Total > 300) venda.Pagamentos[0].Parcelas = _rnd.Next(1, 4);
                 db.Vendas.Add(venda);
+                if (venda.Data >= implantacao) recentes.Add(venda);
                 receitaPorDia[dia] = receitaPorDia.GetValueOrDefault(dia) + venda.Total;
                 lote++;
             }
@@ -421,6 +650,7 @@ public class DadosIniciais(AppDbContext db, SenhaService senhas, Calendario cale
         }
         await db.SaveChangesAsync(ct);
         db.ChangeTracker.Clear();
+        return recentes;
     }
 
     private int SortearHora()
@@ -511,7 +741,7 @@ public class DadosIniciais(AppDbContext db, SenhaService senhas, Calendario cale
         }
     }
 
-    private async Task CriarPedidosAbertosAsync(List<Produto> produtos, Dictionary<string, Deposito> depositos, List<Cliente> clientes, CancellationToken ct)
+    private async Task CriarPedidosAbertosAsync(List<Produto> produtos, Dictionary<string, Deposito> depositos, List<Cliente> clientes, Dictionary<string, Usuario> usuarios, CancellationToken ct)
     {
         var vinhos = produtos.Where(p => p.VisivelLoja).ToList();
         var agora = calendario.AgoraUtc;
@@ -525,6 +755,7 @@ public class DadosIniciais(AppDbContext db, SenhaService senhas, Calendario cale
         };
 
         var i = 0;
+        var criados = new List<Pedido>();
         foreach (var (tipo, modalidade, status, dep) in cenarios)
         {
             var cliente = clientes[_rnd.Next(clientes.Count - 1)];
@@ -552,7 +783,25 @@ public class DadosIniciais(AppDbContext db, SenhaService senhas, Calendario cale
                 pedido.CalcularTotais();
             }
             db.Pedidos.Add(pedido);
+            criados.Add(pedido);
             i++;
+        }
+        await db.SaveChangesAsync(ct);
+
+        // Pedidos que já passaram pelo botão "Separar" têm a sua Ordem de Separação
+        foreach (var pedido in criados.Where(p => p.Status is StatusPedido.EmSeparacao or StatusPedido.ProntoParaRetirada))
+        {
+            var enderecos = await db.Saldos.AsNoTracking().Where(s => s.DepositoId == pedido.DepositoId).ToDictionaryAsync(s => s.ProdutoId, s => s.Localizacao, ct);
+            var ordem = new OrdemSeparacao
+            {
+                Tipo = TipoOrdemSeparacao.PedidoOnline, DepositoOrigemId = pedido.DepositoId, PedidoId = pedido.Id,
+                SolicitanteId = usuarios["gerente"].Id, CriadoEm = pedido.CriadoEm.AddMinutes(25),
+                Itens = pedido.Itens.Select(it => new ItemOrdemSeparacao { ProdutoId = it.ProdutoId, Quantidade = it.Quantidade, Localizacao = enderecos.GetValueOrDefault(it.ProdutoId) }).ToList()
+            };
+            if (pedido.Status == StatusPedido.ProntoParaRetirada) ordem.MarcarSeparada(usuarios["estoque"].Id, pedido.CriadoEm.AddMinutes(50));
+            db.OrdensSeparacao.Add(ordem);
+            await db.SaveChangesAsync(ct);
+            pedido.OrdemSeparacaoId = ordem.Id;
         }
         await db.SaveChangesAsync(ct);
     }
@@ -588,6 +837,21 @@ public class DadosIniciais(AppDbContext db, SenhaService senhas, Calendario cale
             d.Add(r < 2 ? 0 : 11 - r);
         }
         return string.Concat(d);
+    }
+
+    /// <summary>Chave de acesso de NF-e (44 dígitos) com dígito verificador módulo 11 — dados fictícios.</summary>
+    private string GerarChaveNfe(string cnpj, DateOnly emissao, string numero)
+    {
+        var corpo = $"35{emissao:yyMM}{cnpj}55001{int.Parse(numero):D9}1{_rnd.Next(10000000, 99999999)}";
+        var soma = 0;
+        var peso = 2;
+        for (var i = corpo.Length - 1; i >= 0; i--)
+        {
+            soma += (corpo[i] - '0') * peso;
+            peso = peso == 9 ? 2 : peso + 1;
+        }
+        var resto = soma % 11;
+        return corpo + (resto < 2 ? 0 : 11 - resto);
     }
 
     /// <summary>EAN-13 com prefixo 789 (Brasil) e dígito verificador válido.</summary>

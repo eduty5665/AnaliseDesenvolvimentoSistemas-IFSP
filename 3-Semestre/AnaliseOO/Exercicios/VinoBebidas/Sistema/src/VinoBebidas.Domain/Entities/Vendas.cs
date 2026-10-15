@@ -16,6 +16,15 @@ public class Venda : Entidade
     public int DepositoId { get; set; }
     public Deposito? Deposito { get; set; }
     public int? PedidoId { get; set; }
+    /// <summary>Sessão de caixa em que a venda foi registrada (vendas do PDV).</summary>
+    public int? CaixaSessaoId { get; set; }
+    /// <summary>Vendedor/consultor que atendeu (base da comissão); o operador do caixa fica em UsuarioId.</summary>
+    public int? VendedorId { get; set; }
+    public Usuario? Vendedor { get; set; }
+    /// <summary>CPF/CNPJ informado pelo consumidor para constar no cupom.</summary>
+    public string? CpfCnpjNota { get; set; }
+    /// <summary>Supervisor que liberou desconto acima do limite do operador.</summary>
+    public int? DescontoAutorizadoPorId { get; set; }
     public decimal Subtotal { get; set; }
     public decimal Desconto { get; set; }
     public decimal Total { get; set; }
@@ -39,6 +48,9 @@ public class Venda : Entidade
     {
         if (Pagamentos.Count == 0) throw new RegraNegocioException("Informe ao menos uma forma de pagamento.");
         if (Pagamentos.Any(p => p.Valor <= 0)) throw new RegraNegocioException("Valores de pagamento devem ser positivos.");
+        if (Pagamentos.Any(p => p.Parcelas < 1 || p.Parcelas > 12)) throw new RegraNegocioException("Parcelamento deve ser de 1 a 12 vezes.");
+        if (Pagamentos.Any(p => p.Parcelas > 1 && p.Forma != FormaPagamento.CartaoCredito))
+            throw new RegraNegocioException("Somente cartão de crédito pode ser parcelado.");
         var pago = Pagamentos.Sum(p => p.Valor);
         if (pago < Total) throw new RegraNegocioException($"Pagamento insuficiente. Falta R$ {Total - pago:N2}.");
         var excedente = pago - Total;
@@ -48,6 +60,31 @@ public class Venda : Entidade
     }
 
     public decimal CustoTotal => Itens.Sum(i => i.CustoUnitario * i.Quantidade);
+
+    /// <summary>Desconto total concedido (itens + geral) em % do valor bruto.</summary>
+    public decimal PercentualDesconto
+    {
+        get
+        {
+            var bruto = Itens.Sum(i => i.PrecoUnitario * i.Quantidade);
+            return bruto == 0 ? 0 : Math.Round((Itens.Sum(i => i.Desconto) + Desconto) / bruto * 100, 2);
+        }
+    }
+}
+
+/// <summary>Limite de desconto que cada perfil pode conceder sem senha de supervisor.</summary>
+public static class PoliticaDesconto
+{
+    public static decimal LimitePercentual(PerfilUsuario perfil) => perfil switch
+    {
+        PerfilUsuario.Administrador => 100,
+        PerfilUsuario.Gerente => 30,
+        PerfilUsuario.Vendedor => 10,
+        PerfilUsuario.Caixa => 5,
+        _ => 0
+    };
+
+    public static bool PodeAutorizar(PerfilUsuario perfil) => perfil is PerfilUsuario.Administrador or PerfilUsuario.Gerente;
 }
 
 public class ItemVenda
@@ -78,6 +115,10 @@ public class PagamentoVenda
     public int VendaId { get; set; }
     public FormaPagamento Forma { get; set; }
     public decimal Valor { get; set; }
+    /// <summary>Número de parcelas (cartão de crédito).</summary>
+    public int Parcelas { get; set; } = 1;
+    /// <summary>NSU/autorização do comprovante da maquininha (TEF não integrado).</summary>
+    public string? Nsu { get; set; }
 }
 
 /// <summary>Pedido feito pela loja online: reserva ou compra, com retirada ou entrega.</summary>
@@ -101,6 +142,8 @@ public class Pedido : Entidade
     public string? Observacao { get; set; }
     public DateTime AtualizadoEm { get; set; } = DateTime.UtcNow;
     public int? VendaId { get; set; }
+    /// <summary>Ordem de Separação emitida quando o pedido entrou em separação.</summary>
+    public int? OrdemSeparacaoId { get; set; }
     public List<ItemPedido> Itens { get; set; } = [];
 
     public bool EstaAberto => Status is not (StatusPedido.Concluido or StatusPedido.Cancelado or StatusPedido.Expirado);

@@ -25,6 +25,20 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<ItemPedido> ItensPedido => Set<ItemPedido>();
     public DbSet<LancamentoFinanceiro> Lancamentos => Set<LancamentoFinanceiro>();
     public DbSet<Documento> Documentos => Set<Documento>();
+    public DbSet<OrdemSeparacao> OrdensSeparacao => Set<OrdemSeparacao>();
+    public DbSet<ItemOrdemSeparacao> ItensOrdemSeparacao => Set<ItemOrdemSeparacao>();
+    public DbSet<CaixaSessao> CaixasSessao => Set<CaixaSessao>();
+    public DbSet<MovimentoCaixa> MovimentosCaixa => Set<MovimentoCaixa>();
+    public DbSet<VinoBebidas.Domain.Common.ParametroSistema> Parametros => Set<VinoBebidas.Domain.Common.ParametroSistema>();
+
+    /// <summary>
+    /// Aumente a cada mudança de entidades. Bancos SQLite de desenvolvimento com versão antiga são
+    /// salvos em backup e recriados; em SQL Server/PostgreSQL a API avisa que é preciso migrar.
+    /// </summary>
+    public const int VersaoEsquema = 2;
+
+    /// <summary>Schema usado no PostgreSQL/Supabase. Fica fora do "public" para não ser exposto pela Data API.</summary>
+    public const string SchemaPostgres = "vino";
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
@@ -38,6 +52,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
     protected override void OnModelCreating(ModelBuilder b)
     {
+        if (Database.IsNpgsql()) b.HasDefaultSchema(SchemaPostgres);
+
         b.Entity<Usuario>(e =>
         {
             e.HasIndex(u => u.Cpf).IsUnique();
@@ -75,6 +91,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
         b.Entity<Categoria>(e =>
         {
+            e.Property(c => c.TributosAproximados).HasPrecision(5, 2);
             e.HasIndex(c => c.Nome).IsUnique();
             e.Property(c => c.Nome).HasMaxLength(100);
         });
@@ -99,8 +116,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.HasIndex(s => new { s.ProdutoId, s.DepositoId }).IsUnique();
             e.HasOne(s => s.Produto).WithMany(p => p.Saldos).HasForeignKey(s => s.ProdutoId).OnDelete(DeleteBehavior.Cascade);
             e.HasOne(s => s.Deposito).WithMany().HasForeignKey(s => s.DepositoId).OnDelete(DeleteBehavior.Restrict);
+            e.Property(s => s.Localizacao).HasMaxLength(20);
             // Controle otimista: duas vendas simultâneas do mesmo item não "furam" o estoque.
-            e.Property(s => s.AtualizadoEm).IsConcurrencyToken();
+            e.Property(s => s.Versao).IsConcurrencyToken();
         });
 
         b.Entity<Movimentacao>(e =>
@@ -108,6 +126,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.HasIndex(m => m.Data);
             e.Property(m => m.Tipo).HasConversion<string>().HasMaxLength(30);
             e.Property(m => m.Observacao).HasMaxLength(1000);
+            e.Property(m => m.Serie).HasMaxLength(5);
+            e.Property(m => m.ChaveAcesso).HasMaxLength(44);
+            e.Property(m => m.Motivo).HasConversion<string>().HasMaxLength(30);
             e.HasOne(m => m.DepositoOrigem).WithMany().HasForeignKey(m => m.DepositoOrigemId).OnDelete(DeleteBehavior.Restrict);
             e.HasOne(m => m.DepositoDestino).WithMany().HasForeignKey(m => m.DepositoDestinoId).OnDelete(DeleteBehavior.Restrict);
             e.HasOne(m => m.Fornecedor).WithMany().HasForeignKey(m => m.FornecedorId).OnDelete(DeleteBehavior.Restrict);
@@ -125,6 +146,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(v => v.Status).HasConversion<string>().HasMaxLength(20);
             e.HasOne(v => v.Cliente).WithMany().HasForeignKey(v => v.ClienteId).OnDelete(DeleteBehavior.Restrict);
             e.HasOne(v => v.Usuario).WithMany().HasForeignKey(v => v.UsuarioId).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(v => v.Vendedor).WithMany().HasForeignKey(v => v.VendedorId).OnDelete(DeleteBehavior.Restrict);
+            e.HasIndex(v => v.CaixaSessaoId);
+            e.Property(v => v.CpfCnpjNota).HasMaxLength(14);
             e.HasOne(v => v.Deposito).WithMany().HasForeignKey(v => v.DepositoId).OnDelete(DeleteBehavior.Restrict);
             e.HasMany(v => v.Itens).WithOne().HasForeignKey(i => i.VendaId).OnDelete(DeleteBehavior.Cascade);
             e.HasMany(v => v.Pagamentos).WithOne().HasForeignKey(p => p.VendaId).OnDelete(DeleteBehavior.Cascade);
@@ -133,7 +157,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         b.Entity<ItemVenda>(e =>
             e.HasOne(i => i.Produto).WithMany().HasForeignKey(i => i.ProdutoId).OnDelete(DeleteBehavior.Restrict));
 
-        b.Entity<PagamentoVenda>(e => e.Property(p => p.Forma).HasConversion<string>().HasMaxLength(30));
+        b.Entity<PagamentoVenda>(e =>
+        {
+            e.Property(p => p.Forma).HasConversion<string>().HasMaxLength(30);
+            e.Property(p => p.Nsu).HasMaxLength(30);
+        });
 
         b.Entity<Pedido>(e =>
         {
@@ -164,6 +192,49 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.HasOne(l => l.Setor).WithMany().HasForeignKey(l => l.SetorId).OnDelete(DeleteBehavior.SetNull);
             e.HasOne(l => l.Fornecedor).WithMany().HasForeignKey(l => l.FornecedorId).OnDelete(DeleteBehavior.Restrict);
             e.HasOne(l => l.CadastroBancario).WithMany().HasForeignKey(l => l.CadastroBancarioId).OnDelete(DeleteBehavior.SetNull);
+        });
+
+        b.Entity<VinoBebidas.Domain.Common.ParametroSistema>(e =>
+        {
+            e.HasKey(p => p.Chave);
+            e.Property(p => p.Chave).HasMaxLength(60);
+            e.Property(p => p.Valor).HasMaxLength(500);
+        });
+
+        b.Entity<OrdemSeparacao>(e =>
+        {
+            e.HasIndex(o => o.Status);
+            e.HasIndex(o => o.PedidoId);
+            e.Property(o => o.Tipo).HasConversion<string>().HasMaxLength(20);
+            e.Property(o => o.Status).HasConversion<string>().HasMaxLength(20);
+            e.Property(o => o.Observacao).HasMaxLength(1000);
+            e.HasOne(o => o.DepositoOrigem).WithMany().HasForeignKey(o => o.DepositoOrigemId).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(o => o.DepositoDestino).WithMany().HasForeignKey(o => o.DepositoDestinoId).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(o => o.Solicitante).WithMany().HasForeignKey(o => o.SolicitanteId).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(o => o.Separador).WithMany().HasForeignKey(o => o.SeparadorId).OnDelete(DeleteBehavior.Restrict);
+            e.HasMany(o => o.Itens).WithOne().HasForeignKey(i => i.OrdemSeparacaoId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        b.Entity<ItemOrdemSeparacao>(e =>
+        {
+            e.Property(i => i.Localizacao).HasMaxLength(20);
+            e.HasOne(i => i.Produto).WithMany().HasForeignKey(i => i.ProdutoId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        b.Entity<CaixaSessao>(e =>
+        {
+            e.HasIndex(c => new { c.OperadorId, c.Status });
+            e.Property(c => c.Status).HasConversion<string>().HasMaxLength(20);
+            e.Property(c => c.Observacao).HasMaxLength(1000);
+            e.HasOne(c => c.Deposito).WithMany().HasForeignKey(c => c.DepositoId).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(c => c.Operador).WithMany().HasForeignKey(c => c.OperadorId).OnDelete(DeleteBehavior.Restrict);
+            e.HasMany(c => c.Movimentos).WithOne().HasForeignKey(m => m.CaixaSessaoId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        b.Entity<MovimentoCaixa>(e =>
+        {
+            e.Property(m => m.Tipo).HasConversion<string>().HasMaxLength(20);
+            e.Property(m => m.Motivo).HasMaxLength(300);
         });
 
         b.Entity<Documento>(e =>

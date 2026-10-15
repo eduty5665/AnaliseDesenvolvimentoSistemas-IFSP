@@ -23,7 +23,7 @@ public static class CadastrosEndpoints
             {
                 var padrao = Busca.Padrao(busca);
                 var digitos = Documentos.SomenteDigitos(busca);
-                q = q.Where(c => EF.Functions.Like(c.Nome, padrao) || EF.Functions.Like(c.Email!, padrao) ||
+                q = q.Where(c => EF.Functions.Like(c.Nome.ToLower(), padrao) || EF.Functions.Like(c.Email!.ToLower(), padrao) ||
                                  (digitos.Length >= 3 && EF.Functions.Like(c.CpfCnpj!, "%" + digitos + "%")));
             }
             var lista = await q.OrderBy(c => c.Nome).Take(Math.Clamp(limite ?? 100, 1, 1000)).ToListAsync(ct);

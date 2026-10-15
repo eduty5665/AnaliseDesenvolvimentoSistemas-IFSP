@@ -17,7 +17,9 @@ public static class ErpEndpoints
     {
         MapProdutos(app);
         MapEstoque(app);
+        MapOrdensSeparacao(app);
         MapVendas(app);
+        MapCaixa(app);
     }
 
     private static void MapProdutos(IEndpointRouteBuilder app)
@@ -65,6 +67,9 @@ public static class ErpEndpoints
             cat.Nome = r.Nome.Trim();
             cat.Descricao = r.Descricao;
             cat.EhVinho = r.EhVinho;
+            cat.Alcoolico = r.Alcoolico;
+            if (r.TributosAproximados is < 0 or > 100) throw new RegraNegocioException("Percentual de tributos inválido.");
+            cat.TributosAproximados = r.TributosAproximados;
             if (!string.IsNullOrWhiteSpace(r.Cor)) cat.Cor = r.Cor;
         }
     }
@@ -110,10 +115,93 @@ public static class ErpEndpoints
                 int? pagina, int? tamanho, CancellationToken ct) =>
             Results.Ok(await s.ListarMovimentacoesAsync(tipo, produtoId, depositoId, de, ate, pagina ?? 1, tamanho ?? 50, ct)));
 
+        g.MapGet("/movimentacoes/{id:int}", async (int id, EstoqueService s, CancellationToken ct) =>
+            await s.ObterAsync(id, ct) is { } m ? Results.Ok(m) : Results.NotFound());
+
+        g.MapPut("/localizacao", async (LocalizacaoRequest r, EstoqueService s, CancellationToken ct) =>
+        {
+            await s.DefinirLocalizacaoAsync(r.ProdutoId, r.DepositoId, r.Localizacao, ct);
+            return Results.NoContent();
+        }).RequireAuthorization(Politicas.Estoque).WithSummary("Define o endereço (corredor-prateleira-nível) do produto no depósito");
+
         g.MapPost("/movimentacoes", async (MovimentacaoRequest r, EstoqueService s, ClaimsPrincipal user, CancellationToken ct) =>
             Results.Ok(await s.RegistrarAsync(r, user.FuncionarioId(), ct)))
             .RequireAuthorization(Politicas.Estoque)
-            .WithSummary("Entrada de NF, saída, transferência entre depósitos ou ajuste de inventário");
+            .WithSummary("Entrada de NF, saída com motivo, transferência direta ou ajuste de inventário");
+    }
+
+    private static void MapOrdensSeparacao(IEndpointRouteBuilder app)
+    {
+        var g = app.MapGroup("/api/ordens-separacao").WithTags("Ordens de separação").RequireAuthorization(Politicas.Funcionario);
+
+        g.MapGet("/", async (OrdemSeparacaoService s, StatusOrdemSeparacao? status, TipoOrdemSeparacao? tipo, bool? abertas, int? depositoId, int? limite, CancellationToken ct) =>
+            Results.Ok(await s.ListarAsync(status, tipo, abertas ?? false, depositoId, limite ?? 200, ct)));
+
+        g.MapGet("/{id:int}", async (int id, OrdemSeparacaoService s, CancellationToken ct) =>
+            await s.ObterAsync(id, ct) is { } o ? Results.Ok(o) : Results.NotFound());
+
+        g.MapPost("/", async (CriarOrdemSeparacaoRequest r, OrdemSeparacaoService s, ClaimsPrincipal user, CancellationToken ct) =>
+            Results.Ok(await s.EmitirTransferenciaAsync(r, user.FuncionarioId(), ct)))
+            .RequireAuthorization(Politicas.Estoque)
+            .WithSummary("Solicita transferência: emite a ordem de separação e reserva o estoque na origem");
+
+        g.MapPost("/{id:int}/separar", async (int id, ConferirOrdemRequest r, OrdemSeparacaoService s, ClaimsPrincipal user, CancellationToken ct) =>
+            Results.Ok(await s.SepararAsync(id, r, user.FuncionarioId(), ct)))
+            .RequireAuthorization(Politicas.Estoque).WithSummary("Confirma a separação (quantidades conferidas)");
+
+        g.MapPost("/{id:int}/expedir", async (int id, OrdemSeparacaoService s, ClaimsPrincipal user, CancellationToken ct) =>
+            Results.Ok(await s.ExpedirAsync(id, user.FuncionarioId(), ct)))
+            .RequireAuthorization(Politicas.Estoque).WithSummary("Expede a transferência: baixa a origem e deixa em trânsito");
+
+        g.MapPost("/{id:int}/receber", async (int id, ConferirOrdemRequest r, OrdemSeparacaoService s, ClaimsPrincipal user, CancellationToken ct) =>
+            Results.Ok(await s.ReceberAsync(id, r, user.FuncionarioId(), ct)))
+            .WithSummary("Recebe no destino (com conferência e registro de divergência)");
+
+        g.MapPost("/{id:int}/cancelar", async (int id, OrdemSeparacaoService s, CancellationToken ct) =>
+            Results.Ok(await s.CancelarAsync(id, ct)))
+            .RequireAuthorization(Politicas.Estoque);
+    }
+
+    private static void MapCaixa(IEndpointRouteBuilder app)
+    {
+        var g = app.MapGroup("/api/caixa").WithTags("Caixa (PDV)").RequireAuthorization(Politicas.Vendas);
+
+        g.MapGet("/atual", async (CaixaService s, ClaimsPrincipal user, CancellationToken ct) =>
+            await s.AtualAsync(user.Id(), ct) is { } c ? Results.Ok(c) : Results.NoContent())
+            .WithSummary("Caixa aberto do operador logado (204 se não houver)");
+
+        g.MapPost("/abrir", async (AbrirCaixaRequest r, CaixaService s, ClaimsPrincipal user, CancellationToken ct) =>
+            Results.Ok(await s.AbrirAsync(user.Id(), r, ct)));
+
+        g.MapPost("/movimentos", async (MovimentoCaixaRequest r, CaixaService s, ClaimsPrincipal user, CancellationToken ct) =>
+            Results.Ok(await s.MovimentarAsync(user.Id(), r, ct))).WithSummary("Sangria ou suprimento");
+
+        g.MapPost("/fechar", async (FecharCaixaRequest r, CaixaService s, ClaimsPrincipal user, CancellationToken ct) =>
+            Results.Ok(await s.FecharAsync(user.Id(), r, ct))).WithSummary("Fecha o caixa conferindo o dinheiro contado");
+
+        g.MapGet("/sessoes", async (CaixaService s, DateOnly? de, DateOnly? ate, int? depositoId, int? limite, CancellationToken ct) =>
+            Results.Ok(await s.ListarAsync(de, ate, depositoId, limite ?? 60, ct))).RequireAuthorization(Politicas.Gestao);
+
+        g.MapGet("/sessoes/{id:int}", async (int id, CaixaService s, CancellationToken ct) =>
+            await s.ObterAsync(id, ct) is { } c ? Results.Ok(c) : Results.NotFound());
+
+        app.MapGet("/api/vendedores", async (AppDbContext db, CancellationToken ct) =>
+        {
+            var perfis = new[] { PerfilUsuario.Vendedor, PerfilUsuario.Caixa, PerfilUsuario.Gerente };
+            var lista = await db.Usuarios.AsNoTracking().Where(u => u.Ativo && perfis.Contains(u.Perfil))
+                .OrderBy(u => u.Nome).Select(u => new { u.Id, u.Nome, u.Sobrenome }).ToListAsync(ct);
+            return Results.Ok(lista.Select(u => new OpcaoDto(u.Id, $"{u.Nome} {u.Sobrenome}".Trim())));
+        }).WithTags("Caixa (PDV)").RequireAuthorization(Politicas.Funcionario);
+
+        app.MapGet("/api/empresa", (IConfiguration config) => Results.Ok(new EmpresaDto(
+            config["Empresa:Nome"] ?? "Vino Bebidas",
+            config["Empresa:RazaoSocial"] ?? "Vino Bebidas Comércio de Bebidas Ltda",
+            config["Empresa:Cnpj"] ?? "12345678000195",
+            config["Empresa:InscricaoEstadual"],
+            config["Empresa:Endereco"],
+            config["Empresa:Cidade"] ?? "Catanduva",
+            config["Empresa:Telefone"],
+            config["Empresa:ChavePix"]))).WithTags("Sistema").RequireAuthorization(Politicas.Funcionario);
     }
 
     private static void MapVendas(IEndpointRouteBuilder app)
@@ -138,3 +226,4 @@ public static class ErpEndpoints
             .WithSummary("Cancela a venda, devolve o estoque e estorna a receita");
     }
 }
+

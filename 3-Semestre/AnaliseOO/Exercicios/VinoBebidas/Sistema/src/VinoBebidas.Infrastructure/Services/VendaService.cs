@@ -8,20 +8,44 @@ using VinoBebidas.Infrastructure.Data;
 namespace VinoBebidas.Infrastructure.Services;
 
 /// <summary>Frente de caixa (PDV). Cada venda baixa estoque, gera kardex e lança a receita no financeiro.</summary>
-public class VendaService(AppDbContext db, EstoqueService estoque, Calendario calendario, INotificadorPainel notificador)
+public class VendaService(AppDbContext db, EstoqueService estoque, CaixaService caixas, SenhaService senhas, Calendario calendario, INotificadorPainel notificador)
 {
+    /// <summary>
+    /// Venda do PDV. Exige caixa aberto do operador, confere maioridade para bebidas alcoólicas,
+    /// respeita o limite de desconto do perfil (acima disso pede senha de supervisor),
+    /// baixa o estoque, grava o kardex e lança a receita.
+    /// </summary>
     public async Task<VendaDto> RegistrarAsync(VendaRequest req, int? usuarioId, CancellationToken ct = default)
     {
         if (req.Itens is null || req.Itens.Count == 0) throw new RegraNegocioException("A venda não tem itens.");
+        if (req.Canal == CanalVenda.Online) throw new RegraNegocioException("Vendas online nascem dos pedidos da loja.");
+
+        var operador = usuarioId is null ? null : await db.Usuarios.FirstOrDefaultAsync(u => u.Id == usuarioId && u.Ativo, ct);
+        if (operador is null) throw new RegraNegocioException("Operador não identificado.");
 
         var deposito = await db.Depositos.FirstOrDefaultAsync(d => d.Id == req.DepositoId && d.Ativo, ct)
                        ?? throw new RegraNegocioException("Depósito/loja inválido.");
 
+        var sessao = await caixas.SessaoAbertaAsync(operador.Id, ct)
+                     ?? throw new RegraNegocioException("Abra o caixa antes de registrar vendas.");
+        if (sessao.DepositoId != deposito.Id)
+            throw new RegraNegocioException("Seu caixa foi aberto em outra loja. Feche-o para vender nesta.");
+
         if (req.ClienteId is not null && !await db.Clientes.AnyAsync(c => c.Id == req.ClienteId && c.Ativo, ct))
             throw new RegraNegocioException("Cliente não encontrado.");
 
+        if (req.VendedorId is not null && !await db.Usuarios.AnyAsync(u => u.Id == req.VendedorId && u.Ativo, ct))
+            throw new RegraNegocioException("Vendedor não encontrado.");
+
+        var documento = Documentos.SomenteDigitos(req.CpfCnpjNota);
+        if (documento.Length > 0 && !(documento.Length == 11 && Documentos.CpfValido(documento)) && !(documento.Length == 14 && Documentos.CnpjValido(documento)))
+            throw new RegraNegocioException("CPF/CNPJ do cupom inválido.");
+
         var produtoIds = req.Itens.Select(i => i.ProdutoId).Distinct().ToList();
-        var produtos = await db.Produtos.Where(p => produtoIds.Contains(p.Id)).ToDictionaryAsync(p => p.Id, ct);
+        var produtos = await db.Produtos.Include(p => p.Categoria).Where(p => produtoIds.Contains(p.Id)).ToDictionaryAsync(p => p.Id, ct);
+
+        if (!req.MaioridadeConferida && produtos.Values.Any(p => p.Categoria?.Alcoolico ?? true))
+            throw new RegraNegocioException("Confirme que o cliente é maior de 18 anos (venda de bebida alcoólica).");
 
         await using var tx = await db.Database.BeginTransactionAsync(ct);
 
@@ -30,8 +54,11 @@ public class VendaService(AppDbContext db, EstoqueService estoque, Calendario ca
             Data = calendario.AgoraUtc,
             Canal = req.Canal,
             ClienteId = req.ClienteId,
-            UsuarioId = usuarioId,
+            UsuarioId = operador.Id,
+            VendedorId = req.VendedorId ?? operador.Id,
             DepositoId = deposito.Id,
+            CaixaSessaoId = sessao.Id,
+            CpfCnpjNota = documento.Length > 0 ? documento : null,
             Desconto = req.Desconto
         };
 
@@ -55,13 +82,31 @@ public class VendaService(AppDbContext db, EstoqueService estoque, Calendario ca
         }
 
         venda.CalcularTotais();
-        venda.Pagamentos = req.Pagamentos.Select(p => new PagamentoVenda { Forma = p.Forma, Valor = p.Valor }).ToList();
+
+        // Limite de desconto por perfil; acima dele, um gerente/administrador precisa autorizar
+        var limite = PoliticaDesconto.LimitePercentual(operador.Perfil);
+        if (venda.PercentualDesconto > limite)
+        {
+            if (req.Autorizacao is null)
+                throw new RegraNegocioException($"Desconto de {venda.PercentualDesconto:N1}% acima do seu limite ({limite:N0}%). Peça a autorização de um supervisor.");
+            var login = req.Autorizacao.Login.Trim().ToLowerInvariant();
+            var supervisor = await db.Usuarios.FirstOrDefaultAsync(u => u.Login == login && u.Ativo, ct);
+            if (supervisor is null || !PoliticaDesconto.PodeAutorizar(supervisor.Perfil) || !senhas.Conferir(supervisor.SenhaHash, req.Autorizacao.Senha))
+                throw new RegraNegocioException("Autorização de supervisor inválida.");
+            if (venda.PercentualDesconto > PoliticaDesconto.LimitePercentual(supervisor.Perfil))
+                throw new RegraNegocioException("O desconto excede o limite do supervisor.");
+            venda.DescontoAutorizadoPorId = supervisor.Id;
+        }
+
+        venda.Pagamentos = req.Pagamentos
+            .Select(p => new PagamentoVenda { Forma = p.Forma, Valor = p.Valor, Parcelas = Math.Max(1, p.Parcelas), Nsu = string.IsNullOrWhiteSpace(p.Nsu) ? null : p.Nsu.Trim() })
+            .ToList();
         venda.ValidarPagamentos();
 
         db.Vendas.Add(venda);
         await db.SaveChangesAsync(ct);
 
-        RegistrarKardexEReceita(venda, usuarioId, TipoMovimentacao.Venda);
+        RegistrarKardexEReceita(venda, operador.Id, TipoMovimentacao.Venda);
         await db.SaveChangesAsync(ct);
         await tx.CommitAsync(ct);
 
@@ -151,12 +196,19 @@ public class VendaService(AppDbContext db, EstoqueService estoque, Calendario ca
     public async Task<VendaDto?> ObterAsync(int id, CancellationToken ct = default)
     {
         var venda = await db.Vendas.AsNoTracking()
-            .Include(v => v.Itens).ThenInclude(i => i.Produto)
+            .Include(v => v.Itens).ThenInclude(i => i.Produto).ThenInclude(p => p!.Categoria)
             .Include(v => v.Pagamentos)
-            .Include(v => v.Cliente).Include(v => v.Usuario).Include(v => v.Deposito)
+            .Include(v => v.Cliente).Include(v => v.Usuario).Include(v => v.Vendedor).Include(v => v.Deposito)
             .AsSplitQuery()
             .FirstOrDefaultAsync(v => v.Id == id, ct);
-        return venda?.ToDto();
+        if (venda is null) return null;
+        string? autorizadoPor = null;
+        if (venda.DescontoAutorizadoPorId is not null)
+        {
+            var sup = await db.Usuarios.AsNoTracking().FirstOrDefaultAsync(u => u.Id == venda.DescontoAutorizadoPorId, ct);
+            autorizadoPor = sup?.NomeCompleto;
+        }
+        return venda.ToDto(autorizadoPor);
     }
 
     public async Task<PaginaDto<VendaResumoDto>> ListarAsync(DateOnly? de, DateOnly? ate, CanalVenda? canal, StatusVenda? status,

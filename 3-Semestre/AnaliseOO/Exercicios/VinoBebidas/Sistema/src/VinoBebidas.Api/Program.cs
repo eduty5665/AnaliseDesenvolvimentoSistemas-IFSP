@@ -9,6 +9,8 @@ using VinoBebidas.Infrastructure;
 using VinoBebidas.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+// Configuração só desta máquina (fora do Git): é aqui que fica a conexão com o Supabase, com a senha do banco.
+builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: false);
 var config = builder.Configuration;
 
 // ── Banco único + serviços de negócio ──
@@ -41,6 +43,7 @@ builder.Services.AddAuthentication(BearerTokenDefaults.AuthenticationScheme)
         };
     });
 Politicas.Configurar(builder.Services.AddAuthorizationBuilder());
+builder.Services.AddAntiforgery();
 builder.Services.AddSingleton<TokenService>();
 
 // Chaves de proteção dos tokens persistidas em disco para sobreviver a reinícios
@@ -72,7 +75,8 @@ app.UseAntiforgery();
 
 app.MapOpenApi();
 app.MapGet("/docs", () => Results.Content(PaginaDocs.Html, "text/html")).ExcludeFromDescription();
-app.MapGet("/api/saude", () => Results.Ok(new { status = "ok", horario = DateTime.UtcNow })).WithTags("Sistema");
+app.MapGet("/api/saude", (ConexaoBanco banco) => Results.Ok(new { status = "ok", horario = DateTime.UtcNow, banco = banco.Descricao, contingencia = banco.EmContingencia }))
+    .WithTags("Sistema");
 
 app.MapAuth();
 app.MapCatalogo();

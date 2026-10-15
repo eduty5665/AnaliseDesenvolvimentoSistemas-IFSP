@@ -10,6 +10,10 @@ public class Categoria : Entidade
     public bool EhVinho { get; set; }
     /// <summary>Cor usada nos gráficos e nas ilustrações de garrafa (hex).</summary>
     public string Cor { get; set; } = "#7b2d3b";
+    /// <summary>Bebida alcoólica: o PDV exige conferência de maioridade.</summary>
+    public bool Alcoolico { get; set; } = true;
+    /// <summary>Carga tributária aproximada (%) exibida no cupom (Lei 12.741/2012).</summary>
+    public decimal TributosAproximados { get; set; }
 }
 
 public class Produto : Entidade

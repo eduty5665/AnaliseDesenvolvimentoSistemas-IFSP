@@ -63,6 +63,31 @@ public static class FinanceiroEndpoints
             Results.Ok(await s.VerificarAsync(id, r, ct)))
             .WithSummary("Verificação de padrão: completo → Disponível → análise gerada (lançamento)");
 
+        // ── Relatórios ──
+        var r = app.MapGroup("/api/relatorios").WithTags("Relatórios").RequireAuthorization(Politicas.Funcionario);
+
+        r.MapGet("/vendas", async (RelatorioService s, DateOnly de, DateOnly ate, string? agrupamento, int? depositoId, CanalVenda? canal, CancellationToken ct) =>
+            Results.Ok(await s.VendasAsync(de, ate, agrupamento, depositoId, canal, ct)))
+            .RequireAuthorization(Politicas.Gestao)
+            .WithSummary("Vendas por dia, produto (curva ABC), categoria, vendedor, operador, forma de pagamento, canal ou loja");
+
+        r.MapGet("/kardex", async (RelatorioService s, int produtoId, int? depositoId, DateOnly de, DateOnly ate, CancellationToken ct) =>
+            Results.Ok(await s.KardexAsync(produtoId, depositoId, de, ate, ct)))
+            .WithSummary("Extrato de movimentação de um produto com saldo a cada lançamento");
+
+        r.MapGet("/movimentacoes", async (RelatorioService s, DateOnly de, DateOnly ate, TipoMovimentacao? tipo, int? depositoId, bool? incluirVendas, CancellationToken ct) =>
+            Results.Ok(await s.MovimentacoesAsync(de, ate, tipo, depositoId, incluirVendas ?? false, ct)))
+            .WithSummary("Entradas e saídas do período, item a item");
+
+        r.MapGet("/fluxo-caixa", async (RelatorioService s, DateOnly de, DateOnly ate, CancellationToken ct) =>
+            Results.Ok(await s.FluxoCaixaAsync(de, ate, ct)))
+            .RequireAuthorization(Politicas.Financeiro);
+
+        r.MapGet("/dre", async (RelatorioService s, DateOnly de, DateOnly ate, CancellationToken ct) =>
+            Results.Ok(await s.DreAsync(de, ate, ct)))
+            .RequireAuthorization(Politicas.Gestao)
+            .WithSummary("Demonstrativo de resultado gerencial");
+
         // ── Painel / BI ──
         app.MapGet("/api/painel", async (AnalyticsService s, int? dias, int? horizonte, CancellationToken ct) =>
                 Results.Ok(await s.DashboardAsync(dias ?? 90, horizonte ?? 30, ct)))

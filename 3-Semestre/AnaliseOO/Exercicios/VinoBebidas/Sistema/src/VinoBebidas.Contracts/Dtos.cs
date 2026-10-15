@@ -45,9 +45,9 @@ public static class TiposSessao
 
 // ───────────────────────── Catálogo ─────────────────────────
 
-public record CategoriaDto(int Id, string Nome, string? Descricao, bool EhVinho, string Cor);
+public record CategoriaDto(int Id, string Nome, string? Descricao, bool EhVinho, string Cor, bool Alcoolico, decimal TributosAproximados);
 
-public record CategoriaSalvarRequest(string Nome, string? Descricao, bool EhVinho, string? Cor);
+public record CategoriaSalvarRequest(string Nome, string? Descricao, bool EhVinho, string? Cor, bool Alcoolico = true, decimal TributosAproximados = 0);
 
 /// <summary>Visão completa para o ERP (inclui custo e margem).</summary>
 public record ProdutoDto(
@@ -80,7 +80,9 @@ public record ProdutoDto(
     bool VisivelLoja,
     bool Destaque,
     int EstoqueTotal,
-    int EstoqueDisponivel);
+    int EstoqueDisponivel,
+    bool Alcoolico,
+    decimal TributosAproximados);
 
 public record ProdutoSalvarRequest(
     string Sku,
@@ -158,7 +160,11 @@ public record SaldoDto(
     int Disponivel,
     int EstoqueMinimo,
     bool AbaixoMinimo,
-    decimal CustoUnitario);
+    decimal CustoUnitario,
+    decimal PrecoVenda,
+    string? Localizacao);
+
+public record LocalizacaoRequest(int ProdutoId, int DepositoId, string? Localizacao);
 
 public record ItemMovimentacaoRequest(int ProdutoId, int Quantidade, decimal? CustoUnitario = null);
 
@@ -176,29 +182,98 @@ public record MovimentacaoRequest(
     string? NumeroDocumento = null,
     string? Observacao = null,
     bool GerarContaAPagar = false,
-    DateOnly? VencimentoContaAPagar = null);
+    DateOnly? VencimentoContaAPagar = null,
+    // Nota fiscal de entrada
+    string? Serie = null,
+    string? ChaveAcesso = null,
+    DateOnly? DataEmissao = null,
+    decimal ValorFrete = 0,
+    decimal ValorOutrasDespesas = 0,
+    int NumeroParcelas = 1,
+    int IntervaloParcelasDias = 30,
+    // Saída avulsa
+    MotivoSaida? Motivo = null);
 
-public record ItemMovimentacaoDto(int ProdutoId, string Produto, int Quantidade, decimal CustoUnitario);
+public record ItemMovimentacaoDto(int ProdutoId, string Sku, string Produto, int Quantidade, decimal CustoUnitario);
 
 public record MovimentacaoDto(
     int Id,
+    string Numero,
     TipoMovimentacao Tipo,
     DateTime Data,
     string? DepositoOrigem,
     string? DepositoDestino,
     string? Fornecedor,
+    string? FornecedorCnpj,
     string? NumeroDocumento,
+    string? Serie,
+    string? ChaveAcesso,
+    DateOnly? DataEmissao,
+    MotivoSaida? Motivo,
     string? Observacao,
     string? Usuario,
     int? VendaId,
+    int? OrdemSeparacaoId,
+    decimal ValorProdutos,
+    decimal ValorFrete,
+    decimal ValorOutrasDespesas,
     decimal ValorTotal,
     IReadOnlyList<ItemMovimentacaoDto> Itens);
+
+// ───────────────────────── Ordem de Separação ─────────────────────────
+
+public record ItemQuantidadeRequest(int ProdutoId, int Quantidade);
+
+/// <summary>Solicita transferência entre depósitos: emite a ordem e reserva o estoque na origem.</summary>
+public record CriarOrdemSeparacaoRequest(
+    int DepositoOrigemId,
+    int DepositoDestinoId,
+    IReadOnlyList<ItemQuantidadeRequest> Itens,
+    string? Observacao = null);
+
+/// <summary>Quantidades conferidas na separação ou no recebimento. Itens omitidos = quantidade integral.</summary>
+public record ConferirOrdemRequest(IReadOnlyList<ItemQuantidadeRequest>? Itens = null, string? Observacao = null);
+
+public record ItemOrdemSeparacaoDto(
+    int ProdutoId,
+    string Sku,
+    string? CodigoBarras,
+    string Produto,
+    string? Localizacao,
+    int Quantidade,
+    int? QuantidadeSeparada,
+    int? QuantidadeRecebida);
+
+public record OrdemSeparacaoDto(
+    int Id,
+    string Numero,
+    TipoOrdemSeparacao Tipo,
+    StatusOrdemSeparacao Status,
+    DateTime Data,
+    int DepositoOrigemId,
+    string DepositoOrigem,
+    int? DepositoDestinoId,
+    string? DepositoDestino,
+    int? PedidoId,
+    string? PedidoNumero,
+    string? Cliente,
+    string? Entrega,
+    string? Solicitante,
+    string? Separador,
+    string? Observacao,
+    DateTime? SeparadaEm,
+    DateTime? ExpedidaEm,
+    DateTime? ConcluidaEm,
+    IReadOnlyList<ItemOrdemSeparacaoDto> Itens);
 
 // ───────────────────────── Vendas (PDV) ─────────────────────────
 
 public record ItemVendaRequest(int ProdutoId, int Quantidade, decimal Desconto = 0);
 
-public record PagamentoRequest(FormaPagamento Forma, decimal Valor);
+public record PagamentoRequest(FormaPagamento Forma, decimal Valor, int Parcelas = 1, string? Nsu = null);
+
+/// <summary>Login e senha de um gerente/administrador para liberar desconto acima do limite do operador.</summary>
+public record AutorizacaoSupervisorRequest(string Login, string Senha);
 
 public record VendaRequest(
     int DepositoId,
@@ -206,11 +281,15 @@ public record VendaRequest(
     IReadOnlyList<PagamentoRequest> Pagamentos,
     int? ClienteId = null,
     decimal Desconto = 0,
-    CanalVenda Canal = CanalVenda.Loja);
+    CanalVenda Canal = CanalVenda.Loja,
+    int? VendedorId = null,
+    string? CpfCnpjNota = null,
+    bool MaioridadeConferida = false,
+    AutorizacaoSupervisorRequest? Autorizacao = null);
 
-public record ItemVendaDto(int ProdutoId, string Produto, int Quantidade, decimal PrecoUnitario, decimal Desconto, decimal Total);
+public record ItemVendaDto(int ProdutoId, string Sku, string Produto, int Quantidade, decimal PrecoUnitario, decimal Desconto, decimal Total);
 
-public record PagamentoDto(FormaPagamento Forma, decimal Valor);
+public record PagamentoDto(FormaPagamento Forma, decimal Valor, int Parcelas, string? Nsu);
 
 public record VendaDto(
     int Id,
@@ -220,12 +299,17 @@ public record VendaDto(
     StatusVenda Status,
     int? ClienteId,
     string? Cliente,
+    string? Operador,
     string? Vendedor,
     string Deposito,
+    int? CaixaSessaoId,
+    string? CpfCnpjNota,
     decimal Subtotal,
     decimal Desconto,
     decimal Total,
     decimal Troco,
+    decimal TributosAproximados,
+    string? DescontoAutorizadoPor,
     string? MotivoCancelamento,
     IReadOnlyList<ItemVendaDto> Itens,
     IReadOnlyList<PagamentoDto> Pagamentos);
@@ -233,6 +317,51 @@ public record VendaDto(
 public record VendaResumoDto(int Id, string Numero, DateTime Data, CanalVenda Canal, StatusVenda Status, string? Cliente, int Itens, decimal Total);
 
 public record CancelarVendaRequest(string Motivo);
+
+// ───────────────────────── Caixa (PDV) ─────────────────────────
+
+public record AbrirCaixaRequest(int DepositoId, decimal ValorAbertura);
+
+public record MovimentoCaixaRequest(TipoMovimentoCaixa Tipo, decimal Valor, string Motivo);
+
+public record FecharCaixaRequest(decimal ValorContado, string? Observacao = null);
+
+public record MovimentoCaixaDto(int Id, TipoMovimentoCaixa Tipo, decimal Valor, string Motivo, DateTime Quando);
+
+public record ValorFormaDto(FormaPagamento Forma, decimal Valor, int Quantidade);
+
+public record CaixaDto(
+    int Id,
+    string Numero,
+    int DepositoId,
+    string Deposito,
+    int OperadorId,
+    string Operador,
+    StatusCaixa Status,
+    DateTime AbertoEm,
+    DateTime? FechadoEm,
+    decimal ValorAbertura,
+    int QuantidadeVendas,
+    int VendasCanceladas,
+    decimal TotalVendas,
+    IReadOnlyList<ValorFormaDto> PorForma,
+    decimal Suprimentos,
+    decimal Sangrias,
+    decimal DinheiroEsperado,
+    decimal? ValorContado,
+    decimal? Diferenca,
+    string? Observacao,
+    IReadOnlyList<MovimentoCaixaDto> Movimentos);
+
+public record EmpresaDto(
+    string NomeFantasia,
+    string RazaoSocial,
+    string Cnpj,
+    string? InscricaoEstadual,
+    string? Endereco,
+    string? Cidade,
+    string? Telefone,
+    string? ChavePix);
 
 // ───────────────────────── Pedidos online ─────────────────────────
 
@@ -268,6 +397,7 @@ public record PedidoDto(
     DateTime? ValidoAte,
     string? Observacao,
     int? VendaId,
+    int? OrdemSeparacaoId,
     IReadOnlyList<ItemPedidoDto> Itens,
     IReadOnlyList<StatusPedido> ProximosStatus);
 
@@ -486,3 +616,86 @@ public static class EventosPainel
     public const string PedidoAtualizado = "pedido-status";
     public const string Financeiro = "financeiro";
 }
+
+// ───────────────────────── Relatórios ─────────────────────────
+
+public static class AgrupamentosVenda
+{
+    public const string Dia = "dia";
+    public const string Produto = "produto";
+    public const string Categoria = "categoria";
+    public const string Vendedor = "vendedor";
+    public const string Operador = "operador";
+    public const string Forma = "forma";
+    public const string Canal = "canal";
+    public const string Loja = "loja";
+}
+
+public record LinhaVendasDto(
+    string Chave,
+    int Vendas,
+    int Itens,
+    decimal Bruto,
+    decimal Descontos,
+    decimal Liquido,
+    decimal Custo,
+    decimal Lucro,
+    decimal MargemPercentual,
+    decimal Participacao,
+    decimal Acumulado,
+    string? Classe);
+
+public record RelatorioVendasDto(DateOnly De, DateOnly Ate, string Agrupamento, IReadOnlyList<LinhaVendasDto> Linhas, LinhaVendasDto Total);
+
+public record LinhaKardexDto(
+    DateTime Data,
+    TipoMovimentacao Tipo,
+    string Numero,
+    string? Documento,
+    string Deposito,
+    string? Historico,
+    int Entrada,
+    int Saida,
+    int Saldo,
+    decimal CustoUnitario,
+    string? Usuario);
+
+public record KardexDto(int ProdutoId, string Sku, string Produto, string? Deposito, DateOnly De, DateOnly Ate, int SaldoInicial, int SaldoFinal, int TotalEntradas, int TotalSaidas, IReadOnlyList<LinhaKardexDto> Linhas);
+
+public record ResumoMovimentacaoDto(TipoMovimentacao Tipo, int Documentos, int Unidades, decimal Valor);
+
+public record LinhaMovimentacaoDto(
+    DateTime Data,
+    string Numero,
+    TipoMovimentacao Tipo,
+    string? Origem,
+    string? Destino,
+    string? Documento,
+    string? ParceiroOuMotivo,
+    string Sku,
+    string Produto,
+    int Quantidade,
+    decimal CustoUnitario,
+    decimal Valor,
+    string? Usuario);
+
+public record RelatorioMovimentacoesDto(DateOnly De, DateOnly Ate, IReadOnlyList<ResumoMovimentacaoDto> Resumo, IReadOnlyList<LinhaMovimentacaoDto> Linhas);
+
+public record LinhaFluxoDto(DateOnly Data, decimal Entradas, decimal Saidas, decimal Saldo, decimal Acumulado, decimal EntradasPrevistas, decimal SaidasPrevistas);
+
+public record FluxoCaixaDto(DateOnly De, DateOnly Ate, IReadOnlyList<LinhaFluxoDto> Linhas, decimal TotalEntradas, decimal TotalSaidas, decimal TotalEntradasPrevistas, decimal TotalSaidasPrevistas);
+
+public record DreDto(
+    DateOnly De,
+    DateOnly Ate,
+    decimal ReceitaBruta,
+    decimal Descontos,
+    decimal ReceitaLiquida,
+    decimal Cmv,
+    decimal LucroBruto,
+    decimal MargemBrutaPercentual,
+    IReadOnlyList<ValorCategoriaDto> Despesas,
+    decimal TotalDespesas,
+    decimal OutrasReceitas,
+    decimal Resultado,
+    decimal MargemLiquidaPercentual);

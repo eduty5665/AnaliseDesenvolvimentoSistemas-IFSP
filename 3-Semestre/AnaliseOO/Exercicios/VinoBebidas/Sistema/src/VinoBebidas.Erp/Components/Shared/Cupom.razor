@@ -1,0 +1,55 @@
+@* Cupom não fiscal da venda (impresso em bobina de 80 mm ou A4). *@
+<div class="cupom" id="@Id">
+    <div class="centro">
+        <strong>@Empresa.NomeFantasia.ToUpperInvariant()</strong><br />
+        @Empresa.RazaoSocial<br />
+        CNPJ @Fmt.CpfCnpj(Empresa.Cnpj)@(Empresa.InscricaoEstadual is not null ? $" · IE {Empresa.InscricaoEstadual}" : "")<br />
+        @Venda.Deposito@(Empresa.Endereco is not null ? $" · {Empresa.Endereco}" : "")<br />
+        @Empresa.Cidade@(Empresa.Telefone is not null ? $" · {Empresa.Telefone}" : "")
+    </div>
+    <hr />
+    <div class="centro"><strong>CUPOM NÃO FISCAL</strong>@if (Reimpressao) { <br /><span>*** REIMPRESSÃO ***</span> }</div>
+    <div class="linha-cupom"><span>Venda @Venda.Numero</span><span>@Fmt.DataHora(Venda.Data)</span></div>
+    <div class="linha-cupom"><span>Operador: @(Venda.Operador ?? "—")</span><span>@(Venda.CaixaSessaoId is { } cx ? $"Caixa CX{cx:D5}" : Fmt.Texto(Venda.Canal))</span></div>
+    @if (Venda.Vendedor is not null && Venda.Vendedor != Venda.Operador) { <div>Vendedor: @Venda.Vendedor</div> }
+    @if (Venda.Cliente is not null) { <div>Cliente: @Venda.Cliente</div> }
+    <div>CPF/CNPJ consumidor: @(Venda.CpfCnpjNota is null ? "não informado" : Fmt.CpfCnpj(Venda.CpfCnpjNota))</div>
+    <hr />
+    <div class="linha-cupom cabecalho-itens"><span># CÓD · DESCRIÇÃO</span><span>QTD x UNIT = TOTAL</span></div>
+    @{ var n = 0; }
+    @foreach (var i in Venda.Itens)
+    {
+        n++;
+        <div>@n.ToString("000") @i.Sku · @i.Produto</div>
+        <div class="linha-cupom"><span>&nbsp;&nbsp;&nbsp;&nbsp;@i.Quantidade un x @Fmt.Num(i.PrecoUnitario, 2)@(i.Desconto > 0 ? $"  desc -{Fmt.Num(i.Desconto, 2)}" : "")</span><span>@Fmt.Num(i.Total, 2)</span></div>
+    }
+    <hr />
+    <div class="linha-cupom"><span>Qtd. total de itens</span><span>@Venda.Itens.Sum(i => i.Quantidade)</span></div>
+    <div class="linha-cupom"><span>Subtotal</span><span>@Fmt.Moeda(Venda.Subtotal)</span></div>
+    @if (Venda.Desconto > 0) { <div class="linha-cupom"><span>Desconto</span><span>-@Fmt.Moeda(Venda.Desconto)</span></div> }
+    <div class="linha-cupom total"><span>TOTAL</span><span>@Fmt.Moeda(Venda.Total)</span></div>
+    @foreach (var p in Venda.Pagamentos)
+    {
+        <div class="linha-cupom">
+            <span>@Fmt.Texto(p.Forma)@(p.Parcelas > 1 ? $" {p.Parcelas}x de {Fmt.Moeda(Math.Round(p.Valor / p.Parcelas, 2))}" : "")@(p.Nsu is not null ? $" · NSU {p.Nsu}" : "")</span>
+            <span>@Fmt.Moeda(p.Valor)</span>
+        </div>
+    }
+    @if (Venda.Troco > 0) { <div class="linha-cupom"><span>Troco</span><span>@Fmt.Moeda(Venda.Troco)</span></div> }
+    @if (Venda.DescontoAutorizadoPor is not null) { <div>Desconto autorizado por: @Venda.DescontoAutorizadoPor</div> }
+    <hr />
+    @if (Venda.TributosAproximados > 0)
+    {
+        <div class="pequeno">Tributos totais incidentes aprox. (Lei 12.741/2012): @Fmt.Moeda(Venda.TributosAproximados)
+            (@Fmt.Pct(Venda.Total == 0 ? 0 : Math.Round(Venda.TributosAproximados / Venda.Total * 100, 1))) — valores ilustrativos.</div>
+    }
+    @if (Venda.Status == StatusVenda.Cancelada) { <div class="centro"><strong>*** VENDA CANCELADA ***</strong><br />@Venda.MotivoCancelamento</div> }
+    <div class="centro pequeno">Venda de bebida alcoólica proibida para menores de 18 anos.<br />Trocas em até 7 dias com este cupom.<br />Obrigado pela preferência!</div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public VendaDto Venda { get; set; } = default!;
+    [Parameter, EditorRequired] public EmpresaDto Empresa { get; set; } = default!;
+    [Parameter] public bool Reimpressao { get; set; }
+    [Parameter] public string Id { get; set; } = "cupom";
+}

@@ -1,0 +1,81 @@
+@* Comprovante imprimível de entrada (NF), saída avulsa, ajuste ou transferência. *@
+<div class="documento" id="@Id">
+    <header class="doc-cabecalho">
+        <div>
+            <strong class="doc-empresa">@Empresa.NomeFantasia</strong>
+            <span>@Empresa.RazaoSocial · CNPJ @Fmt.CpfCnpj(Empresa.Cnpj)</span>
+        </div>
+        <div class="doc-titulo">
+            <h2>@Titulo</h2>
+            <strong>@Mov.Numero</strong>
+            <span>@Fmt.DataHora(Mov.Data)</span>
+        </div>
+    </header>
+
+    <div class="doc-grade">
+        @if (Mov.DepositoOrigem is not null) { <div><span>@(Mov.Tipo == TipoMovimentacao.Entrada ? "Origem" : "Depósito de origem")</span>@Mov.DepositoOrigem</div> }
+        @if (Mov.DepositoDestino is not null) { <div><span>Depósito de destino</span>@Mov.DepositoDestino</div> }
+        @if (Mov.Fornecedor is not null) { <div class="larga"><span>Fornecedor</span>@Mov.Fornecedor · CNPJ @Fmt.CpfCnpj(Mov.FornecedorCnpj)</div> }
+        @if (Mov.Tipo == TipoMovimentacao.Entrada && Mov.NumeroDocumento is not null)
+        {
+            <div><span>Nota fiscal</span>@Mov.NumeroDocumento / série @Mov.Serie</div>
+            <div><span>Emissão</span>@Fmt.Data(Mov.DataEmissao)</div>
+            @if (Mov.ChaveAcesso is not null) { <div class="larga"><span>Chave de acesso</span><span class="mono">@FormatarChave(Mov.ChaveAcesso)</span></div> }
+        }
+        else if (Mov.NumeroDocumento is not null)
+        {
+            <div><span>Documento</span>@Mov.NumeroDocumento</div>
+        }
+        @if (Mov.Motivo is not null) { <div><span>Motivo</span><strong>@Fmt.Texto(Mov.Motivo.Value)</strong></div> }
+        <div><span>Responsável</span>@(Mov.Usuario ?? "—")</div>
+        @if (Mov.Observacao is not null) { <div class="larga"><span>Observação</span>@Mov.Observacao</div> }
+    </div>
+
+    <table class="doc-tabela">
+        <thead><tr><th>#</th><th>Código</th><th>Produto</th><th class="num">Quantidade</th><th class="num">Custo unit.</th><th class="num">Total</th></tr></thead>
+        <tbody>
+            @{ var n = 0; }
+            @foreach (var i in Mov.Itens)
+            {
+                n++;
+                <tr>
+                    <td>@n</td><td>@i.Sku</td><td>@i.Produto</td>
+                    <td class="num">@(Mov.Tipo == TipoMovimentacao.Ajuste && i.Quantidade > 0 ? "+" : "")@i.Quantidade</td>
+                    <td class="num">@Fmt.Moeda(i.CustoUnitario)</td>
+                    <td class="num">@Fmt.Moeda(Math.Abs(i.Quantidade) * i.CustoUnitario)</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr><td colspan="3">Produtos</td><td class="num">@Mov.Itens.Sum(i => Math.Abs(i.Quantidade))</td><td></td><td class="num">@Fmt.Moeda(Mov.ValorProdutos)</td></tr>
+            @if (Mov.ValorFrete > 0) { <tr><td colspan="5">Frete (rateado no custo)</td><td class="num">@Fmt.Moeda(Mov.ValorFrete)</td></tr> }
+            @if (Mov.ValorOutrasDespesas > 0) { <tr><td colspan="5">Outras despesas</td><td class="num">@Fmt.Moeda(Mov.ValorOutrasDespesas)</td></tr> }
+            <tr><td colspan="5"><strong>Total</strong></td><td class="num"><strong>@Fmt.Moeda(Mov.ValorTotal)</strong></td></tr>
+        </tfoot>
+    </table>
+
+    <div class="doc-assinaturas">
+        <div><span></span>Responsável: @(Mov.Usuario ?? "")</div>
+        <div><span></span>@(Mov.Tipo == TipoMovimentacao.Entrada ? "Conferente do recebimento" : "Autorizado por (gerência)")</div>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public MovimentacaoDto Mov { get; set; } = default!;
+    [Parameter, EditorRequired] public EmpresaDto Empresa { get; set; } = default!;
+    [Parameter] public string Id { get; set; } = "comprovante-mov";
+
+    private string Titulo => Mov.Tipo switch
+    {
+        TipoMovimentacao.Entrada => "ENTRADA DE MERCADORIA",
+        TipoMovimentacao.Saida => "SAÍDA DE MERCADORIA",
+        TipoMovimentacao.Ajuste => "AJUSTE DE INVENTÁRIO",
+        TipoMovimentacao.Transferencia => "TRANSFERÊNCIA — EXPEDIÇÃO",
+        TipoMovimentacao.RecebimentoTransferencia => "TRANSFERÊNCIA — RECEBIMENTO",
+        TipoMovimentacao.Venda => "BAIXA POR VENDA",
+        _ => "ESTORNO DE VENDA"
+    };
+
+    private static string FormatarChave(string chave) =>
+        string.Join(' ', Enumerable.Range(0, (chave.Length + 3) / 4).Select(i => chave.Substring(i * 4, Math.Min(4, chave.Length - i * 4))));
+}

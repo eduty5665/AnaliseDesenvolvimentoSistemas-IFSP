@@ -69,7 +69,10 @@ public class SenhaService
 
 public static class Busca
 {
-    /// <summary>Padrão LIKE sem diferenciar maiúsculas (SQLite e SQL Server com collation padrão).</summary>
+    /// <summary>
+    /// Padrão LIKE em minúsculas. Use sempre com a coluna em minúsculas — EF.Functions.Like(x.Nome.ToLower(), padrao) —
+    /// para a busca não diferenciar maiúsculas em SQLite, SQL Server e PostgreSQL.
+    /// </summary>
     public static string Padrao(string termo) =>
-        "%" + termo.Trim().Replace("%", " ").Replace("_", " ").Replace("[", " ") + "%";
+        "%" + termo.Trim().ToLowerInvariant().Replace("%", " ").Replace("_", " ").Replace("[", " ") + "%";
 }

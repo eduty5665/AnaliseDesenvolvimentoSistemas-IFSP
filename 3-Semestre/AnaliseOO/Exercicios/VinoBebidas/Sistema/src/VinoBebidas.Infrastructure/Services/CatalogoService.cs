@@ -31,12 +31,12 @@ public class CatalogoService(AppDbContext db)
         if (!string.IsNullOrWhiteSpace(f.Busca))
         {
             var padrao = Busca.Padrao(f.Busca);
-            q = q.Where(p => EF.Functions.Like(p.Nome, padrao) || EF.Functions.Like(p.Produtor!, padrao) ||
-                             EF.Functions.Like(p.Uva!, padrao) || EF.Functions.Like(p.Regiao!, padrao));
+            q = q.Where(p => EF.Functions.Like(p.Nome.ToLower(), padrao) || EF.Functions.Like(p.Produtor!.ToLower(), padrao) ||
+                             EF.Functions.Like(p.Uva!.ToLower(), padrao) || EF.Functions.Like(p.Regiao!.ToLower(), padrao));
         }
         if (f.CategoriaId is not null) q = q.Where(p => p.CategoriaId == f.CategoriaId);
         if (!string.IsNullOrWhiteSpace(f.Pais)) q = q.Where(p => p.Pais == f.Pais);
-        if (!string.IsNullOrWhiteSpace(f.Uva)) q = q.Where(p => EF.Functions.Like(p.Uva!, Busca.Padrao(f.Uva)));
+        if (!string.IsNullOrWhiteSpace(f.Uva)) q = q.Where(p => EF.Functions.Like(p.Uva!.ToLower(), Busca.Padrao(f.Uva)));
         if (f.PrecoMin is not null) q = q.Where(p => (p.PrecoPromocional ?? p.PrecoVenda) >= f.PrecoMin);
         if (f.PrecoMax is not null) q = q.Where(p => (p.PrecoPromocional ?? p.PrecoVenda) <= f.PrecoMax);
         if (f.SomenteDestaques) q = q.Where(p => p.Destaque);
@@ -107,7 +107,7 @@ public class ProdutoService(AppDbContext db)
         {
             var termo = busca.Trim();
             var padrao = Busca.Padrao(termo);
-            q = q.Where(p => EF.Functions.Like(p.Nome, padrao) || EF.Functions.Like(p.Sku, padrao) || p.CodigoBarras == termo);
+            q = q.Where(p => EF.Functions.Like(p.Nome.ToLower(), padrao) || EF.Functions.Like(p.Sku.ToLower(), padrao) || p.CodigoBarras == termo);
         }
         if (categoriaId is not null) q = q.Where(p => p.CategoriaId == categoriaId);
         if (ativo is not null) q = q.Where(p => p.Ativo == ativo);

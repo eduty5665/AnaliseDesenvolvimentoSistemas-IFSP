@@ -11,7 +11,7 @@ namespace VinoBebidas.Infrastructure.Services;
 /// Pedidos da loja online. Ao criar, o estoque fica reservado (não aparece como disponível para o PDV).
 /// Ao concluir (retirado/entregue) a reserva vira venda com canal Online.
 /// </summary>
-public class PedidoService(AppDbContext db, EstoqueService estoque, VendaService vendas, Calendario calendario, INotificadorPainel notificador)
+public class PedidoService(AppDbContext db, EstoqueService estoque, VendaService vendas, OrdemSeparacaoService ordens, Calendario calendario, INotificadorPainel notificador)
 {
     public const decimal TaxaEntregaPadrao = 15m;
     public const decimal FreteGratisAcimaDe = 300m;
@@ -107,6 +107,18 @@ public class PedidoService(AppDbContext db, EstoqueService estoque, VendaService
 
         await using var tx = await db.Database.BeginTransactionAsync(ct);
         pedido.AlterarStatus(novo);
+
+        if (novo == StatusPedido.EmSeparacao && pedido.OrdemSeparacaoId is null)
+        {
+            // Clicar em "Separar" emite a Ordem de Separação para o estoquista
+            var ordem = await ordens.EmitirParaPedidoAsync(pedido, usuarioId, ct);
+            await db.SaveChangesAsync(ct);
+            pedido.OrdemSeparacaoId = ordem.Id;
+        }
+        else
+        {
+            await ordens.SincronizarComPedidoAsync(pedido, novo, usuarioId, ct);
+        }
 
         if (novo is StatusPedido.Cancelado or StatusPedido.Expirado)
         {

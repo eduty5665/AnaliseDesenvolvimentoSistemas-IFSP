@@ -2,6 +2,8 @@
 @inject ApiClient Api
 @inject Sessao Sessao
 @inject Avisos Avisos
+@inject DadosEmpresa DadosEmpresa
+@inject IJSRuntime JS
 
 <div class="cabecalho-pagina">
     <h1>Vendas</h1>
@@ -66,7 +68,9 @@ else
                 <div><span>Data</span>@Fmt.DataHora(detalhe.Data)</div>
                 <div><span>Loja</span>@detalhe.Deposito</div>
                 <div><span>Canal</span>@Fmt.Texto(detalhe.Canal)</div>
+                <div><span>Operador</span>@(detalhe.Operador ?? "—")@(detalhe.CaixaSessaoId is { } cx ? $" · caixa CX{cx:D5}" : "")</div>
                 <div><span>Vendedor</span>@(detalhe.Vendedor ?? "—")</div>
+                <div><span>CPF/CNPJ no cupom</span>@Fmt.CpfCnpj(detalhe.CpfCnpjNota)</div>
                 <div><span>Cliente</span>@(detalhe.Cliente ?? "Não identificado")</div>
                 <div><span>Status</span><span class="badge @Fmt.ClasseStatus(detalhe.Status)">@Fmt.Texto(detalhe.Status)</span></div>
             </div>
@@ -83,8 +87,14 @@ else
                 <dt>Subtotal</dt><dd>@Fmt.Moeda(detalhe.Subtotal)</dd>
                 <dt>Desconto</dt><dd>@Fmt.Moeda(detalhe.Desconto)</dd>
                 <dt class="total">Total</dt><dd class="total">@Fmt.Moeda(detalhe.Total)</dd>
-                @foreach (var p in detalhe.Pagamentos) { <dt>@Fmt.Texto(p.Forma)</dt><dd>@Fmt.Moeda(p.Valor)</dd> }
+                @foreach (var p in detalhe.Pagamentos) { <dt>@Fmt.Texto(p.Forma)@(p.Parcelas > 1 ? $" {p.Parcelas}x" : "")@(p.Nsu is not null ? $" · NSU {p.Nsu}" : "")</dt><dd>@Fmt.Moeda(p.Valor)</dd> }
+                @if (detalhe.Troco > 0) { <dt>Troco</dt><dd>@Fmt.Moeda(detalhe.Troco)</dd> }
             </dl>
+            @if (detalhe.DescontoAutorizadoPor is not null) { <p class="nota">Desconto autorizado por @detalhe.DescontoAutorizadoPor.</p> }
+            @if (empresa is not null)
+            {
+                <div class="oculto"><Cupom Venda="detalhe" Empresa="empresa" Reimpressao="true" Id="cupom-reimpressao" /></div>
+            }
             @if (detalhe.MotivoCancelamento is not null)
             {
                 <div class="alerta-erro">Cancelada: @detalhe.MotivoCancelamento</div>
@@ -101,9 +111,20 @@ else
             }
         }
     </ChildContent>
+    <Rodape>
+        <button class="btn fantasma" @onclick="Reimprimir">Reimprimir cupom</button>
+        <button class="btn primario" @onclick="() => detalhe = null">Fechar</button>
+    </Rodape>
 </Modal>
 
 @code {
+    private EmpresaDto? empresa;
+
+    private async Task Reimprimir()
+    {
+        try { await JS.InvokeVoidAsync("vino.imprimir", "cupom-reimpressao"); } catch (JSException) { }
+    }
+
     private PaginaDto<VendaResumoDto>? pagina;
     private DateOnly? de = Fmt.Hoje.AddDays(-7);
     private DateOnly? ate = Fmt.Hoje;
@@ -112,7 +133,11 @@ else
     private VendaDto? detalhe;
     private string motivo = "";
 
-    protected override Task OnInitializedAsync() => Carregar(1);
+    protected override async Task OnInitializedAsync()
+    {
+        empresa = await DadosEmpresa.ObterAsync();
+        await Carregar(1);
+    }
 
     private async Task Carregar(int p)
     {

@@ -1,0 +1,13 @@
+{
+  "name": "skillway",
+  "version": "2.1.0",
+  "private": true,
+  "description": "SkillWay: diagnostico de competencias, trilhas e acompanhamento por hierarquia, com banco de dados (Supabase/PostgreSQL ou SQLite) e IA do Claude.",
+  "scripts": {
+    "start": "node servidor/servidor.js",
+    "supabase": "node servidor/configurar.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -26,7 +26,54 @@ public enum TipoMovimentacao
     Transferencia = 3,
     Ajuste = 4,
     Venda = 5,
-    CancelamentoVenda = 6
+    CancelamentoVenda = 6,
+    /// <summary>Chegada no destino de uma transferência expedida por Ordem de Separação.</summary>
+    RecebimentoTransferencia = 7
+}
+
+/// <summary>Motivo obrigatório das saídas avulsas (auditoria de perdas).</summary>
+public enum MotivoSaida
+{
+    Quebra = 1,
+    Avaria = 2,
+    Vencimento = 3,
+    Degustacao = 4,
+    Brinde = 5,
+    UsoInterno = 6,
+    DevolucaoFornecedor = 7,
+    Outro = 99
+}
+
+public enum TipoOrdemSeparacao
+{
+    PedidoOnline = 1,
+    Transferencia = 2
+}
+
+public enum StatusOrdemSeparacao
+{
+    /// <summary>Emitida, aguardando o estoquista separar.</summary>
+    Aberta = 1,
+    /// <summary>Itens separados e conferidos.</summary>
+    Separada = 2,
+    /// <summary>Transferência saiu da origem e está em trânsito.</summary>
+    Expedida = 3,
+    Concluida = 4,
+    Cancelada = 5
+}
+
+public enum StatusCaixa
+{
+    Aberto = 1,
+    Fechado = 2
+}
+
+public enum TipoMovimentoCaixa
+{
+    /// <summary>Entrada de dinheiro no caixa (reforço de troco).</summary>
+    Suprimento = 1,
+    /// <summary>Retirada de dinheiro do caixa (depósito, cofre).</summary>
+    Sangria = 2
 }
 
 public enum StatusVenda

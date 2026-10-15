@@ -3,247 +3,227 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SkillWay — Habilidades que abrem caminhos</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#050820">
+<title>SkillWay · Habilidades que abrem caminhos</title>
+<meta name="description" content="Plataforma B2B de desenvolvimento de pessoas: diagnóstico de competências, trilha priorizada e acompanhamento pela hierarquia da própria empresa.">
+<link rel="icon" type="image/svg+xml" href="img/favicon.svg">
+<link rel="stylesheet" href="css/fonte.css">
 <link rel="stylesheet" href="css/styles.css">
-<style>
-  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
-  .lp-nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    background: rgba(5,7,15,0.85); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border);
-  }
-  .lp-nav-inner { max-width: 1180px; margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
-  .lp-links { display: flex; gap: 34px; }
-  .lp-links a { font-size: 14.5px; font-weight: 600; color: var(--text-muted); }
-  .lp-links a:hover { color: #fff; }
-  .lp-nav-right { display: flex; align-items: center; gap: 20px; }
-  .lp-nav-right a.enter { font-size: 14.5px; font-weight: 700; color: #fff; }
-  .burger-lp { display: none; }
-
-  .hero { padding: 190px 0 70px; text-align: center; position: relative;
-    background: radial-gradient(circle at 50% 0%, rgba(124,75,254,0.12) 0%, transparent 55%); }
-  .hero .eyebrow { display: inline-block; font-size: 12px; font-weight: 800; letter-spacing: 0.6px; color: var(--teal);
-    border: 1px solid rgba(34,211,238,0.3); background: rgba(34,211,238,0.06); padding: 7px 16px; border-radius: 20px; margin-bottom: 26px; }
-  .hero h1 { font-size: 62px; font-weight: 800; line-height: 1.18; max-width: 780px; margin: 0 auto; }
-  .hero h1 .purple { color: var(--purple); }
-  .hero h1 .cyan { color: var(--teal); }
-  .hero p.lead { font-size: 18px; color: var(--text-muted); max-width: 620px; margin: 26px auto 0; line-height: 1.6; }
-  .hero-ctas { display: flex; gap: 16px; justify-content: center; margin-top: 34px; }
-  .stats-bar {
-    max-width: 900px; margin: 64px auto 0; background: var(--surface); border: 1px solid var(--border);
-    border-radius: 20px; padding: 40px; display: flex; justify-content: space-around;
-  }
-  .stats-bar .s b { font-size: 40px; font-weight: 800; display: block; }
-  .stats-bar .s span { font-size: 13.5px; color: var(--text-faint); }
-
-  .section { padding: 90px 0; }
-  .sec-head { text-align: center; margin-bottom: 50px; }
-  .sec-head .eyebrow-sm { font-size: 12.5px; font-weight: 800; letter-spacing: 0.6px; color: var(--teal); text-transform: uppercase; }
-  .sec-head h2 { font-size: 36px; font-weight: 800; margin-top: 10px; }
-
-  .feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-  .feat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px; }
-  .feat-icon { width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 22px; }
-  .feat-card h3 { font-size: 19px; font-weight: 700; margin-bottom: 12px; }
-  .feat-card p { font-size: 14.5px; color: var(--text-muted); line-height: 1.6; }
-
-  .pricing-section { background: var(--bg-2); }
-  .plans-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 1000px; margin: 0 auto; }
-  .plan-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 34px; display: flex; flex-direction: column; }
-  .plan-card.pop { border: 2px solid var(--teal); position: relative; }
-  .plan-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-  .plan-card h3 { font-size: 17px; font-weight: 700; }
-  .plan-card.pop h3 { color: var(--teal); }
-  .pop-badge { background: var(--green-bg); color: var(--green); font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 20px; }
-  .plan-price { font-size: 36px; font-weight: 800; margin: 14px 0 4px; }
-  .plan-price span { font-size: 13.5px; font-weight: 500; color: var(--text-faint); }
-  .plan-desc { font-size: 13.5px; color: var(--text-muted); margin-bottom: 20px; }
-  .plan-card hr { border: none; border-top: 1px solid var(--border); margin: 0 0 18px; }
-  .plan-card ul { display: flex; flex-direction: column; gap: 12px; margin-bottom: 26px; flex: 1; }
-  .plan-card li { font-size: 13.5px; color: var(--text-muted); display: flex; gap: 8px; }
-  .plan-card li::before { content: '✓'; color: var(--green); font-weight: 700; }
-
-  footer { padding: 60px 0 40px; border-top: 1px solid var(--border); }
-  .footer-grid { display: flex; justify-content: space-between; gap: 40px; flex-wrap: wrap; }
-  .footer-brand p { font-size: 13.5px; color: var(--text-faint); max-width: 320px; line-height: 1.6; margin: 14px 0; }
-  .footer-cols { display: flex; gap: 60px; }
-  .footer-col h4 { font-size: 14px; margin-bottom: 16px; }
-  .footer-col a { display: block; font-size: 13.5px; color: var(--text-muted); margin-bottom: 12px; }
-  .copyright { font-size: 12.5px; color: var(--text-faint); margin-top: 40px; }
-
-  @media (max-width: 980px) {
-    .lp-links { display: none; }
-    .burger-lp { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--border-strong); }
-    .hero h1 { font-size: 42px; }
-    .hero-ctas { flex-direction: column; align-items: stretch; padding: 0 24px; }
-    .stats-bar { flex-direction: column; gap: 24px; text-align: center; }
-    .feat-grid { grid-template-columns: 1fr; }
-    .plans-grid { grid-template-columns: 1fr; }
-    .footer-grid { flex-direction: column; }
-    .footer-cols { gap: 40px; }
-  }
-</style>
+<link rel="stylesheet" href="css/landing.css">
 </head>
-<body>
+<body class="lp">
+<a class="pular" href="#conteudo">Ir para o conteúdo</a>
 
-<div class="lp-nav">
-  <div class="lp-nav-inner">
-    <div class="brand">
-      <svg viewBox="0 0 24 24" fill="none" class="brand-mark"><path d="M3 17l5-6 4 4 8-9" stroke="url(#g1)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 2h6v6" stroke="url(#g1)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="g1" x1="3" y1="2" x2="21" y2="17"><stop stop-color="#22D3EE"/><stop offset="1" stop-color="#A855F7"/></linearGradient></defs></svg>
-      Skill<span class="way">Way</span>
-    </div>
-    <div class="lp-links">
+<header class="lp-nav">
+  <div class="lp-largura lp-nav-dentro">
+    <a href="index.html" class="marca" aria-label="SkillWay, página inicial">
+      <svg class="marca-simbolo" width="30" height="30" viewBox="0 0 48 48" fill="none" aria-hidden="true"><defs><linearGradient id="lgNav" x1="30" y1="4" x2="16" y2="44" gradientUnits="userSpaceOnUse"><stop stop-color="#19C8E6"/><stop offset=".55" stop-color="#4F7CF7"/><stop offset="1" stop-color="#8B5CF6"/></linearGradient></defs><path d="M12 39.5 30 29.5c6.5-3.7 5.5-11-1.5-13L20.5 14c-6.8-2-6-9.5 1-10.3l12.5-1.4" stroke="url(#lgNav)" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round" transform="translate(0 3.5)"/><path d="M32.5 1.2 42.5 5 35.5 12.5z" fill="#19C8E6"/><path d="M14.5 41 29 33" stroke="#fff" stroke-width="1.3" stroke-linecap="round" stroke-dasharray="2.6 3" opacity=".9"/></svg>
+      <span class="marca-nome">Skill<span>Way</span></span>
+    </a>
+    <nav class="lp-links" aria-label="Seções">
       <a href="#como-funciona">Como funciona</a>
-      <a href="#funcionalidades">Funcionalidades</a>
-      <a href="#precos">Preços</a>
-      <a href="#" id="suporteLink">Suporte</a>
-    </div>
-    <div class="lp-nav-right">
-      <a href="login.html" class="enter">Entrar</a>
-      <a href="login.html" class="btn btn-primary btn-sm">Agendar Demonstração</a>
-      <button class="burger-lp" id="burgerLp">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h16" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
-      </button>
+      <a href="#papeis">Para quem</a>
+      <a href="#pesquisa">Pesquisa</a>
+      <a href="#planos">Planos</a>
+    </nav>
+    <div class="lp-nav-acoes">
+      <a class="lp-entrar" href="app.html#/entrar">Entrar</a>
+      <a class="btn btn-primario btn-p" href="app.html#/cadastro">Cadastrar empresa</a>
     </div>
   </div>
-</div>
+</header>
 
-<section class="hero">
-  <div class="wrap">
-    <div class="eyebrow">IA CORPORATIVA DE ÚLTIMA GERAÇÃO</div>
-    <h1>Habilidades que <span class="purple">abrem</span><br><span class="cyan">caminhos.</span></h1>
-    <p class="lead">Conecte o perfil técnico e comportamental de cada colaborador ao plano de capacitação sob medida para o crescimento do seu negócio.</p>
-    <div class="hero-ctas">
-      <a href="login.html" class="btn btn-primary">Começar Grátis Agora</a>
-      <a href="#precos" class="btn btn-ghost">Falar com Especialista</a>
-    </div>
-    <div class="stats-bar">
-      <div class="s"><b style="color:var(--teal);">2.400+</b><span>Colaboradores ativos</span></div>
-      <div class="s"><b style="color:var(--purple);">96%</b><span>Satisfação nas trilhas</span></div>
-      <div class="s"><b style="color:var(--green);">-23%</b><span>Turnover médio anual</span></div>
-    </div>
-  </div>
-</section>
+<main id="conteudo">
 
-<section class="section" id="funcionalidades">
-  <div class="wrap">
-    <div class="sec-head">
-      <div class="eyebrow-sm">Funcionalidades Chave</div>
-      <h2>Tecnologia ponta a ponta para o RH</h2>
-    </div>
-    <div class="feat-grid" id="como-funciona">
-      <div class="feat-card">
-        <div class="feat-icon" style="background:rgba(34,211,238,0.12);">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 12h4l2-7 4 14 2-7h6" stroke="#22D3EE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <section class="lp-heroi">
+    <div class="lp-largura lp-heroi-grade">
+      <div>
+        <h1>Habilidades que abrem caminhos.</h1>
+        <p class="lp-lead">Cada colaborador descobre o que estudar primeiro. Cada gestor acompanha o próprio time. A hierarquia que a sua empresa já tem vira o caminho de desenvolvimento, sem configuração manual.</p>
+        <div class="lp-ctas">
+          <a class="btn btn-primario" href="app.html#/entrar">Entrar na demonstração</a>
+          <a class="btn btn-fantasma" href="app.html#/cadastro">Cadastrar minha empresa</a>
         </div>
-        <h3>01. Diagnóstico Inteligente</h3>
-        <p>Mapeie rapidamente os gaps técnicos e operacionais da sua equipe utilizando avaliações baseadas em dados históricos reais.</p>
+        <p class="lp-nota">A demonstração já vem com uma empresa fictícia, 15 pessoas e três perfis de acesso: colaboradora, gestor e RH.</p>
       </div>
-      <div class="feat-card">
-        <div class="feat-icon" style="background:rgba(168,85,247,0.12);">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 19V6a2 2 0 012-2h9l5 5v10a2 2 0 01-2 2H6a2 2 0 01-2-2z" stroke="#A855F7" stroke-width="1.8" stroke-linejoin="round"/></svg>
-        </div>
-        <h3>02. Curadoria Automática</h3>
-        <p>Trilhas de aprendizagem customizadas dinamicamente via inteligência artificial com recomendações de alta aderência.</p>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon" style="background:rgba(52,211,153,0.12);">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 19l4-9 4 5 3-4 5 8" stroke="#34D399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
-        <h3>03. Evolução Contínua</h3>
-        <p>RH e lideranças acompanham o progresso em tempo real com relatórios gerenciais e acompanhamento consultivo de gaps.</p>
-      </div>
-    </div>
-  </div>
-</section>
 
-<section class="section pricing-section" id="precos">
-  <div class="wrap">
-    <div class="sec-head">
-      <div class="eyebrow-sm" style="color:var(--purple);">Preços</div>
-      <h2>Investimento sob medida para sua equipe</h2>
+      <!-- A estrada do logo, estendida: o caminho que o produto entrega. -->
+      <figure class="lp-estrada" aria-label="O caminho do SkillWay: perfil, objetivo, gap, ação, evidência e evolução">
+        <svg viewBox="0 0 500 500" role="img" aria-hidden="true">
+          <defs>
+            <linearGradient id="gradEstrada" x1="60" y1="450" x2="440" y2="90" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#8B5CF6"/><stop offset=".5" stop-color="#4F7CF7"/><stop offset="1" stop-color="#19C8E6"/>
+            </linearGradient>
+          </defs>
+          <path class="via" pathLength="1" d="M40 420 H360 a70 70 0 0 0 0 -140 H140 a70 70 0 0 1 0 -140 H412" />
+          <path class="seta" d="M408 108 462 140 408 172z"/>
+          <path class="faixa" d="M56 420 H360 a70 70 0 0 0 0 -140 H140 a70 70 0 0 1 0 -140 H400" />
+          <g class="marcos">
+            <g style="--i:0"><circle cx="96" cy="420" r="13"/><text class="n" x="96" y="425">1</text><text class="t" x="96" y="378">Perfil</text></g>
+            <g style="--i:1"><circle cx="288" cy="420" r="13"/><text class="n" x="288" y="425">2</text><text class="t" x="288" y="378">Objetivo</text></g>
+            <g style="--i:2"><circle cx="336" cy="280" r="13"/><text class="n" x="336" y="285">3</text><text class="t" x="336" y="238">Gap</text></g>
+            <g style="--i:3"><circle cx="164" cy="280" r="13"/><text class="n" x="164" y="285">4</text><text class="t" x="164" y="238">Ação</text></g>
+            <g style="--i:4"><circle cx="164" cy="140" r="13"/><text class="n" x="164" y="145">5</text><text class="t" x="164" y="98">Evidência</text></g>
+            <g style="--i:5"><circle cx="352" cy="140" r="13"/><text class="n" x="352" y="145">6</text><text class="t" x="352" y="98">Evolução</text></g>
+          </g>
+        </svg>
+      </figure>
     </div>
-    <div class="plans-grid">
-      <div class="plan-card">
-        <h3>Starter</h3>
-        <div class="plan-price">R$ 19 <span>/ colab / mês</span></div>
-        <p class="plan-desc">Até 15 colaboradores. Ideal para startups em crescimento.</p>
-        <hr>
-        <ul>
-          <li>Trilhas básicas sugeridas</li>
-          <li>Suporte por e-mail</li>
-          <li>Dashboard simplificado</li>
-        </ul>
-        <a href="login.html" class="btn btn-ghost btn-block">Começar Starter</a>
-      </div>
-      <div class="plan-card pop">
-        <div class="plan-head"><h3>Professional</h3><span class="pop-badge">POPULAR</span></div>
-        <div class="plan-price">R$ 35 <span>/ colab / mês</span></div>
-        <p class="plan-desc">De 15 a 100 colaboradores. Ideal para médias empresas.</p>
-        <hr>
-        <ul>
-          <li>Trilhas de IA completas</li>
-          <li>Suporte prioritário 24/7</li>
-          <li>Dashboards avançados de RH</li>
-          <li>Diagnósticos personalizados</li>
-        </ul>
-        <a href="login.html" class="btn btn-primary btn-block">Assinar Professional</a>
-      </div>
-      <div class="plan-card">
-        <h3>Enterprise</h3>
-        <div class="plan-price">Sob Consulta</div>
-        <p class="plan-desc">Mais de 100 colaboradores. Soluções customizadas de ponta.</p>
-        <hr>
-        <ul>
-          <li>SSO &amp; Integrações dedicadas</li>
-          <li>Consultoria de implantação</li>
-          <li>IA treinada para sua hierarquia</li>
-          <li>SLAs de suporte dedicados</li>
-        </ul>
-        <a href="#" class="btn btn-ghost btn-block" id="falarVendasBtn">Falar com Vendas</a>
-      </div>
-    </div>
-  </div>
-</section>
+  </section>
 
-<footer>
-  <div class="wrap footer-grid">
-    <div class="footer-brand" style="max-width:340px;">
-      <div class="brand">
-        <svg viewBox="0 0 24 24" fill="none" class="brand-mark"><path d="M3 17l5-6 4 4 8-9" stroke="url(#g2)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 2h6v6" stroke="url(#g2)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="g2" x1="3" y1="2" x2="21" y2="17"><stop stop-color="#22D3EE"/><stop offset="1" stop-color="#A855F7"/></linearGradient></defs></svg>
-        Skill<span class="way">Way</span>
-      </div>
-      <p>SkillWay é a plataforma líder em curadoria de competências guiada por inteligência artificial para o mercado corporativo brasileiro.</p>
-      <div class="copyright">© 2026 SkillWay Inc. Todos os direitos reservados.</div>
-    </div>
-    <div class="footer-cols">
-      <div class="footer-col">
-        <h4>Produto</h4>
-        <a href="#como-funciona">Como Funciona</a>
-        <a href="dashboard.html">Trilhas Ativas</a>
-        <a href="#" id="quizzesLink">Quizzes IA</a>
-      </div>
-      <div class="footer-col">
-        <h4>Recursos</h4>
-        <a href="#" id="termosLink">Termos de Uso</a>
-        <a href="#" id="privLink">Privacidade</a>
-        <a href="#" id="casesLink">Cases de Sucesso</a>
+  <section class="lp-secao lp-problema">
+    <div class="lp-largura">
+      <h2>O problema não é falta de vontade. É falta de direção.</h2>
+      <p class="lp-sub">Sobram cursos e faltam critérios para escolher. Quem trabalha não sabe por onde começar; quem lidera não enxerga o gap do time.</p>
+      <div class="lp-fatos">
+        <div><b>59%</b><p>da força de trabalho global vai precisar se requalificar até 2030.</p><small>Fórum Econômico Mundial</small></div>
+        <div><b>11,8 mi</b><p>de profissionais a requalificar no Brasil até 2027.</p><small>CNI</small></div>
+        <div><b>440 mil</b><p>vagas ficaram abertas por falta de qualificação, com 8,5 milhões de pessoas desempregadas.</p><small>IBGE, 2023</small></div>
       </div>
     </div>
+  </section>
+
+  <section class="lp-secao" id="como-funciona">
+    <div class="lp-largura">
+      <h2>Como funciona</h2>
+      <p class="lp-sub">Da planilha do organograma à primeira trilha no mesmo dia.</p>
+      <ol class="lp-passos">
+        <li><span>1</span><h3>O RH importa o organograma</h3><p>Uma planilha com nome, e-mail, cargo e superior direto. Quem aparece como superior passa a administrar o próprio time dentro do sistema.</p></li>
+        <li><span>2</span><h3>Cada pessoa faz o diagnóstico</h3><p>Cinco etapas, cerca de cinco minutos: área e currículo, objetivo, autoavaliação, tempo disponível e orçamento.</p></li>
+        <li><span>3</span><h3>O SkillWay monta a trilha</h3><p>O perfil é comparado com o que o cargo pede. A trilha prioriza até quatro competências, com conteúdo que já existe no mercado e uma prática aplicada no trabalho.</p></li>
+        <li><span>4</span><h3>Gestor e RH acompanham</h3><p>Progresso por pessoa, gap da equipe, quizzes, sugestões de conteúdo e relatórios. O que seria trabalho manual vira rotina de poucos cliques.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="lp-secao lp-faixa-escura" id="papeis">
+    <div class="lp-largura">
+      <h2>Um sistema, três pontos de vista</h2>
+      <p class="lp-sub">A mesma pessoa pode ser colaboradora de quem está acima e administradora de quem está abaixo.</p>
+      <div class="lp-papeis">
+        <article>
+          <h3>Colaborador</h3>
+          <p>Recebe o próprio Perfil da Pessoa, uma trilha curta e a prova do que aprendeu.</p>
+          <ul><li>Gap de competências em um radar</li><li>Passos na ordem certa, dentro do tempo e do orçamento</li><li>Quiz de validação e certificado por competência</li><li>Colegas da empresa que já dominam o assunto</li><li>Mentor IA para tirar dúvidas sobre a trilha</li></ul>
+        </article>
+        <article>
+          <h3>Gestor</h3>
+          <p>Administra quem responde a ele, sem depender do RH para cada ação.</p>
+          <ul><li>Progresso e status de cada pessoa</li><li>Leitura da equipe escrita pelo Claude, com ações sugeridas</li><li>Quizzes gerados por IA e revisados por quem envia</li><li>Relatório individual com evidências de prática</li></ul>
+        </article>
+        <article>
+          <h3>RH e diretoria</h3>
+          <p>Enxergam a empresa inteira e onde estão as lacunas estratégicas.</p>
+          <ul><li>Organograma importado por planilha</li><li>Mapa de competências por área e unidade</li><li>Benchmarks entre equipes</li><li>Meta coletiva e exportação em CSV e PDF</li></ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="lp-secao" id="pesquisa">
+    <div class="lp-largura lp-pesquisa">
+      <div>
+        <h2>O que a nossa pesquisa mostrou</h2>
+        <p class="lp-sub">22 pessoas responderam ao formulário do SkillWay entre 10 e 18 de setembro de 2026. A maioria já se sente capaz. O que falta é saber qual é o próximo passo.</p>
+        <div class="lp-numeros">
+          <div><b>95%</b><span>achariam útil uma plataforma assim (21 de 22)</span></div>
+          <div><b>73%</b><span>sentem-se capacitados para a área que desejam</span></div>
+          <div><b>45%</b><span>sentem alguma insegurança na função atual</span></div>
+          <div><b>68%</b><span>querem evoluir na própria formação ou atuação</span></div>
+        </div>
+        <p class="lp-nota">Amostra pequena, concentrada em São Paulo (91%) e em pessoas de 18 a 24 anos (64%).</p>
+      </div>
+      <div class="lp-citacoes">
+        <blockquote><p>Às vezes nos sentimos perdidos. Não sabemos por onde começar, qual curso fazer, qual livro ler.</p><footer>Respondente, 18 a 24 anos, TI</footer></blockquote>
+        <blockquote><p>Daria um norte e seria possível visualizar se é isso mesmo que quero antes de entrar de cabeça.</p><footer>Respondente, 18 a 24 anos, Logística</footer></blockquote>
+        <blockquote><p>Indubitavelmente, devido ao melhor direcionamento e centralização dos passos a serem seguidos.</p><footer>Respondente, 25 a 34 anos, Administração</footer></blockquote>
+      </div>
+    </div>
+  </section>
+
+  <section class="lp-secao lp-faixa-escura" id="planos">
+    <div class="lp-largura">
+      <h2>Planos por colaborador ativo</h2>
+      <p class="lp-sub">Para empresas de 100 a 2.0 colaboradores. O preço por pessoa cai conforme o porte.</p>
+      <div class="lp-calc">
+        <label for="calcN">Quantos colaboradores a sua empresa tem?</label>
+        <div class="lp-calc-linha">
+          <input type="range" id="calcN" min="100" max="2000" step="10" value="300" aria-describedby="calcSaida">
+          <output id="calcSaida" for="calcN"></output>
+        </div>
+      </div>
+      <div class="lp-planos">
+        <article data-plano="starter">
+          <h3>Starter</h3><p class="lp-faixa">100 a 300 colaboradores</p>
+          <p class="lp-preco">R$ 29 <span>por colaborador/mês</span></p>
+          <ul><li>Diagnóstico e curadoria</li><li>Trilha individual</li><li>Onboarding self-service</li></ul>
+        </article>
+        <article data-plano="growth">
+          <h3>Growth</h3><p class="lp-faixa">301 a 800 colaboradores</p>
+          <p class="lp-preco">R$ 24 <span>por colaborador/mês</span></p>
+          <ul><li>Tudo do Starter</li><li>Painel do administrador</li><li>Customer success dedicado</li></ul>
+        </article>
+        <article data-plano="enterprise">
+          <h3>Enterprise</h3><p class="lp-faixa">801 a 2.0 colaboradores</p>
+          <p class="lp-preco">R$ 19 <span>por colaborador/mês</span></p>
+          <ul><li>Tudo do Growth</li><li>Onboarding assistido</li><li>Relatórios executivos</li><li>Taxa de implantação à parte</li></ul>
+        </article>
+      </div>
+      <p class="lp-nota centro">Valores do plano de vendas do projeto. O SkillWay é um projeto acadêmico e ainda não é comercializado.</p>
+    </div>
+  </section>
+
+  <section class="lp-secao">
+    <div class="lp-largura lp-estreita">
+      <h2>Perguntas que o RH costuma fazer</h2>
+      <div class="lp-faq">
+        <details><summary>Já usamos uma plataforma de RH. O SkillWay substitui?</summary><p>Não substitui: complementa. Plataformas de recrutamento e de perfil comportamental dizem quem é o colaborador. O SkillWay diz o que ele precisa estudar para o cargo e acompanha se está estudando.</p></details>
+        <details><summary>Quanto tempo leva a implantação?</summary><p>O organograma entra por planilha e a hierarquia de administração é criada a partir da coluna de superior direto. Não há etapa de configurar manualmente quem administra quem.</p></details>
+        <details><summary>O SkillWay produz os cursos?</summary><p>Não. A curadoria aponta para conteúdo que já existe em plataformas como SEBRAE, Fundação Bradesco, Coursera, Alura e Udemy, respeitando o orçamento que cada pessoa informou, e soma a isso uma prática aplicada no trabalho.</p></details>
+        <details><summary>Que inteligência artificial o SkillWay usa?</summary><p>O Claude, da Anthropic, pela API. Ele lê o currículo no diagnóstico, escreve a leitura do perfil e o plano de estudo, gera quizzes sob medida, analisa a equipe para o gestor, resume respostas abertas e atende no Mentor IA. A chave da API fica no servidor, e os nomes das pessoas são trocados por códigos antes de a equipe ser analisada. Sem chave, o sistema segue funcionando com as regras da base curada.</p></details>
+        <details><summary>Onde os dados ficam guardados?</summary><p>Em um banco de dados PostgreSQL no Supabase (ou em um arquivo SQLite no próprio servidor, quando a empresa prefere não usar a nuvem), com senha protegida e permissões que seguem a hierarquia: cada pessoa vê os próprios registros, o gestor vê quem responde a ele e o RH vê a empresa.</p></details>
+        <details><summary>Como sabemos que funciona?</summary><p>Os dados que temos hoje são os da pesquisa de validação: 21 de 22 respondentes achariam a plataforma útil. O próximo passo do projeto é um piloto com duas ou três empresas para medir o efeito real.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="lp-secao lp-final">
+    <div class="lp-largura">
+      <h2>Veja o caminho inteiro funcionando</h2>
+      <p class="lp-sub">Entre como colaboradora, gestor ou RH e percorra o diagnóstico, a trilha e os relatórios.</p>
+      <div class="lp-ctas centro">
+        <a class="btn btn-primario" href="app.html#/entrar">Entrar na demonstração</a>
+        <a class="btn btn-fantasma" href="app.html#/cadastro">Cadastrar minha empresa</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="lp-rodape">
+  <div class="lp-largura">
+    <span class="marca"><span class="marca-nome">Skill<span>Way</span></span></span>
+    <p>Projeto acadêmico da disciplina de Empreendedorismo · Gestão de Tecnologia da Informação · IFSP Catanduva. A empresa e as pessoas da demonstração são fictícias.</p>
   </div>
 </footer>
 
-<script src="js/app.js"></script>
 <script>
-  document.getElementById('suporteLink').addEventListener('click', function(e){ e.preventDefault(); SkillWay.toast('Suporte: contato@skillway.com.br'); });
-  document.getElementById('falarVendasBtn').addEventListener('click', function(e){ e.preventDefault(); SkillWay.toast('Nossa equipe entrará em contato em breve.'); });
-  ['quizzesLink','termosLink','privLink','casesLink'].forEach(function(id){
-    document.getElementById(id).addEventListener('click', function(e){ e.preventDefault(); SkillWay.toast('Página ilustrativa nesta demonstração.'); });
-  });
-  document.getElementById('burgerLp').addEventListener('click', function(){
-    SkillWay.toast('Menu completo disponível na versão desktop desta demonstração.');
-  });
+(function () {
+  var faixa = document.getElementById('calcN'), saida = document.getElementById('calcSaida');
+  var planos = [
+    { id: 'starter', nome: 'Starter', preco: 29, max: 300 },
+    { id: 'growth', nome: 'Growth', preco: 24, max: 800 },
+    { id: 'enterprise', nome: 'Enterprise', preco: 19, max: 2000 }
+  ];
+  function calcular() {
+    var n = parseInt(faixa.value, 10);
+    var p = planos.filter(function (x) { return n <= x.max; })[0];
+    saida.innerHTML = '<b>' + n.toLocaleString('pt-BR') + '</b> colaboradores · plano <b>' + p.nome + '</b> · <b>R$ ' +
+      (n * p.preco).toLocaleString('pt-BR') + '</b> por mês';
+    document.querySelectorAll('[data-plano]').forEach(function (el) { el.classList.toggle('atual', el.getAttribute('data-plano') === p.id); });
+  }
+  faixa.addEventListener('input', calcular);
+  calcular();
+})();
 </script>
 </body>
 </html>

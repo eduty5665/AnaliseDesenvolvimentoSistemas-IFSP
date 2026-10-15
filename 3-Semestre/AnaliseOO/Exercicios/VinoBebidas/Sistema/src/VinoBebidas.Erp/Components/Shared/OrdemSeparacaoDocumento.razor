@@ -1,0 +1,70 @@
+@* Ordem de Separação imprimível: o estoquista percorre os endereços, marca e assina. *@
+<div class="documento" id="@Id">
+    <header class="doc-cabecalho">
+        <div>
+            <strong class="doc-empresa">@Empresa.NomeFantasia</strong>
+            <span>@Empresa.RazaoSocial · CNPJ @Fmt.CpfCnpj(Empresa.Cnpj)</span>
+        </div>
+        <div class="doc-titulo">
+            <h2>ORDEM DE SEPARAÇÃO</h2>
+            <strong>@Ordem.Numero</strong>
+            <span>Emitida em @Fmt.DataHora(Ordem.Data)</span>
+        </div>
+    </header>
+
+    <div class="doc-grade">
+        <div><span>Tipo</span>@Fmt.Texto(Ordem.Tipo)</div>
+        <div><span>Situação</span>@Fmt.Texto(Ordem.Status)</div>
+        <div><span>Retirar de</span><strong>@Ordem.DepositoOrigem</strong></div>
+        @if (Ordem.Tipo == TipoOrdemSeparacao.Transferencia)
+        {
+            <div><span>Enviar para</span><strong>@Ordem.DepositoDestino</strong></div>
+        }
+        else
+        {
+            <div><span>Pedido</span><strong>@Ordem.PedidoNumero</strong></div>
+            <div><span>Cliente</span>@Ordem.Cliente</div>
+            <div class="larga"><span>Destino</span>@Ordem.Entrega</div>
+        }
+        <div><span>Solicitante</span>@(Ordem.Solicitante ?? "—")</div>
+        @if (Ordem.Observacao is not null) { <div class="larga"><span>Observação</span>@Ordem.Observacao</div> }
+    </div>
+
+    <table class="doc-tabela">
+        <thead>
+            <tr><th>#</th><th>Endereço</th><th>Código</th><th>Produto</th><th>Cód. barras</th><th class="num">Qtd</th><th class="num">Separado</th><th>OK</th></tr>
+        </thead>
+        <tbody>
+            @{ var n = 0; }
+            @foreach (var i in Ordem.Itens)
+            {
+                n++;
+                <tr>
+                    <td>@n</td>
+                    <td><strong>@(i.Localizacao ?? "—")</strong></td>
+                    <td>@i.Sku</td>
+                    <td>@i.Produto</td>
+                    <td>@i.CodigoBarras</td>
+                    <td class="num"><strong>@i.Quantidade</strong></td>
+                    <td class="num">@(i.QuantidadeSeparada?.ToString() ?? "____")</td>
+                    <td><span class="doc-caixa"></span></td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr><td colspan="5">@Ordem.Itens.Count item(ns) · rota ordenada pelo endereço</td><td class="num"><strong>@Ordem.Itens.Sum(i => i.Quantidade)</strong></td><td colspan="2"></td></tr>
+        </tfoot>
+    </table>
+
+    <div class="doc-assinaturas">
+        <div><span></span>Separado por@(Ordem.Separador is not null ? $": {Ordem.Separador}" : "")</div>
+        <div><span></span>Conferido por</div>
+        <div><span></span>@(Ordem.Tipo == TipoOrdemSeparacao.Transferencia ? "Recebido no destino" : "Entregue ao cliente / motorista")</div>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public OrdemSeparacaoDto Ordem { get; set; } = default!;
+    [Parameter, EditorRequired] public EmpresaDto Empresa { get; set; } = default!;
+    [Parameter] public string Id { get; set; } = "ordem-separacao";
+}

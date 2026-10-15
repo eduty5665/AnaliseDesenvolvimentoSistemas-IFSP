@@ -38,8 +38,9 @@ else
                 <NavLink href="estoque"><span class="ic">▤</span> Saldos</NavLink>
                 @if (Sessao.PodeEstoque)
                 {
-                    <NavLink href="movimentacoes"><span class="ic">⇄</span> Movimentações</NavLink>
+                    <NavLink href="movimentacoes"><span class="ic">⇄</span> Entradas e saídas</NavLink>
                 }
+                <NavLink href="ordens-separacao"><span class="ic">☑</span> Ordens de separação</NavLink>
                 <NavLink href="fornecedores"><span class="ic">⌂</span> Fornecedores</NavLink>
                 @if (Sessao.PodeFinanceiro)
                 {
@@ -47,6 +48,8 @@ else
                     <NavLink href="financeiro"><span class="ic">$</span> Contas</NavLink>
                     <NavLink href="documentos"><span class="ic">⎙</span> Documentos (OCR)</NavLink>
                 }
+                <div class="grupo">Gestão</div>
+                <NavLink href="relatorios"><span class="ic">▥</span> Relatórios</NavLink>
                 @if (Sessao.EhAdmin)
                 {
                     <div class="grupo">Administração</div>

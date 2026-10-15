@@ -1,5 +1,4 @@
 import react from '@vitejs/plugin-react'
-import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'vite'
 
 // Em desenvolvimento, /api e /hubs são repassados para a API .NET (porta 5080).
@@ -7,7 +6,7 @@ import { defineConfig } from 'vite'
 const api = process.env.VITE_API_PROXY ?? 'http://localhost:5080'
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react()],
   server: {
     port: 5173,
     host: true,

@@ -1,0 +1,203 @@
+﻿SKILLWAY — SISTEMA WEB (versão 2.1: banco no Supabase + IA do Claude)
+Habilidades que abrem caminhos.
+Projeto de Empreendedorismo · Gestão de Tecnologia da Informação · IFSP Catanduva
+=====================================================================
+
+COMO ABRIR
+----------
+Modo completo (banco de dados + IA do Claude):
+  0. Só na primeira vez, para gravar no Supabase: dois cliques em
+     conectar-supabase.bat (veja "BANCO DE DADOS NO SUPABASE" logo abaixo).
+     Sem esse passo o sistema funciona igual, gravando em um arquivo local.
+  1. Dê dois cliques em iniciar.bat.
+     Ele liga o servidor e abre o navegador em http://localhost:3000
+     (se preferir o terminal: "node servidor/servidor.js" dentro desta pasta).
+  2. Deixe a janela preta do servidor aberta enquanto usa o sistema.
+     Para encerrar, feche a janela ou aperte Ctrl + C.
+  Precisa só do Node.js 18 ou mais novo. Não há nada para instalar com npm.
+
+Modo local (reserva, sem servidor):
+  Dois cliques em app.html. Funciona sem Node, mas os dados ficam só no
+  navegador e os recursos de IA aparecem desligados.
+
+ACESSOS DE DEMONSTRAÇÃO (empresa fictícia "Grupo Atlântico Varejo")
+-------------------------------------------------------------------
+Na tela de entrada há botões prontos. A senha de todos é skillway123:
+
+  Colaboradora ....... marina.souza@grupoatlantico.com.br
+  Gestor de loja ..... paulo.mendes@grupoatlantico.com.br   (administra 5 pessoas)
+  RH ................. helena.prado@grupoatlantico.com.br   (vê a empresa toda)
+  Dev júnior (TI) .... lucas.amorim@grupoatlantico.com.br
+  Sem diagnóstico .... rafael.torres@grupoatlantico.com.br  (para testar o fluxo do zero)
+
+COMO LIGAR A IA DO CLAUDE
+-------------------------
+1. Crie uma chave em https://console.anthropic.com (menu API Keys). A API é
+   paga por uso: é preciso ter créditos na conta da Anthropic.
+2. Com o servidor ligado, entre como RH (Helena) e abra Empresa.
+3. No cartão "Inteligência artificial (Claude)", cole a chave, escolha o
+   modelo e clique em Salvar. Depois use "Testar conexão".
+   Alternativa: copie env.exemplo.txt com o nome .env e preencha ANTHROPIC_API_KEY.
+
+A chave fica guardada só no servidor (no banco de dados, tabela config, ou no
+arquivo .env) e nunca é enviada ao navegador. NÃO envie a pasta dados/ nem o
+arquivo .env para o GitHub: o .gitignore desta pasta já bloqueia os dois.
+
+O que a IA faz:
+  - Diagnóstico ........ lê o currículo e sugere o nível em cada competência
+                         (a pessoa confirma ou ajusta).
+  - Meu perfil ......... escreve a leitura do perfil, as prioridades e um plano
+                         de estudo que cabe no tempo informado.
+  - Mentor IA .......... conversa sobre a trilha e o desenvolvimento, conhecendo
+                         o perfil da pessoa.
+  - Quizzes ............ gera perguntas sob medida para o gestor revisar e
+                         enviar; gera treinos para o colaborador (não valem
+                         como validação nem alteram o nível).
+  - Visão geral ........ lê a equipe e sugere ações (lembrete, quiz, conteúdo).
+  - Perguntas abertas .. resume as respostas da equipe por tema.
+
+Privacidade: para gerar as análises, o servidor envia à API da Anthropic o
+cargo, os níveis, a trilha e o currículo informado. O nome e o e-mail da pessoa
+não são enviados. Na leitura da equipe e no resumo de respostas, cada pessoa
+vai com um código (P1, P2...), que o servidor troca pelo nome só na volta.
+O texto livre que a própria pessoa escreve (currículo, respostas, perguntas ao
+mentor) é enviado como foi escrito.
+
+Sem chave, tudo continua funcionando com o motor de regras e a base curada
+(js/catalog.js e js/engine.js): trilha, quizzes de validação, alertas.
+
+BANCO DE DADOS NO SUPABASE
+--------------------------
+O sistema grava tudo no PostgreSQL do projeto "SkillWay" do Supabase
+(código twinrnbxkdrbqgdjwgnl, região us-west-2). As tabelas já foram criadas
+lá, no esquema "skillway".
+
+Para ligar o servidor a ele (uma vez só):
+  1. Dê dois cliques em conectar-supabase.bat.
+  2. Digite a senha do banco (Database password, a que foi definida ao criar o
+     projeto; não é a senha da conta do Supabase). Ela não aparece na tela.
+     Não lembra? Painel do Supabase > Project Settings > Database >
+     Reset database password.
+  3. O assistente testa a conexão e grava a linha DATABASE_URL no arquivo .env.
+     Se ele não achar o endereço sozinho, pede a string de conexão: no painel,
+     botão Connect (no topo) > Session pooler > copie o que começa com
+     postgresql://
+  4. Abra o iniciar.bat. Na janela do servidor deve aparecer
+     "Banco de dados: PostgreSQL no Supabase". Na primeira vez ele grava a
+     empresa de demonstração no banco.
+
+Onde ver os dados: painel do Supabase > Table Editor > troque o esquema de
+"public" para "skillway" (seletor no alto da lista de tabelas).
+
+  Tabelas ...... empresas, usuarios, diagnosticos, trilhas, eventos, quizzes,
+                 tentativas, mensagens, certificados, analises (resultados da
+                 IA), conversas (mentor), ia_uso (tokens consumidos),
+                 sessoes e config.
+  Segurança .... o esquema "skillway" não é publicado pela API do Supabase e
+                 todas as tabelas têm RLS ligado sem políticas: só o servidor
+                 do SkillWay, que entra com a senha do banco, lê e grava.
+                 A senha fica apenas no arquivo .env deste computador.
+                 NÃO envie o .env para o GitHub (o .gitignore já bloqueia).
+  Velocidade ... o projeto está em us-west-2 (Oregon, EUA); cada consulta
+                 atravessa o continente. O servidor agrupa as gravações para
+                 compensar. Um projeto criado em "South America (São Paulo)"
+                 responderia bem mais rápido: basta criar outro, colocar o
+                 código e a região em servidor/supabase.json e rodar o
+                 conectar-supabase.bat de novo (o servidor cria as tabelas).
+  Pausa ........ no plano gratuito o Supabase pausa projetos sem uso por cerca
+                 de uma semana. Se o servidor não conectar, reative o projeto
+                 no painel.
+  Recomeçar .... tela Empresa > Restaurar demonstração (apaga e recria só a
+                 empresa de demonstração).
+
+Sem Supabase (reserva): se não houver DATABASE_URL no .env, o servidor grava em
+dados/skillway.db, um arquivo SQLite criado sozinho (abre no DB Browser for
+SQLite). Usa o SQLite do Node 22.5 ou mais novo e, em versões mais antigas, o
+mesmo SQLite em WebAssembly (servidor/sqljs). Os dois bancos são independentes:
+o que foi gravado em um não aparece no outro.
+
+Login e permissões no servidor:
+  - senhas guardadas com scrypt; sessão em cookie HttpOnly;
+  - cada pessoa recebe só os próprios registros; o gestor, os de quem está
+    abaixo dele; o RH, os da empresa;
+  - o servidor confere cada gravação: ninguém grava registro de outra pessoa,
+    cria quiz ou mensagem para fora da própria equipe, nem muda o próprio papel.
+
+Para usar em outros computadores da mesma rede: no arquivo .env, defina
+HOST=0.0.0.0 e abra http://IP-DO-SERVIDOR:3000 nos outros aparelhos. A chave
+da API só pode ser alterada no próprio computador do servidor.
+
+PUBLICAR NA INTERNET
+--------------------
+O Supabase guarda o banco, mas não roda o servidor do SkillWay (que é em
+Node.js). Para o sistema ficar acessível por um link, o servidor precisa de uma
+hospedagem de Node (Render, Railway, Fly.io ou parecida) apontando para o mesmo
+banco:
+  - comando de início: node servidor/servidor.js
+  - variáveis de ambiente: DATABASE_URL (a mesma do .env), HOST=0.0.0.0,
+    ANTHROPIC_API_KEY (opcional) e PORT se a hospedagem não definir sozinha.
+Com isso os dados continuam no Supabase e o que foi cadastrado localmente
+aparece igual no endereço publicado.
+
+O QUE O SISTEMA FAZ
+-------------------
+Colaborador
+  - Diagnóstico em 5 etapas (Seção 13 da documentação), com rascunho salvo.
+  - Perfil da Pessoa: radar, gap em relação ao cargo, evidências do currículo,
+    evolução, afinidade com outras áreas e leitura da IA.
+  - Trilha priorizada (até 4 competências), filtrada pelo orçamento, com
+    registro de horas e de evidência da prática.
+  - Quiz de validação (mínimo de 70%), treino com IA e certificado com código.
+  - Mentor IA e mensagens do gestor.
+
+Gestor e RH (hierarquia espelhada)
+  - Visão geral: progresso por pessoa, gap da equipe, leitura da IA e alertas
+    automáticos com ação em um clique.
+  - Minha equipe: cadastro, senha provisória, desativação, organograma e
+    importação por planilha CSV.
+  - Relatórios individuais e consolidados, com CSV e PDF.
+  - Quizzes (base curada, próprios ou gerados por IA), sugestões de conteúdo,
+    perguntas abertas com resumo da IA.
+  - Benchmarks e, para o RH, dados da empresa, plano, meta coletiva,
+    banco de dados e configuração da IA.
+
+LIMITES CONHECIDOS (é um protótipo acadêmico)
+---------------------------------------------
+  - As regras de diagnóstico, trilha e correção de quiz rodam no navegador; o
+    servidor confere quem pode gravar, mas não recalcula notas. Em produção,
+    essa lógica iria para o servidor.
+  - O servidor atende por HTTP, sem certificado. Para uso fora da rede local
+    é preciso uma hospedagem, que cuida do HTTPS (veja "Publicar na internet").
+  - Com o banco em us-west-2, telas e gravações levam frações de segundo a
+    mais do que com o banco local.
+  - Os links da trilha levam ao portal ou à busca da plataforma parceira.
+  - Textos gerados pela IA podem conter erros; o gabarito dos quizzes gerados
+    deve ser revisado antes do envio.
+
+ESTRUTURA DA PASTA
+------------------
+iniciar.bat ............ liga o servidor e abre o navegador
+conectar-supabase.bat .. pede a senha do banco, testa e grava o .env
+index.html ............. página de apresentação
+app.html ............... o sistema (todas as telas)
+servidor/servidor.js ... servidor: páginas, login, permissões, API e IA
+servidor/banco.js ...... tabelas e acesso ao banco (PostgreSQL/Supabase ou SQLite)
+servidor/configurar.js . assistente usado pelo conectar-supabase.bat
+servidor/supabase.json . código e região do projeto no Supabase (não é segredo)
+servidor/vendor/ ....... driver do PostgreSQL (postgres.js, domínio público)
+servidor/ia.js ......... chamadas à API do Claude e os prompts
+servidor/regras.js ..... reaproveita no servidor as regras do navegador
+servidor/sqljs/ ........ SQLite em WebAssembly (reserva para Node antigo, licença MIT)
+dados/ ................. banco SQLite local, só quando não há Supabase (não versionar)
+.env ................... senha do banco e chave da IA (criado por você; não versionar)
+env.exemplo.txt ........ modelo de configuração opcional (copiar como .env)
+css/ ................... styles.css (aplicativo), landing.css, fonte.css
+js/catalog.js .......... base curada: áreas, competências, conteúdos, perguntas, planos
+js/store.js ............ dados no navegador: modo servidor (API) e modo local
+js/engine.js ........... motor de diagnóstico, trilha, quizzes e alertas
+js/seed.js ............. dados da empresa de demonstração
+js/ui.js, js/ia.js ..... componentes de interface e telas de IA
+js/app.js .............. roteador e estrutura das telas
+js/views-*.js .......... telas de acesso, do colaborador e da gestão
+login.html, dashboard.html, diagnostico.html, painel-admin.html e
+relatorio-perfil.html .. páginas da primeira versão; só redirecionam para app.html.

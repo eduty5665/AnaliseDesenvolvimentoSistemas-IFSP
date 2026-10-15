@@ -19,6 +19,7 @@ builder.Services.AddHttpClient("api", c =>
 builder.Services.AddScoped<Sessao>();
 builder.Services.AddScoped<ApiClient>();
 builder.Services.AddScoped<Avisos>();
+builder.Services.AddScoped<DadosEmpresa>();
 
 var app = builder.Build();
 

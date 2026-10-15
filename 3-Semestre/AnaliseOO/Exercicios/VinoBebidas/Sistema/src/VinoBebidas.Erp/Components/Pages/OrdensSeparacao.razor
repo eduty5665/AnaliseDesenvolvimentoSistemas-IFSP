@@ -1,0 +1,323 @@
+@page "/ordens-separacao"
+@inject ApiClient Api
+@inject Sessao Sessao
+@inject Avisos Avisos
+@inject DadosEmpresa DadosEmpresa
+@inject IJSRuntime JS
+
+<div class="cabecalho-pagina">
+    <h1>Ordens de separação</h1>
+    <div class="acoes">
+        <div class="segmentado">
+            <button class="@(somenteAbertas ? "ativo" : "")" @onclick="() => Filtrar(true)">Em andamento</button>
+            <button class="@(!somenteAbertas ? "ativo" : "")" @onclick="() => Filtrar(false)">Todas</button>
+        </div>
+        @if (Sessao.PodeEstoque)
+        {
+            <button class="btn primario" @onclick="NovaTransferencia">+ Solicitar transferência</button>
+        }
+    </div>
+</div>
+
+<p class="nota">
+    Pedidos online geram a ordem ao clicar em <strong>Separar</strong> na tela de pedidos. Transferências seguem o fluxo
+    <span class="badge alerta">Aguardando separação</span> → <span class="badge info">Separada</span> →
+    <span class="badge info">Em trânsito</span> → <span class="badge ok">Concluída</span>.
+</p>
+
+@if (ordens is null)
+{
+    <div class="carregando"><div class="spinner"></div></div>
+}
+else if (ordens.Count == 0)
+{
+    <div class="vazio cartao">Nenhuma ordem @(somenteAbertas ? "em andamento" : "encontrada").</div>
+}
+else
+{
+    <div class="cartao">
+        <table class="tabela">
+            <thead><tr><th>Número</th><th>Emissão</th><th>Tipo</th><th>Origem → Destino</th><th class="num">Itens</th><th>Situação</th><th></th></tr></thead>
+            <tbody>
+                @foreach (var o in ordens)
+                {
+                    <tr>
+                        <td><strong>@o.Numero</strong></td>
+                        <td>@Fmt.DataHora(o.Data)<div class="sub">@o.Solicitante</div></td>
+                        <td>@Fmt.Texto(o.Tipo)@if (o.PedidoNumero is not null) { <div class="sub">@o.PedidoNumero · @o.Cliente</div> }</td>
+                        <td>@o.DepositoOrigem → @(o.DepositoDestino ?? (o.Entrega?.StartsWith("Entrega") == true ? "Entrega" : "Cliente (retirada)"))</td>
+                        <td class="num">@o.Itens.Sum(i => i.Quantidade)<div class="sub">@o.Itens.Count produto(s)</div></td>
+                        <td><span class="badge @Fmt.ClasseStatus(o.Status)">@Fmt.Texto(o.Status)</span></td>
+                        <td class="acoes-linha">
+                            <button class="btn fantasma pequeno" @onclick="() => Abrir(o, Modo.Ver)">Abrir / imprimir</button>
+                            @if (o.Tipo == TipoOrdemSeparacao.Transferencia)
+                            {
+                                @if (o.Status == StatusOrdemSeparacao.Aberta && Sessao.PodeEstoque)
+                                {
+                                    <button class="btn primario pequeno" @onclick="() => Abrir(o, Modo.Separar)">Conferir separação</button>
+                                }
+                                @if (o.Status == StatusOrdemSeparacao.Separada && Sessao.PodeEstoque)
+                                {
+                                    <button class="btn primario pequeno" disabled="@(ocupado == o.Id)" @onclick="() => Expedir(o)">Expedir</button>
+                                }
+                                @if (o.Status == StatusOrdemSeparacao.Expedida)
+                                {
+                                    <button class="btn primario pequeno" @onclick="() => Abrir(o, Modo.Receber)">Receber no destino</button>
+                                }
+                                @if (o.Status is StatusOrdemSeparacao.Aberta or StatusOrdemSeparacao.Separada && Sessao.PodeEstoque)
+                                {
+                                    <button class="btn perigo-fantasma pequeno" disabled="@(ocupado == o.Id)" @onclick="() => Cancelar(o)">Cancelar</button>
+                                }
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@* ───────── Documento / conferência ───────── *@
+<Modal Aberto="@(atual is not null)" Titulo="@TituloModal" OnFechar="() => atual = null" Largo="true">
+    <ChildContent>
+        @if (atual is not null && empresa is not null)
+        {
+            @if (modo == Modo.Ver)
+            {
+                <OrdemSeparacaoDocumento Ordem="atual" Empresa="empresa" />
+            }
+            else
+            {
+                <p class="nota">
+                    @(modo == Modo.Separar
+                        ? "Informe quanto foi efetivamente separado de cada item. O que faltar tem a reserva liberada e volta a ficar disponível."
+                        : "Informe quanto chegou. Diferenças entre o expedido e o recebido ficam registradas como divergência.")
+                </p>
+                <table class="tabela compacta">
+                    <thead><tr><th>Endereço</th><th>Produto</th><th class="num">@(modo == Modo.Separar ? "Solicitado" : "Expedido")</th><th class="num">@(modo == Modo.Separar ? "Separado" : "Recebido")</th></tr></thead>
+                    <tbody>
+                        @foreach (var c in conferencia)
+                        {
+                            <tr class="@(c.Quantidade != c.Esperado ? "linha-alerta" : "")">
+                                <td><strong>@(c.Item.Localizacao ?? "—")</strong></td>
+                                <td>@c.Item.Produto<div class="sub">@c.Item.Sku</div></td>
+                                <td class="num">@c.Esperado</td>
+                                <td class="num"><input class="curto" type="number" min="0" max="@c.Esperado" @bind="c.Quantidade" /></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <label>Observação <input @bind="observacao" placeholder="@(modo == Modo.Receber ? "Ex.: 1 garrafa chegou quebrada" : "")" /></label>
+            }
+        }
+    </ChildContent>
+    <Rodape>
+        <button class="btn fantasma" @onclick="() => atual = null">Fechar</button>
+        @if (modo == Modo.Ver)
+        {
+            <button class="btn primario" @onclick="Imprimir">Imprimir</button>
+        }
+        else
+        {
+            <button class="btn primario" @onclick="Confirmar" disabled="@(ocupado is not null)">@(modo == Modo.Separar ? "Confirmar separação" : "Confirmar recebimento")</button>
+        }
+    </Rodape>
+</Modal>
+
+@* ───────── Nova transferência ───────── *@
+<Modal Aberto="@criando" Titulo="Solicitar transferência" OnFechar="() => criando = false" Largo="true">
+    <ChildContent>
+        <div class="form-grade">
+            <label>Retirar de
+                <select @bind="origemId">
+                    @foreach (var d in depositos) { <option value="@d.Id">@d.Nome</option> }
+                </select>
+            </label>
+            <label>Enviar para
+                <select @bind="destinoId">
+                    @foreach (var d in depositos) { <option value="@d.Id">@d.Nome</option> }
+                </select>
+            </label>
+            <label class="col-2">Observação <input @bind="observacao" placeholder="Ex.: reposição semanal" /></label>
+        </div>
+        <h3>Itens</h3>
+        <SeletorProduto Id="os-busca" AoEscolher="AdicionarItem" />
+        @if (novosItens.Count > 0)
+        {
+            <table class="tabela compacta">
+                <thead><tr><th>Produto</th><th class="num">Quantidade</th><th></th></tr></thead>
+                <tbody>
+                    @foreach (var i in novosItens)
+                    {
+                        <tr>
+                            <td>@i.Nome<div class="sub">@i.Sku</div></td>
+                            <td class="num"><input class="curto" type="number" min="1" @bind="i.Quantidade" /></td>
+                            <td><button class="btn fantasma pequeno" @onclick="() => novosItens.Remove(i)">✕</button></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        <p class="nota">Ao emitir, o estoque fica reservado na origem (não pode ser vendido) até a expedição.</p>
+    </ChildContent>
+    <Rodape>
+        <button class="btn fantasma" @onclick="() => criando = false">Cancelar</button>
+        <button class="btn primario" @onclick="Emitir" disabled="@(novosItens.Count == 0 || ocupado is not null)">Emitir ordem de separação</button>
+    </Rodape>
+</Modal>
+
+@code {
+    private enum Modo { Ver, Separar, Receber }
+
+    private class Conferido
+    {
+        public required ItemOrdemSeparacaoDto Item { get; init; }
+        public int Esperado { get; init; }
+        public int Quantidade { get; set; }
+    }
+
+    private class NovoItem
+    {
+        public int ProdutoId { get; init; }
+        public string Nome { get; init; } = "";
+        public string Sku { get; init; } = "";
+        public int Quantidade { get; set; } = 6;
+    }
+
+    private List<OrdemSeparacaoDto>? ordens;
+    private List<DepositoDto> depositos = [];
+    private EmpresaDto? empresa;
+    private bool somenteAbertas = true;
+    private int? ocupado;
+
+    private OrdemSeparacaoDto? atual;
+    private Modo modo;
+    private List<Conferido> conferencia = [];
+    private string? observacao;
+
+    private bool criando;
+    private int origemId, destinoId;
+    private readonly List<NovoItem> novosItens = [];
+
+    private string TituloModal => atual is null ? "" : modo switch
+    {
+        Modo.Separar => $"Conferir separação · {atual.Numero}",
+        Modo.Receber => $"Recebimento · {atual.Numero}",
+        _ => $"Ordem de separação {atual.Numero}"
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            empresa = await DadosEmpresa.ObterAsync();
+            depositos = (await Api.GetAsync<List<DepositoDto>>("api/depositos")).Where(d => d.Ativo).ToList();
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+        await Carregar();
+    }
+
+    private async Task Filtrar(bool abertas)
+    {
+        somenteAbertas = abertas;
+        await Carregar();
+    }
+
+    private async Task Carregar()
+    {
+        try { ordens = await Api.GetAsync<List<OrdemSeparacaoDto>>($"api/ordens-separacao?abertas={somenteAbertas.ToString().ToLower()}&limite=200"); }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+    }
+
+    private void Abrir(OrdemSeparacaoDto o, Modo m)
+    {
+        atual = o;
+        modo = m;
+        observacao = null;
+        conferencia = o.Itens.Select(i =>
+        {
+            var esperado = m == Modo.Receber ? i.QuantidadeSeparada ?? 0 : i.Quantidade;
+            return new Conferido { Item = i, Esperado = esperado, Quantidade = esperado };
+        }).ToList();
+    }
+
+    private async Task Confirmar()
+    {
+        if (atual is null) return;
+        ocupado = atual.Id;
+        try
+        {
+            var req = new ConferirOrdemRequest(conferencia.Select(c => new ItemQuantidadeRequest(c.Item.ProdutoId, c.Quantidade)).ToList(), observacao);
+            var acao = modo == Modo.Separar ? "separar" : "receber";
+            var r = await Api.PostAsync<OrdemSeparacaoDto>($"api/ordens-separacao/{atual.Id}/{acao}", req);
+            Avisos.Sucesso(modo == Modo.Separar ? $"{r.Numero} separada. Pronta para expedir." : $"{r.Numero} recebida; estoque do destino atualizado.");
+            atual = null;
+            await Carregar();
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+        finally { ocupado = null; }
+    }
+
+    private async Task Expedir(OrdemSeparacaoDto o)
+    {
+        ocupado = o.Id;
+        try
+        {
+            await Api.PostAsync<OrdemSeparacaoDto>($"api/ordens-separacao/{o.Id}/expedir", null);
+            Avisos.Sucesso($"{o.Numero} expedida: saiu de {o.DepositoOrigem} e está em trânsito.");
+            await Carregar();
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+        finally { ocupado = null; }
+    }
+
+    private async Task Cancelar(OrdemSeparacaoDto o)
+    {
+        ocupado = o.Id;
+        try
+        {
+            await Api.PostAsync<OrdemSeparacaoDto>($"api/ordens-separacao/{o.Id}/cancelar", null);
+            Avisos.Sucesso($"{o.Numero} cancelada; reserva liberada.");
+            await Carregar();
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+        finally { ocupado = null; }
+    }
+
+    private async Task Imprimir()
+    {
+        try { await JS.InvokeVoidAsync("vino.imprimir", "ordem-separacao"); } catch (JSException) { }
+    }
+
+    private void NovaTransferencia()
+    {
+        origemId = depositos.FirstOrDefault(d => d.Tipo == TipoDeposito.CentroDistribuicao)?.Id ?? depositos.FirstOrDefault()?.Id ?? 0;
+        destinoId = depositos.FirstOrDefault(d => d.Tipo == TipoDeposito.Loja)?.Id ?? 0;
+        observacao = null;
+        novosItens.Clear();
+        criando = true;
+    }
+
+    private void AdicionarItem(ProdutoDto p)
+    {
+        var existente = novosItens.FirstOrDefault(i => i.ProdutoId == p.Id);
+        if (existente is not null) existente.Quantidade += 6;
+        else novosItens.Add(new NovoItem { ProdutoId = p.Id, Nome = p.Nome, Sku = p.Sku });
+    }
+
+    private async Task Emitir()
+    {
+        ocupado = 0;
+        try
+        {
+            var req = new CriarOrdemSeparacaoRequest(origemId, destinoId, novosItens.Select(i => new ItemQuantidadeRequest(i.ProdutoId, i.Quantidade)).ToList(), observacao);
+            var o = await Api.PostAsync<OrdemSeparacaoDto>("api/ordens-separacao", req);
+            Avisos.Sucesso($"{o.Numero} emitida. Estoque reservado em {o.DepositoOrigem}.");
+            criando = false;
+            await Carregar();
+            Abrir(o, Modo.Ver);
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+        finally { ocupado = null; }
+    }
+}

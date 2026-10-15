@@ -1,0 +1,556 @@
+@page "/relatorios"
+@inject ApiClient Api
+@inject Sessao Sessao
+@inject Avisos Avisos
+@inject DadosEmpresa DadosEmpresa
+@inject IJSRuntime JS
+
+<div class="cabecalho-pagina">
+    <h1>Relatórios</h1>
+    <div class="acoes">
+        <button class="btn fantasma" @onclick="ExportarCsv" disabled="@(!TemResultado)">⭳ Exportar CSV</button>
+        <button class="btn primario" @onclick="Imprimir" disabled="@(!TemResultado)">⎙ Imprimir</button>
+    </div>
+</div>
+
+<div class="relatorio-abas">
+    @foreach (var r in Disponiveis)
+    {
+        <button class="@(atual == r.Id ? "ativo" : "")" @onclick="() => Selecionar(r.Id)">
+            <strong>@r.Nome</strong><small>@r.Descricao</small>
+        </button>
+    }
+</div>
+
+<div class="filtros cartao">
+    @if (atual != "estoque")
+    {
+        <label>De <input type="date" @bind="de" /></label>
+        <label>Até <input type="date" @bind="ate" /></label>
+        <div class="segmentado">
+            <button @onclick="() => Periodo(0)">Hoje</button>
+            <button @onclick="() => Periodo(7)">7 dias</button>
+            <button @onclick="() => Periodo(30)">30 dias</button>
+            <button @onclick="MesAtual">Mês</button>
+        </div>
+    }
+    @if (atual == "vendas")
+    {
+        <label>Agrupar por
+            <select @bind="agrupamento">
+                <option value="@AgrupamentosVenda.Dia">Dia</option>
+                <option value="@AgrupamentosVenda.Produto">Produto (curva ABC)</option>
+                <option value="@AgrupamentosVenda.Categoria">Categoria</option>
+                <option value="@AgrupamentosVenda.Vendedor">Vendedor</option>
+                <option value="@AgrupamentosVenda.Operador">Operador de caixa</option>
+                <option value="@AgrupamentosVenda.Forma">Forma de pagamento</option>
+                <option value="@AgrupamentosVenda.Canal">Canal</option>
+                <option value="@AgrupamentosVenda.Loja">Loja</option>
+            </select>
+        </label>
+        <label>Canal
+            <select @bind="canal">
+                <option value="">Todos</option>
+                @foreach (var c in Enum.GetValues<CanalVenda>()) { <option value="@c">@Fmt.Texto(c)</option> }
+            </select>
+        </label>
+    }
+    @if (atual == "movimentacoes")
+    {
+        <label>Tipo
+            <select @bind="tipoMov">
+                <option value="">Todos</option>
+                @foreach (var t in Enum.GetValues<TipoMovimentacao>()) { <option value="@t">@Fmt.Texto(t)</option> }
+            </select>
+        </label>
+        <label class="check"><input type="checkbox" @bind="incluirVendas" /> Incluir baixas por venda</label>
+    }
+    @if (atual is "vendas" or "estoque" or "kardex" or "movimentacoes" or "caixas")
+    {
+        <label>@(atual == "caixas" ? "Loja" : "Depósito")
+            <select @bind="depositoId">
+                <option value="">Todos</option>
+                @foreach (var d in depositos) { <option value="@d.Id">@d.Nome</option> }
+            </select>
+        </label>
+    }
+    @if (atual == "estoque")
+    {
+        <label class="check"><input type="checkbox" @bind="abaixoMinimo" /> Somente abaixo do mínimo</label>
+        <label class="check"><input type="checkbox" @bind="ocultarZerados" /> Ocultar sem saldo</label>
+    }
+    <button class="btn primario" @onclick="Gerar" disabled="@gerando">@(gerando ? "Gerando…" : "Gerar relatório")</button>
+</div>
+
+@if (atual == "kardex")
+{
+    <div class="cartao">
+        @if (produtoKardex is null)
+        {
+            <SeletorProduto Id="busca-kardex" Placeholder="Produto do kardex: código de barras, SKU ou nome (Enter)" AoEscolher="EscolherProduto" />
+        }
+        else
+        {
+            <span class="chip">@produtoKardex.Nome · @produtoKardex.Sku <button title="Trocar produto" @onclick="() => { produtoKardex = null; kardex = null; }">✕</button></span>
+        }
+    </div>
+}
+
+@if (gerando)
+{
+    <div class="carregando"><div class="spinner"></div></div>
+}
+else if (!TemResultado)
+{
+    <div class="vazio cartao">Escolha os filtros e clique em <strong>Gerar relatório</strong>.</div>
+}
+else
+{
+    <div class="cartao">
+        <div class="documento larga relatorio" id="relatorio">
+            <header class="doc-cabecalho">
+                <div>
+                    <strong class="doc-empresa">@(empresa?.NomeFantasia ?? "Vino Bebidas")</strong>
+                    @if (empresa is not null) { <span>@empresa.RazaoSocial · CNPJ @Fmt.CpfCnpj(empresa.Cnpj)</span> }
+                </div>
+                <div class="doc-titulo">
+                    <h2>@Titulo.ToUpperInvariant()</h2>
+                    <span>@Subtitulo</span>
+                    <span>Emitido em @Fmt.DataHora(emitidoEm) por @Sessao.Atual?.Nome</span>
+                </div>
+            </header>
+
+            @switch (atual)
+            {
+                case "vendas" when vendas is not null:
+                    var abc = vendas.Agrupamento == AgrupamentosVenda.Produto;
+                    <div class="doc-grade">
+                        <div><span>Vendas</span><strong>@vendas.Total.Vendas</strong></div>
+                        <div><span>Itens</span><strong>@vendas.Total.Itens</strong></div>
+                        <div><span>Receita líquida</span><strong>@Fmt.Moeda(vendas.Total.Liquido)</strong></div>
+                        <div><span>Ticket médio</span><strong>@Fmt.Moeda(vendas.Total.Vendas == 0 ? 0 : vendas.Total.Liquido / vendas.Total.Vendas)</strong></div>
+                        <div><span>Lucro bruto</span><strong>@Fmt.Moeda(vendas.Total.Lucro)</strong></div>
+                        <div><span>Margem</span><strong>@Fmt.Pct(vendas.Total.MargemPercentual)</strong></div>
+                    </div>
+                    <table class="doc-tabela">
+                        <thead>
+                            <tr>
+                                <th>@RotuloAgrupamento</th><th class="num">Vendas</th><th class="num">Itens</th><th class="num">Bruto</th><th class="num">Descontos</th>
+                                <th class="num">Líquido</th><th class="num">Custo</th><th class="num">Lucro</th><th class="num">Margem</th><th class="num">Part.</th>
+                                @if (abc) { <th class="num">Acum.</th><th>ABC</th> }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var l in vendas.Linhas)
+                            {
+                                <tr>
+                                    <td>@l.Chave</td><td class="num">@l.Vendas</td><td class="num">@l.Itens</td><td class="num">@Fmt.Moeda(l.Bruto)</td><td class="num">@Fmt.Moeda(l.Descontos)</td>
+                                    <td class="num"><strong>@Fmt.Moeda(l.Liquido)</strong></td><td class="num">@Fmt.Moeda(l.Custo)</td><td class="num">@Fmt.Moeda(l.Lucro)</td>
+                                    <td class="num">@Fmt.Pct(l.MargemPercentual)</td><td class="num">@Fmt.Pct(l.Participacao)</td>
+                                    @if (abc) { <td class="num">@Fmt.Pct(l.Acumulado)</td><td><span class="classe-abc @l.Classe">@l.Classe</span></td> }
+                                </tr>
+                            }
+                            @if (vendas.Linhas.Count == 0) { <tr><td colspan="@(abc ? 12 : 10)">Nenhuma venda concluída no período.</td></tr> }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td>Total</td><td class="num">@vendas.Total.Vendas</td><td class="num">@vendas.Total.Itens</td><td class="num">@Fmt.Moeda(vendas.Total.Bruto)</td><td class="num">@Fmt.Moeda(vendas.Total.Descontos)</td>
+                                <td class="num">@Fmt.Moeda(vendas.Total.Liquido)</td><td class="num">@Fmt.Moeda(vendas.Total.Custo)</td><td class="num">@Fmt.Moeda(vendas.Total.Lucro)</td>
+                                <td class="num">@Fmt.Pct(vendas.Total.MargemPercentual)</td><td class="num">100,0%</td>
+                                @if (abc) { <td></td><td></td> }
+                            </tr>
+                        </tfoot>
+                    </table>
+                    @if (abc)
+                    {
+                        <p class="nota">Curva ABC por receita líquida: classe A = produtos que somam até 80% do faturamento, B = até 95%, C = restante.</p>
+                    }
+                    break;
+
+                case "estoque" when estoque is not null:
+                    <div class="doc-grade">
+                        <div><span>Produtos / posições</span><strong>@estoque.Select(s => s.ProdutoId).Distinct().Count() / @estoque.Count</strong></div>
+                        <div><span>Unidades</span><strong>@Fmt.Num(estoque.Sum(s => s.Quantidade))</strong></div>
+                        <div><span>Reservadas</span><strong>@Fmt.Num(estoque.Sum(s => s.Reservado))</strong></div>
+                        <div><span>Valor a custo</span><strong>@Fmt.Moeda(estoque.Sum(s => s.Quantidade * s.CustoUnitario))</strong></div>
+                        <div><span>Valor a preço de venda</span><strong>@Fmt.Moeda(estoque.Sum(s => s.Quantidade * s.PrecoVenda))</strong></div>
+                        <div><span>Abaixo do mínimo</span><strong>@estoque.Count(s => s.AbaixoMinimo)</strong></div>
+                    </div>
+                    <table class="doc-tabela">
+                        <thead><tr><th>SKU</th><th>Produto</th><th>Categoria</th><th>Depósito</th><th>Local</th><th class="num">Físico</th><th class="num">Reserv.</th><th class="num">Disp.</th><th class="num">Mín.</th><th class="num">Custo médio</th><th class="num">Valor a custo</th><th class="num">Valor a venda</th></tr></thead>
+                        <tbody>
+                            @foreach (var s in estoque)
+                            {
+                                <tr>
+                                    <td class="mono">@s.Sku</td><td>@s.Produto</td><td>@s.Categoria</td><td>@s.Deposito</td><td class="mono">@(s.Localizacao ?? "—")</td>
+                                    <td class="num">@s.Quantidade</td><td class="num">@s.Reservado</td><td class="num"><strong>@s.Disponivel</strong>@(s.AbaixoMinimo ? " ▼" : "")</td><td class="num">@s.EstoqueMinimo</td>
+                                    <td class="num">@Fmt.Moeda(s.CustoUnitario)</td><td class="num">@Fmt.Moeda(s.Quantidade * s.CustoUnitario)</td><td class="num">@Fmt.Moeda(s.Quantidade * s.PrecoVenda)</td>
+                                </tr>
+                            }
+                            @if (estoque.Count == 0) { <tr><td colspan="12">Nenhum saldo para o filtro.</td></tr> }
+                        </tbody>
+                        <tfoot>
+                            <tr><td colspan="5">Total</td><td class="num">@estoque.Sum(s => s.Quantidade)</td><td class="num">@estoque.Sum(s => s.Reservado)</td><td class="num">@estoque.Sum(s => s.Disponivel)</td><td></td><td></td>
+                                <td class="num">@Fmt.Moeda(estoque.Sum(s => s.Quantidade * s.CustoUnitario))</td><td class="num">@Fmt.Moeda(estoque.Sum(s => s.Quantidade * s.PrecoVenda))</td></tr>
+                        </tfoot>
+                    </table>
+                    <p class="nota">▼ disponível abaixo do estoque mínimo cadastrado.</p>
+                    break;
+
+                case "kardex" when kardex is not null:
+                    <div class="doc-grade">
+                        <div><span>Produto</span><strong>@kardex.Produto</strong></div>
+                        <div><span>SKU</span>@kardex.Sku</div>
+                        <div><span>Depósito</span>@(kardex.Deposito ?? "Todos")</div>
+                        <div><span>Saldo inicial</span><strong>@kardex.SaldoInicial</strong></div>
+                        <div><span>Entradas / saídas</span><strong>+@kardex.TotalEntradas / −@kardex.TotalSaidas</strong></div>
+                        <div><span>Saldo final</span><strong>@kardex.SaldoFinal</strong></div>
+                    </div>
+                    <table class="doc-tabela">
+                        <thead><tr><th>Data</th><th>Lançamento</th><th>Tipo</th><th>Documento</th><th>Depósito</th><th>Histórico</th><th class="num">Entrada</th><th class="num">Saída</th><th class="num">Saldo</th><th class="num">Custo un.</th><th>Usuário</th></tr></thead>
+                        <tbody>
+                            <tr><td colspan="8"><em>Saldo anterior</em></td><td class="num"><strong>@kardex.SaldoInicial</strong></td><td colspan="2"></td></tr>
+                            @foreach (var l in kardex.Linhas)
+                            {
+                                <tr>
+                                    <td class="data">@Fmt.DataHora(l.Data)</td><td class="mono">@l.Numero</td><td>@Fmt.Texto(l.Tipo)</td><td>@(l.Documento ?? "—")</td><td>@l.Deposito</td><td>@(l.Historico ?? "—")</td>
+                                    <td class="num">@(l.Entrada > 0 ? l.Entrada.ToString() : "")</td><td class="num">@(l.Saida > 0 ? l.Saida.ToString() : "")</td>
+                                    <td class="num"><strong>@l.Saldo</strong></td><td class="num">@Fmt.Moeda(l.CustoUnitario)</td><td>@(l.Usuario ?? "—")</td>
+                                </tr>
+                            }
+                            @if (kardex.Linhas.Count == 0) { <tr><td colspan="11">Sem movimentação no período.</td></tr> }
+                        </tbody>
+                        <tfoot><tr><td colspan="6">Totais do período</td><td class="num">@kardex.TotalEntradas</td><td class="num">@kardex.TotalSaidas</td><td class="num">@kardex.SaldoFinal</td><td colspan="2"></td></tr></tfoot>
+                    </table>
+                    break;
+
+                case "movimentacoes" when movimentacoes is not null:
+                    <table class="doc-tabela resumo">
+                        <thead><tr><th>Resumo por tipo</th><th class="num">Documentos</th><th class="num">Unidades</th><th class="num">Valor a custo</th></tr></thead>
+                        <tbody>
+                            @foreach (var r in movimentacoes.Resumo)
+                            {
+                                <tr><td>@Fmt.Texto(r.Tipo)</td><td class="num">@r.Documentos</td><td class="num">@r.Unidades</td><td class="num">@Fmt.Moeda(r.Valor)</td></tr>
+                            }
+                            @if (movimentacoes.Resumo.Count == 0) { <tr><td colspan="4">Nenhuma movimentação no período.</td></tr> }
+                        </tbody>
+                    </table>
+                    <table class="doc-tabela">
+                        <thead><tr><th>Data</th><th>Lançamento</th><th>Tipo</th><th>Origem</th><th>Destino</th><th>Documento</th><th>Fornecedor / motivo</th><th>SKU</th><th>Produto</th><th class="num">Qtd</th><th class="num">Custo un.</th><th class="num">Valor</th><th>Usuário</th></tr></thead>
+                        <tbody>
+                            @foreach (var l in movimentacoes.Linhas)
+                            {
+                                <tr>
+                                    <td class="data">@Fmt.DataHora(l.Data)</td><td class="mono">@l.Numero</td><td>@Fmt.Texto(l.Tipo)</td><td>@(l.Origem ?? "—")</td><td>@(l.Destino ?? "—")</td><td>@(l.Documento ?? "—")</td><td>@(l.ParceiroOuMotivo ?? "—")</td>
+                                    <td class="mono">@l.Sku</td><td>@l.Produto</td><td class="num">@l.Quantidade</td><td class="num">@Fmt.Moeda(l.CustoUnitario)</td><td class="num">@Fmt.Moeda(l.Valor)</td><td>@(l.Usuario ?? "—")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    break;
+
+                case "fluxo" when fluxo is not null:
+                    <div class="doc-grade">
+                        <div><span>Entradas realizadas</span><strong>@Fmt.Moeda(fluxo.TotalEntradas)</strong></div>
+                        <div><span>Saídas realizadas</span><strong>@Fmt.Moeda(fluxo.TotalSaidas)</strong></div>
+                        <div><span>Saldo do período</span><strong>@Fmt.Moeda(fluxo.TotalEntradas - fluxo.TotalSaidas)</strong></div>
+                        <div><span>A receber (em aberto)</span><strong>@Fmt.Moeda(fluxo.TotalEntradasPrevistas)</strong></div>
+                        <div><span>A pagar (em aberto)</span><strong>@Fmt.Moeda(fluxo.TotalSaidasPrevistas)</strong></div>
+                        <div><span>Saldo projetado</span><strong>@Fmt.Moeda(fluxo.TotalEntradas - fluxo.TotalSaidas + fluxo.TotalEntradasPrevistas - fluxo.TotalSaidasPrevistas)</strong></div>
+                    </div>
+                    <table class="doc-tabela">
+                        <thead><tr><th>Data</th><th class="num">Entradas</th><th class="num">Saídas</th><th class="num">Saldo do dia</th><th class="num">Acumulado</th><th class="num">A receber</th><th class="num">A pagar</th></tr></thead>
+                        <tbody>
+                            @foreach (var l in fluxo.Linhas)
+                            {
+                                <tr>
+                                    <td>@Fmt.Data(l.Data)</td><td class="num">@Fmt.Moeda(l.Entradas)</td><td class="num">@Fmt.Moeda(l.Saidas)</td>
+                                    <td class="num">@Fmt.Moeda(l.Saldo)</td><td class="num"><strong>@Fmt.Moeda(l.Acumulado)</strong></td>
+                                    <td class="num">@(l.EntradasPrevistas == 0 ? "" : Fmt.Moeda(l.EntradasPrevistas))</td><td class="num">@(l.SaidasPrevistas == 0 ? "" : Fmt.Moeda(l.SaidasPrevistas))</td>
+                                </tr>
+                            }
+                            @if (fluxo.Linhas.Count == 0) { <tr><td colspan="7">Sem lançamentos no período.</td></tr> }
+                        </tbody>
+                        <tfoot><tr><td>Total</td><td class="num">@Fmt.Moeda(fluxo.TotalEntradas)</td><td class="num">@Fmt.Moeda(fluxo.TotalSaidas)</td><td class="num">@Fmt.Moeda(fluxo.TotalEntradas - fluxo.TotalSaidas)</td><td></td><td class="num">@Fmt.Moeda(fluxo.TotalEntradasPrevistas)</td><td class="num">@Fmt.Moeda(fluxo.TotalSaidasPrevistas)</td></tr></tfoot>
+                    </table>
+                    <p class="nota">Entradas e saídas = lançamentos pagos, pela data do pagamento. A receber / a pagar = lançamentos em aberto, pela data de vencimento.</p>
+                    break;
+
+                case "dre" when dre is not null:
+                    <table class="doc-tabela dre">
+                        <tbody>
+                            <tr><td>Receita bruta de vendas</td><td class="num">@Fmt.Moeda(dre.ReceitaBruta)</td><td class="num">@PctReceita(dre.ReceitaBruta)</td></tr>
+                            <tr><td>(−) Descontos concedidos</td><td class="num">@Fmt.Moeda(-dre.Descontos)</td><td class="num">@PctReceita(dre.Descontos)</td></tr>
+                            <tr class="subtotal"><td>(=) Receita líquida</td><td class="num">@Fmt.Moeda(dre.ReceitaLiquida)</td><td class="num">100,0%</td></tr>
+                            <tr><td>(−) Custo das mercadorias vendidas (CMV)</td><td class="num">@Fmt.Moeda(-dre.Cmv)</td><td class="num">@PctReceita(dre.Cmv)</td></tr>
+                            <tr class="subtotal"><td>(=) Lucro bruto</td><td class="num">@Fmt.Moeda(dre.LucroBruto)</td><td class="num">@Fmt.Pct(dre.MargemBrutaPercentual)</td></tr>
+                            @foreach (var d in dre.Despesas)
+                            {
+                                <tr><td>(−) @d.Nome</td><td class="num">@Fmt.Moeda(-d.Valor)</td><td class="num">@PctReceita(d.Valor)</td></tr>
+                            }
+                            <tr class="subtotal"><td>(=) Total de despesas operacionais</td><td class="num">@Fmt.Moeda(-dre.TotalDespesas)</td><td class="num">@PctReceita(dre.TotalDespesas)</td></tr>
+                            @if (dre.OutrasReceitas != 0)
+                            {
+                                <tr><td>(+) Outras receitas</td><td class="num">@Fmt.Moeda(dre.OutrasReceitas)</td><td class="num">@PctReceita(dre.OutrasReceitas)</td></tr>
+                            }
+                            <tr class="resultado"><td>(=) Resultado do período</td><td class="num">@Fmt.Moeda(dre.Resultado)</td><td class="num">@Fmt.Pct(dre.MargemLiquidaPercentual)</td></tr>
+                        </tbody>
+                    </table>
+                    <p class="nota">Demonstrativo gerencial (não fiscal): vendas concluídas no período pelo custo médio da data da venda; despesas pelos lançamentos do financeiro com vencimento no período.</p>
+                    break;
+
+                case "caixas" when caixas is not null:
+                    <table class="doc-tabela">
+                        <thead><tr><th>Caixa</th><th>Loja</th><th>Operador</th><th>Abertura</th><th>Fechamento</th><th class="num">Vendas</th><th class="num">Total vendido</th><th class="num">Suprim.</th><th class="num">Sangrias</th><th class="num">Dinheiro esperado</th><th class="num">Contado</th><th class="num">Diferença</th></tr></thead>
+                        <tbody>
+                            @foreach (var c in caixas)
+                            {
+                                <tr>
+                                    <td class="mono">@c.Numero</td><td>@c.Deposito</td><td>@c.Operador</td><td class="data">@Fmt.DataHora(c.AbertoEm)</td>
+                                    <td>@(c.FechadoEm is { } fim ? Fmt.DataHora(fim) : "Aberto")</td>
+                                    <td class="num">@c.QuantidadeVendas</td><td class="num"><strong>@Fmt.Moeda(c.TotalVendas)</strong></td>
+                                    <td class="num">@Fmt.Moeda(c.Suprimentos)</td><td class="num">@Fmt.Moeda(c.Sangrias)</td><td class="num">@Fmt.Moeda(c.DinheiroEsperado)</td>
+                                    <td class="num">@Fmt.Moeda(c.ValorContado)</td><td class="num">@(c.Diferenca is { } dif ? (dif == 0 ? "—" : Fmt.Moeda(dif)) : "")</td>
+                                </tr>
+                            }
+                            @if (caixas.Count == 0) { <tr><td colspan="12">Nenhum caixa aberto no período.</td></tr> }
+                        </tbody>
+                        <tfoot>
+                            <tr><td colspan="5">Total</td><td class="num">@caixas.Sum(c => c.QuantidadeVendas)</td><td class="num">@Fmt.Moeda(caixas.Sum(c => c.TotalVendas))</td>
+                                <td class="num">@Fmt.Moeda(caixas.Sum(c => c.Suprimentos))</td><td class="num">@Fmt.Moeda(caixas.Sum(c => c.Sangrias))</td><td></td><td></td>
+                                <td class="num">@Fmt.Moeda(caixas.Sum(c => c.Diferenca ?? 0))</td></tr>
+                        </tfoot>
+                    </table>
+                    <p class="nota">Diferença = valor contado na gaveta − dinheiro esperado (abertura + vendas em dinheiro líquidas de troco + suprimentos − sangrias). Negativo indica falta.</p>
+                    break;
+            }
+        </div>
+    </div>
+}
+
+@code {
+    private record Relatorio(string Id, string Nome, string Descricao);
+
+    private static readonly Relatorio[] Todos =
+    [
+        new("vendas", "Vendas", "Por dia, produto, vendedor… e curva ABC"),
+        new("estoque", "Posição de estoque", "Saldos valorizados por depósito"),
+        new("kardex", "Kardex", "Extrato de um produto com saldo"),
+        new("movimentacoes", "Entradas e saídas", "Movimentações item a item"),
+        new("caixas", "Fechamentos de caixa", "Sessões, sangrias e diferenças"),
+        new("fluxo", "Fluxo de caixa", "Realizado e previsto por dia"),
+        new("dre", "DRE gerencial", "Resultado do período")
+    ];
+
+    private IEnumerable<Relatorio> Disponiveis => Todos.Where(r => r.Id switch
+    {
+        "vendas" or "dre" or "caixas" => Sessao.PodeGestao,
+        "fluxo" => Sessao.PodeFinanceiro,
+        _ => true
+    });
+
+    private string atual = "estoque";
+    private DateOnly de = Fmt.Hoje.AddDays(-29);
+    private DateOnly ate = Fmt.Hoje;
+    private string agrupamento = AgrupamentosVenda.Dia;
+    private CanalVenda? canal;
+    private TipoMovimentacao? tipoMov;
+    private bool incluirVendas;
+    private int? depositoId;
+    private bool abaixoMinimo;
+    private bool ocultarZerados = true;
+    private ProdutoDto? produtoKardex;
+    private bool gerando;
+    private DateTime emitidoEm = DateTime.UtcNow;
+
+    private List<DepositoDto> depositos = [];
+    private EmpresaDto? empresa;
+
+    private RelatorioVendasDto? vendas;
+    private List<SaldoDto>? estoque;
+    private KardexDto? kardex;
+    private RelatorioMovimentacoesDto? movimentacoes;
+    private FluxoCaixaDto? fluxo;
+    private DreDto? dre;
+    private List<CaixaDto>? caixas;
+
+    private bool TemResultado => atual switch
+    {
+        "vendas" => vendas is not null,
+        "estoque" => estoque is not null,
+        "kardex" => kardex is not null,
+        "movimentacoes" => movimentacoes is not null,
+        "fluxo" => fluxo is not null,
+        "dre" => dre is not null,
+        "caixas" => caixas is not null,
+        _ => false
+    };
+
+    private string Titulo => atual switch
+    {
+        "vendas" => $"Relatório de vendas por {RotuloAgrupamento.ToLowerInvariant()}",
+        "estoque" => "Posição de estoque",
+        "kardex" => "Kardex — extrato de movimentação",
+        "movimentacoes" => "Entradas e saídas de estoque",
+        "fluxo" => "Fluxo de caixa",
+        "dre" => "Demonstrativo de resultado (DRE gerencial)",
+        "caixas" => "Fechamentos de caixa",
+        _ => "Relatório"
+    };
+
+    private string Subtitulo
+    {
+        get
+        {
+            var deposito = depositoId is { } id ? depositos.FirstOrDefault(d => d.Id == id)?.Nome : null;
+            var periodo = atual == "estoque" ? $"Posição em {Fmt.Data(Fmt.Hoje)}" : $"Período: {Fmt.Data(de)} a {Fmt.Data(ate)}";
+            return atual is "fluxo" or "dre" ? periodo : $"{periodo} · {deposito ?? "Todos os depósitos"}";
+        }
+    }
+
+    private string RotuloAgrupamento => (vendas?.Agrupamento ?? agrupamento) switch
+    {
+        AgrupamentosVenda.Produto => "Produto",
+        AgrupamentosVenda.Categoria => "Categoria",
+        AgrupamentosVenda.Vendedor => "Vendedor",
+        AgrupamentosVenda.Operador => "Operador",
+        AgrupamentosVenda.Forma => "Forma de pagamento",
+        AgrupamentosVenda.Canal => "Canal",
+        AgrupamentosVenda.Loja => "Loja",
+        _ => "Dia"
+    };
+
+    private string PctReceita(decimal valor) => dre is null || dre.ReceitaLiquida == 0 ? "—" : Fmt.Pct(valor / dre.ReceitaLiquida * 100);
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            depositos = await Api.GetAsync<List<DepositoDto>>("api/depositos");
+            empresa = await DadosEmpresa.ObterAsync();
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+        atual = Disponiveis.First().Id;
+    }
+
+    private void Selecionar(string id) => atual = id;
+
+    private void Periodo(int dias)
+    {
+        ate = Fmt.Hoje;
+        de = dias == 0 ? ate : ate.AddDays(-(dias - 1));
+    }
+
+    private void MesAtual()
+    {
+        ate = Fmt.Hoje;
+        de = new DateOnly(ate.Year, ate.Month, 1);
+    }
+
+    private void EscolherProduto(ProdutoDto p)
+    {
+        produtoKardex = p;
+        kardex = null;
+    }
+
+    private async Task Gerar()
+    {
+        if (atual != "estoque" && de > ate) { Avisos.Erro("A data inicial deve ser anterior à final."); return; }
+        if (atual == "kardex" && produtoKardex is null) { Avisos.Erro("Escolha o produto do kardex."); return; }
+
+        gerando = true;
+        var periodo = $"de={de:yyyy-MM-dd}&ate={ate:yyyy-MM-dd}";
+        var dep = depositoId is { } id ? $"&depositoId={id}" : "";
+        try
+        {
+            switch (atual)
+            {
+                case "vendas":
+                    vendas = await Api.GetAsync<RelatorioVendasDto>($"api/relatorios/vendas?{periodo}&agrupamento={agrupamento}{dep}{(canal is not null ? $"&canal={canal}" : "")}");
+                    break;
+                case "estoque":
+                    var saldos = await Api.GetAsync<List<SaldoDto>>($"api/estoque/saldos?abaixoMinimo={abaixoMinimo.ToString().ToLower()}{dep}");
+                    estoque = saldos.Where(s => !ocultarZerados || s.Quantidade != 0 || s.Reservado != 0)
+                        .OrderBy(s => s.Deposito).ThenBy(s => s.Localizacao ?? "~").ThenBy(s => s.Produto).ToList();
+                    break;
+                case "kardex":
+                    kardex = await Api.GetAsync<KardexDto>($"api/relatorios/kardex?produtoId={produtoKardex!.Id}&{periodo}{dep}");
+                    break;
+                case "movimentacoes":
+                    movimentacoes = await Api.GetAsync<RelatorioMovimentacoesDto>(
+                        $"api/relatorios/movimentacoes?{periodo}{dep}&incluirVendas={incluirVendas.ToString().ToLower()}{(tipoMov is not null ? $"&tipo={tipoMov}" : "")}");
+                    break;
+                case "fluxo":
+                    fluxo = await Api.GetAsync<FluxoCaixaDto>($"api/relatorios/fluxo-caixa?{periodo}");
+                    break;
+                case "dre":
+                    dre = await Api.GetAsync<DreDto>($"api/relatorios/dre?{periodo}");
+                    break;
+                case "caixas":
+                    caixas = await Api.GetAsync<List<CaixaDto>>($"api/caixa/sessoes?{periodo}{dep}&limite=500");
+                    break;
+            }
+            emitidoEm = DateTime.UtcNow;
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+        finally { gerando = false; }
+    }
+
+    private async Task Imprimir()
+    {
+        try { await JS.InvokeVoidAsync("vino.imprimir", "relatorio"); } catch (JSException) { }
+    }
+
+    private async Task ExportarCsv()
+    {
+        string[] cabecalho;
+        IEnumerable<IEnumerable<object?>> linhas;
+        switch (atual)
+        {
+            case "vendas" when vendas is not null:
+                cabecalho = [RotuloAgrupamento, "Vendas", "Itens", "Bruto", "Descontos", "Liquido", "Custo", "Lucro", "Margem %", "Participacao %", "Acumulado %", "Classe ABC"];
+                linhas = vendas.Linhas.Select(l => new object?[] { l.Chave, l.Vendas, l.Itens, l.Bruto, l.Descontos, l.Liquido, l.Custo, l.Lucro, l.MargemPercentual, l.Participacao, l.Acumulado, l.Classe });
+                break;
+            case "estoque" when estoque is not null:
+                cabecalho = ["SKU", "Produto", "Categoria", "Deposito", "Localizacao", "Fisico", "Reservado", "Disponivel", "Minimo", "Custo medio", "Valor a custo", "Preco de venda", "Valor a venda"];
+                linhas = estoque.Select(s => new object?[] { s.Sku, s.Produto, s.Categoria, s.Deposito, s.Localizacao, s.Quantidade, s.Reservado, s.Disponivel, s.EstoqueMinimo, s.CustoUnitario, s.Quantidade * s.CustoUnitario, s.PrecoVenda, s.Quantidade * s.PrecoVenda });
+                break;
+            case "kardex" when kardex is not null:
+                cabecalho = ["Data", "Lancamento", "Tipo", "Documento", "Deposito", "Historico", "Entrada", "Saida", "Saldo", "Custo unitario", "Usuario"];
+                linhas = kardex.Linhas.Select(l => new object?[] { l.Data, l.Numero, l.Tipo, l.Documento, l.Deposito, l.Historico, l.Entrada, l.Saida, l.Saldo, l.CustoUnitario, l.Usuario });
+                break;
+            case "movimentacoes" when movimentacoes is not null:
+                cabecalho = ["Data", "Lancamento", "Tipo", "Origem", "Destino", "Documento", "Fornecedor ou motivo", "SKU", "Produto", "Quantidade", "Custo unitario", "Valor", "Usuario"];
+                linhas = movimentacoes.Linhas.Select(l => new object?[] { l.Data, l.Numero, l.Tipo, l.Origem, l.Destino, l.Documento, l.ParceiroOuMotivo, l.Sku, l.Produto, l.Quantidade, l.CustoUnitario, l.Valor, l.Usuario });
+                break;
+            case "fluxo" when fluxo is not null:
+                cabecalho = ["Data", "Entradas", "Saidas", "Saldo do dia", "Acumulado", "A receber", "A pagar"];
+                linhas = fluxo.Linhas.Select(l => new object?[] { l.Data, l.Entradas, l.Saidas, l.Saldo, l.Acumulado, l.EntradasPrevistas, l.SaidasPrevistas });
+                break;
+            case "dre" when dre is not null:
+                cabecalho = ["Conta", "Valor"];
+                var contas = new List<object?[]>
+                {
+                    new object?[] { "Receita bruta", dre.ReceitaBruta },
+                    new object?[] { "(-) Descontos", -dre.Descontos },
+                    new object?[] { "(=) Receita liquida", dre.ReceitaLiquida },
+                    new object?[] { "(-) CMV", -dre.Cmv },
+                    new object?[] { "(=) Lucro bruto", dre.LucroBruto }
+                };
+                contas.AddRange(dre.Despesas.Select(d => new object?[] { $"(-) {d.Nome}", -d.Valor }));
+                contas.Add(["(+) Outras receitas", dre.OutrasReceitas]);
+                contas.Add(["(=) Resultado", dre.Resultado]);
+                linhas = contas;
+                break;
+            case "caixas" when caixas is not null:
+                cabecalho = ["Caixa", "Loja", "Operador", "Abertura", "Fechamento", "Vendas", "Total vendido", "Suprimentos", "Sangrias", "Dinheiro esperado", "Contado", "Diferenca"];
+                linhas = caixas.Select(c => new object?[] { c.Numero, c.Deposito, c.Operador, c.AbertoEm, c.FechadoEm, c.QuantidadeVendas, c.TotalVendas, c.Suprimentos, c.Sangrias, c.DinheiroEsperado, c.ValorContado, c.Diferenca });
+                break;
+            default:
+                return;
+        }
+        var nome = atual == "estoque" ? $"estoque-{Fmt.Hoje:yyyyMMdd}.csv" : $"{atual}-{de:yyyyMMdd}-{ate:yyyyMMdd}.csv";
+        try { await JS.InvokeVoidAsync("vino.baixarTexto", nome, Fmt.Csv(cabecalho, linhas)); }
+        catch (JSException) { Avisos.Erro("Não foi possível gerar o arquivo."); }
+    }
+}

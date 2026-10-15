@@ -1,0 +1,4 @@
+# Banco de dados e chave da API: nunca enviar para o GitHub
+dados/
+.env
+node_modules/

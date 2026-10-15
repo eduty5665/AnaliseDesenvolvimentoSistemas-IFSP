@@ -10,3 +10,8 @@ App_Data/
 mobile/.expo/
 mobile/dist/
 .env
+
+# conexão com o Supabase (tem a senha do banco)
+appsettings.Local.json
+*.bak
+logs/

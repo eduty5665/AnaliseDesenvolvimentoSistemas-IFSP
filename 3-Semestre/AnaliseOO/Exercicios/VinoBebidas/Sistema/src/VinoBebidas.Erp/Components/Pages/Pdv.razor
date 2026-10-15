@@ -1,161 +1,366 @@
 @page "/pdv"
+@implements IAsyncDisposable
 @inject ApiClient Api
 @inject Sessao Sessao
 @inject Avisos Avisos
+@inject DadosEmpresa DadosEmpresa
 @inject IJSRuntime JS
 
-<div class="cabecalho-pagina">
-    <h1>Frente de caixa</h1>
-    <div class="acoes">
-        <label class="inline">Loja
-            <select @bind="depositoId" @bind:after="LojaMudou">
-                @foreach (var d in depositos)
-                {
-                    <option value="@d.Id">@d.Nome</option>
-                }
-            </select>
-        </label>
-        <button class="btn fantasma" @onclick="NovaVenda" disabled="@(itens.Count == 0)">Limpar venda</button>
+@if (carregando)
+{
+    <div class="carregando"><div class="spinner"></div></div>
+}
+else if (caixa is null)
+{
+    @* ───────── Caixa fechado: é preciso abrir antes de vender ───────── *@
+    <div class="cabecalho-pagina"><h1>Frente de caixa</h1></div>
+    <div class="caixa-fechado cartao">
+        <h2>Caixa fechado</h2>
+        <p class="nota">Para registrar vendas, abra o caixa informando a loja e o fundo de troco que está na gaveta.</p>
+        <div class="form-grade">
+            <label>Loja
+                <select @bind="depositoId">
+                    @foreach (var d in lojas) { <option value="@d.Id">@d.Nome</option> }
+                </select>
+            </label>
+            <label>Fundo de troco (R$)
+                <input type="number" min="0" step="0.01" @bind="fundoTroco" />
+            </label>
+        </div>
+        <button class="btn primario grande" @onclick="AbrirCaixa" disabled="@(depositoId == 0 || ocupado)">Abrir caixa</button>
     </div>
-</div>
+}
+else
+{
+    <div class="cabecalho-pagina">
+        <div>
+            <h1>Frente de caixa</h1>
+            <div class="caixa-info">
+                <span class="badge ok">Caixa @caixa.Numero aberto</span>
+                <span>@caixa.Deposito · @caixa.Operador · desde @Fmt.Hora(caixa.AbertoEm)</span>
+                <span>@caixa.QuantidadeVendas venda(s) · @Fmt.Moeda(caixa.TotalVendas)</span>
+            </div>
+        </div>
+        <div class="acoes">
+            <button class="btn fantasma" @onclick="() => AbrirMovimento(TipoMovimentoCaixa.Sangria)">Sangria <kbd>F7</kbd></button>
+            <button class="btn fantasma" @onclick="() => AbrirMovimento(TipoMovimentoCaixa.Suprimento)">Suprimento</button>
+            <button class="btn fantasma" @onclick="AbrirFechamento">Fechar caixa</button>
+        </div>
+    </div>
 
-<div class="pdv">
-    <section class="pdv-itens cartao">
-        <SeletorProduto Id="pdv-busca" AoEscolher="Adicionar" />
-        @if (itens.Count == 0)
-        {
-            <div class="vazio">Leia o código de barras ou digite o nome do produto.</div>
-        }
-        else
-        {
-            <table class="tabela">
-                <thead>
-                    <tr><th>Produto</th><th class="num">Qtd</th><th class="num">Unitário</th><th class="num">Desconto</th><th class="num">Total</th><th></th></tr>
-                </thead>
-                <tbody>
-                    @foreach (var i in itens)
-                    {
-                        <tr class="@(i.Quantidade > i.Produto.EstoqueDisponivel ? "linha-alerta" : "")">
-                            <td>
-                                <strong>@i.Produto.Nome</strong>
-                                <div class="sub">@i.Produto.Sku · disponível @i.Produto.EstoqueDisponivel</div>
-                            </td>
-                            <td class="num">
-                                <div class="qtd">
-                                    <button @onclick="() => Alterar(i, -1)">−</button>
-                                    <input type="number" min="1" @bind="i.Quantidade" />
-                                    <button @onclick="() => Alterar(i, 1)">+</button>
-                                </div>
-                            </td>
-                            <td class="num">@Fmt.Moeda(i.Produto.PrecoAtual)</td>
-                            <td class="num"><input class="curto" type="number" min="0" step="0.01" @bind="i.Desconto" /></td>
-                            <td class="num"><strong>@Fmt.Moeda(i.Total)</strong></td>
-                            <td><button class="btn fantasma pequeno" @onclick="() => itens.Remove(i)">✕</button></td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
-    </section>
-
-    <aside class="pdv-resumo cartao">
-        <div class="campo">
-            <label>Cliente (opcional)</label>
-            @if (cliente is null)
-            {
-                <div class="linha">
-                    <input placeholder="Nome, CPF ou e-mail" @bind="buscaCliente" @onkeydown="BuscarClienteEnter" />
-                    <button class="btn fantasma" @onclick="BuscarCliente">Buscar</button>
-                </div>
-                @if (clientesEncontrados.Count > 0)
+    <div class="pdv">
+        <section class="pdv-itens cartao">
+            <div class="seletor-produto">
+                <input id="pdv-busca" placeholder="Código de barras, SKU ou nome — use 3*código para quantidade  (F2)" @bind="termo" @bind:event="oninput"
+                       @onkeydown="TeclaBusca" autocomplete="off" />
+                @if (sugestoes.Count > 0)
                 {
-                    <ul class="sugestoes estatica">
-                        @foreach (var c in clientesEncontrados)
+                    <ul class="sugestoes">
+                        @foreach (var p in sugestoes)
                         {
-                            <li @onclick="() => { cliente = c; clientesEncontrados.Clear(); }">
-                                <span class="nome">@c.Nome</span><span class="meta">@c.CpfCnpj @c.Email</span>
+                            <li @onclick="() => Adicionar(p, quantidadePendente)">
+                                <span class="nome">@p.Nome</span>
+                                <span class="meta">@p.Sku · @Fmt.Moeda(p.PrecoAtual)</span>
                             </li>
                         }
                     </ul>
                 }
+            </div>
+
+            @if (itens.Count == 0)
+            {
+                <div class="vazio pdv-vazio">
+                    <strong>Caixa livre</strong>
+                    <span>Leia o código de barras do produto para iniciar a venda.</span>
+                    <div class="atalhos-pdv">
+                        <span><kbd>F2</kbd> produto</span><span><kbd>F4</kbd> cliente</span><span><kbd>F6</kbd> desconto</span>
+                        <span><kbd>F8</kbd> dinheiro</span><span><kbd>F9</kbd> Pix</span><span><kbd>F10</kbd> finalizar</span>
+                    </div>
+                </div>
             }
             else
             {
-                <div class="chip">@cliente.Nome <button @onclick="() => cliente = null">✕</button></div>
-            }
-        </div>
-
-        <dl class="totais">
-            <dt>Itens</dt><dd>@itens.Sum(i => i.Quantidade)</dd>
-            <dt>Subtotal</dt><dd>@Fmt.Moeda(Subtotal)</dd>
-            <dt>Desconto geral</dt><dd><input class="curto" type="number" min="0" step="0.01" @bind="descontoGeral" /></dd>
-            <dt class="total">Total</dt><dd class="total">@Fmt.Moeda(Total)</dd>
-        </dl>
-
-        <div class="campo">
-            <label>Pagamento</label>
-            <div class="formas">
-                @foreach (var f in new[] { FormaPagamento.Dinheiro, FormaPagamento.Pix, FormaPagamento.CartaoDebito, FormaPagamento.CartaoCredito })
-                {
-                    <button class="btn fantasma" @onclick="() => AdicionarPagamento(f)" disabled="@(Restante <= 0)">@Fmt.Texto(f)</button>
-                }
-            </div>
-            @foreach (var p in pagamentos)
-            {
-                <div class="linha pagamento">
-                    <span>@Fmt.Texto(p.Forma)</span>
-                    <input type="number" min="0" step="0.01" @bind="p.Valor" />
-                    <button class="btn fantasma pequeno" @onclick="() => pagamentos.Remove(p)">✕</button>
+                <table class="tabela">
+                    <thead>
+                        <tr><th>#</th><th>Produto</th><th class="num">Qtd</th><th class="num">Unitário</th><th class="num">Desc. R$</th><th class="num">Total</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                        @{ var n = 0; }
+                        @foreach (var i in itens)
+                        {
+                            n++;
+                            <tr class="@(i.Quantidade > i.Disponivel ? "linha-alerta" : "")">
+                                <td class="sub">@n.ToString("00")</td>
+                                <td>
+                                    <strong>@i.Produto.Nome</strong>
+                                    <div class="sub">@i.Produto.Sku · @(i.Produto.CodigoBarras ?? "s/ EAN") · disponível @i.Disponivel@(i.Quantidade > i.Disponivel ? " — estoque insuficiente" : "")</div>
+                                </td>
+                                <td class="num">
+                                    <div class="qtd">
+                                        <button @onclick="() => Alterar(i, -1)">−</button>
+                                        <input type="number" min="1" @bind="i.Quantidade" />
+                                        <button @onclick="() => Alterar(i, 1)">+</button>
+                                    </div>
+                                </td>
+                                <td class="num">
+                                    @if (i.Produto.PrecoPromocional is not null) { <s class="sub">@Fmt.Moeda(i.Produto.PrecoVenda)</s><br /> }
+                                    @Fmt.Moeda(i.Produto.PrecoAtual)
+                                </td>
+                                <td class="num"><input class="curto" type="number" min="0" step="0.01" @bind="i.Desconto" /></td>
+                                <td class="num"><strong>@Fmt.Moeda(i.Total)</strong></td>
+                                <td><button class="btn fantasma pequeno" title="Cancelar item" @onclick="() => itens.Remove(i)">✕</button></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <div class="resumo-linha">
+                    <button class="btn perigo-fantasma pequeno" @onclick="CancelarVenda">Cancelar venda</button>
+                    <span>@itens.Count item(ns) · @itens.Sum(i => i.Quantidade) unidade(s)</span>
                 </div>
             }
+        </section>
+
+        <aside class="pdv-resumo cartao">
+            <div class="form-grade">
+                <label>Vendedor
+                    <select @bind="vendedorId">
+                        @foreach (var v in vendedores) { <option value="@v.Id">@v.Nome</option> }
+                    </select>
+                </label>
+                <label>CPF/CNPJ no cupom
+                    <input id="pdv-cpf" placeholder="opcional" @bind="cpfNota" inputmode="numeric" />
+                </label>
+            </div>
+
+            <div class="campo">
+                <label>Cliente <kbd>F4</kbd></label>
+                @if (cliente is null)
+                {
+                    <div class="linha">
+                        <input id="pdv-cliente" placeholder="Nome, CPF ou e-mail" @bind="buscaCliente" @onkeydown="@(e => e.Key == "Enter" ? BuscarCliente() : Task.CompletedTask)" />
+                        <button class="btn fantasma" @onclick="BuscarCliente">Buscar</button>
+                    </div>
+                    @if (clientesEncontrados.Count > 0)
+                    {
+                        <ul class="sugestoes estatica">
+                            @foreach (var c in clientesEncontrados)
+                            {
+                                <li @onclick="() => EscolherCliente(c)">
+                                    <span class="nome">@c.Nome</span><span class="meta">@Fmt.CpfCnpj(c.CpfCnpj)</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                }
+                else
+                {
+                    <div class="chip">@cliente.Nome <button @onclick="() => cliente = null">✕</button></div>
+                }
+            </div>
+
             <dl class="totais">
-                @if (Restante > 0)
+                <dt>Subtotal</dt><dd>@Fmt.Moeda(Subtotal)</dd>
+                <dt>Desconto geral <kbd>F6</kbd></dt>
+                <dd>
+                    <input id="pdv-desconto" class="curto" type="number" min="0" step="0.01" @bind="descontoGeral" />
+                    <button class="btn fantasma pequeno" @onclick="() => AplicarPercentual(5)">5%</button>
+                    <button class="btn fantasma pequeno" @onclick="() => AplicarPercentual(10)">10%</button>
+                </dd>
+                @if (PercentualDesconto > 0)
                 {
-                    <dt>Falta pagar</dt><dd class="negativo">@Fmt.Moeda(Restante)</dd>
+                    <dt>Desconto total</dt>
+                    <dd class="@(PrecisaSupervisor ? "negativo" : "")">@Fmt.Pct(PercentualDesconto)@(PrecisaSupervisor ? $" — limite {Fmt.Num(LimiteDesconto)}%: exige supervisor" : "")</dd>
                 }
-                else if (Troco > 0)
-                {
-                    <dt>Troco</dt><dd class="positivo">@Fmt.Moeda(Troco)</dd>
-                }
+                <dt class="total">Total</dt><dd class="total">@Fmt.Moeda(Total)</dd>
             </dl>
-        </div>
 
-        <button class="btn primario grande" @onclick="Finalizar" disabled="@(!PodeFinalizar || enviando)">
-            @(enviando ? "Registrando..." : $"Finalizar venda · {Fmt.Moeda(Total)}")
-        </button>
-    </aside>
-</div>
+            <div class="campo">
+                <label>Pagamento</label>
+                <div class="formas">
+                    <button class="btn fantasma" @onclick="() => AdicionarPagamento(FormaPagamento.Dinheiro)" disabled="@(Restante <= 0)">Dinheiro <kbd>F8</kbd></button>
+                    <button class="btn fantasma" @onclick="() => AdicionarPagamento(FormaPagamento.Pix)" disabled="@(Restante <= 0)">Pix <kbd>F9</kbd></button>
+                    <button class="btn fantasma" @onclick="() => AdicionarPagamento(FormaPagamento.CartaoDebito)" disabled="@(Restante <= 0)">Débito</button>
+                    <button class="btn fantasma" @onclick="() => AdicionarPagamento(FormaPagamento.CartaoCredito)" disabled="@(Restante <= 0)">Crédito</button>
+                </div>
+                @foreach (var p in pagamentos)
+                {
+                    <div class="pagamento-linha">
+                        <div class="linha">
+                            <span class="forma">@Fmt.Texto(p.Forma)</span>
+                            <input type="number" min="0" step="0.01" @bind="p.Valor" title="@(p.Forma == FormaPagamento.Dinheiro ? "Valor recebido do cliente" : "Valor")" />
+                            <button class="btn fantasma pequeno" @onclick="() => pagamentos.Remove(p)">✕</button>
+                        </div>
+                        @if (p.Forma == FormaPagamento.CartaoCredito)
+                        {
+                            <div class="linha">
+                                <select @bind="p.Parcelas">
+                                    @for (var x = 1; x <= 6; x++)
+                                    {
+                                        var parcelas = x;
+                                        <option value="@parcelas">@(parcelas == 1 ? "À vista" : $"{parcelas}x de {Fmt.Moeda(Math.Round(p.Valor / parcelas, 2))} sem juros")</option>
+                                    }
+                                </select>
+                            </div>
+                        }
+                        @if (p.Forma is FormaPagamento.CartaoCredito or FormaPagamento.CartaoDebito)
+                        {
+                            <div class="linha"><input placeholder="NSU do comprovante da maquininha" @bind="p.Nsu" /></div>
+                        }
+                        @if (p.Forma == FormaPagamento.Pix)
+                        {
+                            <div class="linha">
+                                <button class="btn fantasma pequeno" @onclick="() => MostrarPix(p)">Mostrar QR code</button>
+                                <label class="check"><input type="checkbox" @bind="p.Confirmado" /> Recebimento conferido</label>
+                            </div>
+                        }
+                    </div>
+                }
+                <dl class="totais">
+                    @if (Restante > 0 && pagamentos.Count > 0)
+                    {
+                        <dt>Falta pagar</dt><dd class="negativo">@Fmt.Moeda(Restante)</dd>
+                    }
+                    @if (Troco > 0)
+                    {
+                        <dt class="troco">Troco</dt><dd class="troco positivo">@Fmt.Moeda(Troco)</dd>
+                    }
+                </dl>
+            </div>
 
+            @if (TemAlcool)
+            {
+                <label class="check maioridade">
+                    <input type="checkbox" @bind="maioridade" /> Conferi: cliente é maior de 18 anos
+                </label>
+            }
+
+            @if (Pendencia is not null && itens.Count > 0)
+            {
+                <p class="nota pendencia">@Pendencia</p>
+            }
+            <button class="btn primario grande" @onclick="Finalizar" disabled="@(Pendencia is not null || ocupado)">
+                @(ocupado ? "Registrando..." : $"Finalizar · {Fmt.Moeda(Total)}") <kbd>F10</kbd>
+            </button>
+        </aside>
+    </div>
+}
+
+@* ───────── Cupom ───────── *@
 <Modal Aberto="@(cupom is not null)" Titulo="Venda registrada" OnFechar="NovaVenda">
     <ChildContent>
-        @if (cupom is not null)
+        @if (cupom is not null && empresa is not null)
         {
-            <div class="cupom" id="cupom">
-                <div class="centro"><strong>VINO BEBIDAS</strong><br />@cupom.Deposito<br />CUPOM NÃO FISCAL</div>
-                <div class="linha-cupom"><span>Venda @cupom.Numero</span><span>@Fmt.DataHora(cupom.Data)</span></div>
-                @if (cupom.Cliente is not null) { <div>Cliente: @cupom.Cliente</div> }
-                <hr />
-                @foreach (var i in cupom.Itens)
-                {
-                    <div>@i.Produto</div>
-                    <div class="linha-cupom"><span>@i.Quantidade x @Fmt.Moeda(i.PrecoUnitario)@(i.Desconto > 0 ? $" (-{Fmt.Moeda(i.Desconto)})" : "")</span><span>@Fmt.Moeda(i.Total)</span></div>
-                }
-                <hr />
-                <div class="linha-cupom"><span>Subtotal</span><span>@Fmt.Moeda(cupom.Subtotal)</span></div>
-                @if (cupom.Desconto > 0) { <div class="linha-cupom"><span>Desconto</span><span>-@Fmt.Moeda(cupom.Desconto)</span></div> }
-                <div class="linha-cupom total"><span>TOTAL</span><span>@Fmt.Moeda(cupom.Total)</span></div>
-                @foreach (var p in cupom.Pagamentos)
-                {
-                    <div class="linha-cupom"><span>@Fmt.Texto(p.Forma)</span><span>@Fmt.Moeda(p.Valor)</span></div>
-                }
-                @if (cupom.Troco > 0) { <div class="linha-cupom"><span>Troco</span><span>@Fmt.Moeda(cupom.Troco)</span></div> }
-                <div class="centro">Obrigado pela preferência! Beba com moderação.</div>
+            @if (cupom.Troco > 0) { <div class="troco-destaque">Troco: <strong>@Fmt.Moeda(cupom.Troco)</strong></div> }
+            <Cupom Venda="cupom" Empresa="empresa" />
+        }
+    </ChildContent>
+    <Rodape>
+        <button class="btn fantasma" @onclick="@(() => Imprimir("cupom"))">Imprimir cupom</button>
+        <button class="btn primario" @onclick="NovaVenda">Nova venda</button>
+    </Rodape>
+</Modal>
+
+@* ───────── Pix ───────── *@
+<Modal Aberto="@(pix is not null)" Titulo="Pagamento via Pix" OnFechar="() => pix = null">
+    <ChildContent>
+        @if (pix is not null)
+        {
+            <div class="pix">
+                <div id="pix-qr" class="pix-qr"></div>
+                <strong class="pix-valor">@Fmt.Moeda(pix.Valor)</strong>
+                <p class="nota">Peça para o cliente apontar o app do banco para o QR code. Confirme no extrato da loja antes de finalizar.</p>
+                <textarea readonly rows="3">@pixCodigo</textarea>
+                <button class="btn fantasma pequeno" @onclick="CopiarPix">Copiar "copia e cola"</button>
             </div>
         }
     </ChildContent>
     <Rodape>
-        <button class="btn fantasma" @onclick="Imprimir">Imprimir</button>
-        <button class="btn primario" @onclick="NovaVenda">Nova venda</button>
+        <button class="btn fantasma" @onclick="() => pix = null">Voltar</button>
+        <button class="btn primario" @onclick="ConfirmarPix">Recebido</button>
+    </Rodape>
+</Modal>
+
+@* ───────── Autorização de supervisor ───────── *@
+<Modal Aberto="@pedirSupervisor" Titulo="Autorização de supervisor" OnFechar="() => pedirSupervisor = false">
+    <ChildContent>
+        <p class="nota">O desconto de <strong>@Fmt.Pct(PercentualDesconto)</strong> passa do seu limite (@Fmt.Num(LimiteDesconto)%).
+            Um gerente ou administrador precisa autorizar.</p>
+        <div class="form-grade uma-coluna">
+            <label>Login do supervisor <input @bind="supLogin" autocomplete="off" /></label>
+            <label>Senha <input type="password" @bind="supSenha" autocomplete="new-password" @onkeydown="@(e => e.Key == "Enter" ? Enviar(true) : Task.CompletedTask)" /></label>
+        </div>
+    </ChildContent>
+    <Rodape>
+        <button class="btn fantasma" @onclick="() => pedirSupervisor = false">Cancelar</button>
+        <button class="btn primario" @onclick="() => Enviar(true)" disabled="@ocupado">Autorizar e finalizar</button>
+    </Rodape>
+</Modal>
+
+@* ───────── Sangria / suprimento ───────── *@
+<Modal Aberto="@(movTipo is not null)" Titulo="@(movTipo == TipoMovimentoCaixa.Sangria ? "Sangria (retirada de dinheiro)" : "Suprimento (reforço de troco)")" OnFechar="() => movTipo = null">
+    <ChildContent>
+        <p class="nota">Dinheiro em caixa agora: <strong>@Fmt.Moeda(caixa?.DinheiroEsperado ?? 0)</strong></p>
+        <div class="form-grade uma-coluna">
+            <label>Valor (R$) <input type="number" min="0" step="0.01" @bind="movValor" /></label>
+            <label>Motivo <input @bind="movMotivo" placeholder="@(movTipo == TipoMovimentoCaixa.Sangria ? "Ex.: recolhimento para o cofre" : "Ex.: troco trazido do banco")" /></label>
+        </div>
+    </ChildContent>
+    <Rodape>
+        <button class="btn fantasma" @onclick="() => movTipo = null">Cancelar</button>
+        <button class="btn primario" @onclick="RegistrarMovimento" disabled="@ocupado">Registrar</button>
+    </Rodape>
+</Modal>
+
+@* ───────── Fechamento ───────── *@
+<Modal Aberto="@fechando" Titulo="Fechamento de caixa" OnFechar="() => fechando = false" Largo="true">
+    <ChildContent>
+        @if (fechamento is not null && empresa is not null)
+        {
+            <FechamentoCaixa Caixa="fechamento" Empresa="empresa" />
+        }
+        else if (caixa is not null)
+        {
+            <div class="grade-2">
+                <div>
+                    <h3>Resumo do turno</h3>
+                    <dl class="totais">
+                        <dt>Fundo de troco (abertura)</dt><dd>@Fmt.Moeda(caixa.ValorAbertura)</dd>
+                        @foreach (var f in caixa.PorForma)
+                        {
+                            <dt>@Fmt.Texto(f.Forma) (@f.Quantidade)</dt><dd>@Fmt.Moeda(f.Valor)</dd>
+                        }
+                        <dt>Suprimentos</dt><dd>@Fmt.Moeda(caixa.Suprimentos)</dd>
+                        <dt>Sangrias</dt><dd>−@Fmt.Moeda(caixa.Sangrias)</dd>
+                        <dt class="total">Dinheiro esperado na gaveta</dt><dd class="total">@Fmt.Moeda(caixa.DinheiroEsperado)</dd>
+                    </dl>
+                </div>
+                <div class="form-grade uma-coluna">
+                    <label>Dinheiro contado na gaveta (R$)
+                        <input type="number" min="0" step="0.01" @bind="contado" @bind:event="oninput" />
+                    </label>
+                    @if (contado is not null)
+                    {
+                        var dif = contado.Value - caixa.DinheiroEsperado;
+                        <div class="@(dif == 0 ? "alerta-ok" : "alerta-erro")">
+                            @(dif == 0 ? "Caixa confere." : dif > 0 ? $"Sobra de {Fmt.Moeda(dif)}" : $"Falta de {Fmt.Moeda(-dif)}")
+                        </div>
+                    }
+                    <label>Observação <input @bind="obsFechamento" placeholder="Explique diferenças, se houver" /></label>
+                </div>
+            </div>
+        }
+    </ChildContent>
+    <Rodape>
+        @if (fechamento is not null)
+        {
+            <button class="btn fantasma" @onclick="@(() => Imprimir("fechamento-caixa"))">Imprimir</button>
+            <button class="btn primario" @onclick="ConcluirFechamento">Concluir</button>
+        }
+        else
+        {
+            <button class="btn fantasma" @onclick="() => fechando = false">Voltar</button>
+            <button class="btn primario" @onclick="FecharCaixa" disabled="@(contado is null || ocupado || itens.Count > 0)">@(itens.Count > 0 ? "Há uma venda em andamento" : "Fechar caixa")</button>
+        }
     </Rodape>
 </Modal>
 
@@ -163,81 +368,269 @@
     private class Linha
     {
         public required ProdutoDto Produto { get; init; }
+        public int Disponivel { get; init; }
         public int Quantidade { get; set; } = 1;
         public decimal Desconto { get; set; }
-        public decimal Total => Math.Max(0, Produto.PrecoAtual * Quantidade - Desconto);
+        public decimal Bruto => Produto.PrecoAtual * Quantidade;
+        public decimal Total => Math.Max(0, Bruto - Desconto);
     }
 
     private class Pagto
     {
         public FormaPagamento Forma { get; init; }
         public decimal Valor { get; set; }
+        public int Parcelas { get; set; } = 1;
+        public string? Nsu { get; set; }
+        public bool Confirmado { get; set; }
     }
 
-    private List<DepositoDto> depositos = [];
+    private bool carregando = true;
+    private bool ocupado;
+    private CaixaDto? caixa;
+    private EmpresaDto? empresa;
+    private List<DepositoDto> lojas = [];
+    private List<OpcaoDto> vendedores = [];
     private int depositoId;
+    private decimal fundoTroco = 200;
+
+    private string termo = "";
+    private int quantidadePendente = 1;
+    private List<ProdutoDto> sugestoes = [];
     private readonly List<Linha> itens = [];
     private readonly List<Pagto> pagamentos = [];
     private decimal descontoGeral;
+    private int vendedorId;
+    private string? cpfNota;
+    private bool maioridade;
     private ClienteDto? cliente;
     private string buscaCliente = "";
     private List<ClienteDto> clientesEncontrados = [];
+
     private VendaDto? cupom;
-    private bool enviando;
+    private Pagto? pix;
+    private string pixCodigo = "";
+    private bool pedirSupervisor;
+    private string supLogin = "", supSenha = "";
+
+    private TipoMovimentoCaixa? movTipo;
+    private decimal movValor;
+    private string movMotivo = "";
+    private bool fechando;
+    private decimal? contado;
+    private string? obsFechamento;
+    private CaixaDto? fechamento;
+
+    private DotNetObjectReference<Pdv>? referencia;
 
     private decimal Subtotal => itens.Sum(i => i.Total);
     private decimal Total => Math.Max(0, Subtotal - descontoGeral);
     private decimal Pago => pagamentos.Sum(p => p.Valor);
     private decimal Restante => Math.Max(0, Total - Pago);
     private decimal Troco => Math.Max(0, Pago - Total);
-    private bool PodeFinalizar => itens.Count > 0 && Total > 0 && Restante == 0 && itens.All(i => i.Quantidade > 0);
+    private decimal DinheiroPago => pagamentos.Where(p => p.Forma == FormaPagamento.Dinheiro).Sum(p => p.Valor);
+    private bool TemAlcool => itens.Any(i => i.Produto.Alcoolico);
+    private decimal LimiteDesconto => Sessao.Perfil is { } p ? PoliticaDesconto.LimitePercentual(p) : 0;
+    private decimal PercentualDesconto
+    {
+        get
+        {
+            var bruto = itens.Sum(i => i.Bruto);
+            return bruto == 0 ? 0 : Math.Round((itens.Sum(i => i.Desconto) + descontoGeral) / bruto * 100, 2);
+        }
+    }
+    private bool PrecisaSupervisor => PercentualDesconto > LimiteDesconto;
+
+    /// <summary>O que falta para poder finalizar (null = pronto).</summary>
+    private string? Pendencia =>
+        itens.Count == 0 ? "Sem itens." :
+        itens.Any(i => i.Quantidade <= 0) ? "Há item com quantidade inválida." :
+        itens.Any(i => i.Quantidade > i.Disponivel) ? "Há item sem estoque suficiente nesta loja." :
+        Total <= 0 ? "Total zerado." :
+        pagamentos.Count == 0 ? "Informe a forma de pagamento." :
+        Restante > 0 ? $"Falta pagar {Fmt.Moeda(Restante)}." :
+        Troco > DinheiroPago ? "Troco só pode ser dado sobre dinheiro." :
+        pagamentos.Any(p => p.Forma == FormaPagamento.Pix && !p.Confirmado) ? "Confira o recebimento do Pix." :
+        TemAlcool && !maioridade ? "Confirme a maioridade do cliente." : null;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            depositos = (await Api.GetAsync<List<DepositoDto>>("api/depositos")).Where(d => d.Ativo && d.Tipo == TipoDeposito.Loja).ToList();
-            depositoId = Sessao.DepositoPadraoId ?? depositos.FirstOrDefault()?.Id ?? 0;
+            empresa = await DadosEmpresa.ObterAsync();
+            lojas = (await Api.GetAsync<List<DepositoDto>>("api/depositos")).Where(d => d.Ativo && d.Tipo == TipoDeposito.Loja).ToList();
+            vendedores = await Api.GetAsync<List<OpcaoDto>>("api/vendedores");
+            caixa = await Api.GetOuNuloAsync<CaixaDto>("api/caixa/atual");
+            depositoId = caixa?.DepositoId ?? Sessao.DepositoPadraoId ?? lojas.FirstOrDefault()?.Id ?? 0;
+            vendedorId = vendedores.Any(v => v.Id == Sessao.Atual?.Id) ? Sessao.Atual!.Id : vendedores.FirstOrDefault()?.Id ?? 0;
         }
         catch (ApiException ex) { Avisos.Erro(ex.Message); }
+        carregando = false;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender) await JS.InvokeVoidAsync("vino.focar", "pdv-busca");
+        if (firstRender)
+        {
+            referencia = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("vino.atalhos.registrar", referencia);
+        }
     }
 
-    private void LojaMudou() => Sessao.DepositoPadraoId = depositoId;
-
-    private async Task Adicionar(ProdutoDto p)
+    [JSInvokable]
+    public async Task Atalho(string tecla)
     {
-        // Saldo do produto na loja selecionada
-        var saldos = await Api.GetAsync<List<SaldoDto>>($"api/estoque/saldos?depositoId={depositoId}&busca={Uri.EscapeDataString(p.Sku)}");
-        var disponivel = saldos.FirstOrDefault(s => s.ProdutoId == p.Id)?.Disponivel ?? 0;
-        var produtoNaLoja = p with { EstoqueDisponivel = disponivel };
-
-        var existente = itens.FirstOrDefault(i => i.Produto.Id == p.Id);
-        if (existente is not null) existente.Quantidade++;
-        else itens.Insert(0, new Linha { Produto = produtoNaLoja });
-
-        if (disponivel <= 0) Avisos.Erro($"{p.Nome}: sem estoque disponível nesta loja.");
-        await JS.InvokeVoidAsync("vino.focar", "pdv-busca");
+        if (caixa is null || cupom is not null) return;
+        switch (tecla)
+        {
+            case "F2": await Focar("pdv-busca"); break;
+            case "F4": await Focar("pdv-cliente"); break;
+            case "F6": await Focar("pdv-desconto"); break;
+            case "F7": AbrirMovimento(TipoMovimentoCaixa.Sangria); break;
+            case "F8": AdicionarPagamento(FormaPagamento.Dinheiro); break;
+            case "F9": AdicionarPagamento(FormaPagamento.Pix); break;
+            case "F10": await Finalizar(); break;
+        }
+        StateHasChanged();
     }
 
-    private void Alterar(Linha l, int delta)
+    private async Task Focar(string id)
     {
-        l.Quantidade = Math.Max(1, l.Quantidade + delta);
+        try { await JS.InvokeVoidAsync("vino.focar", id); } catch (JSException) { }
     }
 
-    private void AdicionarPagamento(FormaPagamento forma)
+    // ── Caixa ──
+
+    private async Task AbrirCaixa()
     {
-        pagamentos.Add(new Pagto { Forma = forma, Valor = Restante });
+        ocupado = true;
+        try
+        {
+            caixa = await Api.PostAsync<CaixaDto>("api/caixa/abrir", new AbrirCaixaRequest(depositoId, fundoTroco));
+            Sessao.DepositoPadraoId = depositoId;
+            Avisos.Sucesso($"Caixa {caixa.Numero} aberto com fundo de {Fmt.Moeda(caixa.ValorAbertura)}.");
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+        finally { ocupado = false; }
+        await Focar("pdv-busca");
     }
 
-    private async Task BuscarClienteEnter(KeyboardEventArgs e)
+    private void AbrirMovimento(TipoMovimentoCaixa tipo)
     {
-        if (e.Key == "Enter") await BuscarCliente();
+        movTipo = tipo;
+        movValor = 0;
+        movMotivo = "";
     }
+
+    private async Task RegistrarMovimento()
+    {
+        if (movTipo is null) return;
+        ocupado = true;
+        try
+        {
+            caixa = await Api.PostAsync<CaixaDto>("api/caixa/movimentos", new MovimentoCaixaRequest(movTipo.Value, movValor, movMotivo));
+            Avisos.Sucesso($"{Fmt.Texto(movTipo.Value)} de {Fmt.Moeda(movValor)} registrada.");
+            movTipo = null;
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+        finally { ocupado = false; }
+    }
+
+    private async Task AbrirFechamento()
+    {
+        try { caixa = await Api.GetOuNuloAsync<CaixaDto>("api/caixa/atual") ?? caixa; }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+        contado = null;
+        obsFechamento = null;
+        fechamento = null;
+        fechando = true;
+    }
+
+    private async Task FecharCaixa()
+    {
+        if (contado is null) return;
+        ocupado = true;
+        try
+        {
+            fechamento = await Api.PostAsync<CaixaDto>("api/caixa/fechar", new FecharCaixaRequest(contado.Value, obsFechamento));
+            Avisos.Sucesso("Caixa fechado.");
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+        finally { ocupado = false; }
+    }
+
+    private void ConcluirFechamento()
+    {
+        fechando = false;
+        fechamento = null;
+        caixa = null;
+    }
+
+    // ── Itens ──
+
+    private async Task TeclaBusca(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape") { sugestoes.Clear(); return; }
+        if (e.Key != "Enter" || string.IsNullOrWhiteSpace(termo)) return;
+
+        // "3*7891234567890" = três unidades do produto
+        var texto = termo.Trim();
+        quantidadePendente = 1;
+        var partes = texto.Split('*', 2);
+        if (partes.Length == 2 && int.TryParse(partes[0], out var q) && q is > 0 and <= 999)
+        {
+            quantidadePendente = q;
+            texto = partes[1].Trim();
+        }
+        if (texto.Length == 0) return;
+
+        try
+        {
+            var exato = await Api.GetOuNuloAsync<ProdutoDto>($"api/produtos/codigo/{Uri.EscapeDataString(texto)}");
+            if (exato is not null) { await Adicionar(exato, quantidadePendente); return; }
+            var pagina = await Api.GetAsync<PaginaDto<ProdutoDto>>($"api/produtos?ativo=true&tamanho=10&busca={Uri.EscapeDataString(texto)}");
+            sugestoes = pagina.Itens.ToList();
+            if (sugestoes.Count == 1) await Adicionar(sugestoes[0], quantidadePendente);
+            else if (sugestoes.Count == 0) Avisos.Erro($"Produto não encontrado: \"{texto}\".");
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+    }
+
+    private async Task Adicionar(ProdutoDto p, int quantidade)
+    {
+        sugestoes.Clear();
+        termo = "";
+        try
+        {
+            var existente = itens.FirstOrDefault(i => i.Produto.Id == p.Id);
+            if (existente is not null)
+            {
+                existente.Quantidade += quantidade;
+            }
+            else
+            {
+                // Saldo do produto na loja do caixa
+                var saldos = await Api.GetAsync<List<SaldoDto>>($"api/estoque/saldos?depositoId={caixa!.DepositoId}&busca={Uri.EscapeDataString(p.Sku)}");
+                var disponivel = saldos.FirstOrDefault(s => s.ProdutoId == p.Id)?.Disponivel ?? 0;
+                itens.Add(new Linha { Produto = p, Disponivel = disponivel, Quantidade = quantidade });
+                if (disponivel <= 0) Avisos.Erro($"{p.Nome}: sem estoque nesta loja.");
+            }
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+        quantidadePendente = 1;
+        await Focar("pdv-busca");
+    }
+
+    private static void Alterar(Linha l, int delta) => l.Quantidade = Math.Max(1, l.Quantidade + delta);
+
+    private void AplicarPercentual(decimal pct) => descontoGeral = Math.Round(Subtotal * pct / 100, 2);
+
+    private void CancelarVenda()
+    {
+        Limpar();
+        Avisos.Sucesso("Venda cancelada antes do fechamento. Nada foi gravado.");
+    }
+
+    // ── Cliente ──
 
     private async Task BuscarCliente()
     {
@@ -250,35 +643,121 @@
         catch (ApiException ex) { Avisos.Erro(ex.Message); }
     }
 
+    private void EscolherCliente(ClienteDto c)
+    {
+        cliente = c;
+        clientesEncontrados.Clear();
+        buscaCliente = "";
+        if (string.IsNullOrWhiteSpace(cpfNota) && c.CpfCnpj is not null) cpfNota = c.CpfCnpj;
+    }
+
+    // ── Pagamento ──
+
+    private void AdicionarPagamento(FormaPagamento forma)
+    {
+        if (Restante <= 0 || itens.Count == 0) return;
+        pagamentos.Add(new Pagto { Forma = forma, Valor = Restante });
+    }
+
+    private async Task MostrarPix(Pagto p)
+    {
+        if (empresa is null) return;
+        pix = p;
+        pixCodigo = PixBrCode.Gerar(empresa.ChavePix ?? empresa.Cnpj, empresa.RazaoSocial, empresa.Cidade ?? "Catanduva", p.Valor,
+            $"CX{caixa?.Id}{DateTime.UtcNow:HHmmss}");
+        StateHasChanged();
+        await Task.Delay(50);
+        try
+        {
+            if (!await JS.InvokeAsync<bool>("vino.qr", "pix-qr", pixCodigo))
+                Avisos.Erro("QR code indisponível (sem internet para carregar a biblioteca). Use o copia e cola.");
+        }
+        catch (JSException) { }
+    }
+
+    private async Task CopiarPix()
+    {
+        if (await JS.InvokeAsync<bool>("vino.copiar", pixCodigo)) Avisos.Sucesso("Código Pix copiado.");
+    }
+
+    private void ConfirmarPix()
+    {
+        if (pix is not null) pix.Confirmado = true;
+        pix = null;
+    }
+
+    // ── Finalização ──
+
     private async Task Finalizar()
     {
-        if (!PodeFinalizar) return;
-        enviando = true;
+        if (Pendencia is not null)
+        {
+            if (itens.Count > 0) Avisos.Erro(Pendencia);
+            return;
+        }
+        if (PrecisaSupervisor)
+        {
+            supLogin = supSenha = "";
+            pedirSupervisor = true;
+            return;
+        }
+        await Enviar(false);
+    }
+
+    private async Task Enviar(bool comSupervisor)
+    {
+        if (ocupado || caixa is null) return;
+        ocupado = true;
         try
         {
             var req = new VendaRequest(
-                depositoId,
+                caixa.DepositoId,
                 itens.Select(i => new ItemVendaRequest(i.Produto.Id, i.Quantidade, i.Desconto)).ToList(),
-                pagamentos.Select(p => new PagamentoRequest(p.Forma, p.Valor)).ToList(),
+                pagamentos.Select(p => new PagamentoRequest(p.Forma, p.Valor, p.Parcelas, p.Nsu)).ToList(),
                 cliente?.Id,
-                descontoGeral);
+                descontoGeral,
+                CanalVenda.Loja,
+                vendedorId == 0 ? null : vendedorId,
+                cpfNota,
+                maioridade,
+                comSupervisor ? new AutorizacaoSupervisorRequest(supLogin, supSenha) : null);
             cupom = await Api.PostAsync<VendaDto>("api/vendas", req);
-            Avisos.Sucesso($"Venda {cupom.Numero} registrada.");
+            pedirSupervisor = false;
+            caixa = await Api.GetOuNuloAsync<CaixaDto>("api/caixa/atual") ?? caixa;
         }
         catch (ApiException ex) { Avisos.Erro(ex.Message); }
-        finally { enviando = false; }
+        finally { ocupado = false; }
     }
 
-    private async Task Imprimir() => await JS.InvokeVoidAsync("vino.imprimir");
-
-    private async Task NovaVenda()
+    private async Task Imprimir(string id)
     {
-        cupom = null;
+        try { await JS.InvokeVoidAsync("vino.imprimir", id); } catch (JSException) { }
+    }
+
+    private void Limpar()
+    {
         itens.Clear();
         pagamentos.Clear();
         descontoGeral = 0;
         cliente = null;
+        cpfNota = null;
+        maioridade = false;
         buscaCliente = "";
-        await JS.InvokeVoidAsync("vino.focar", "pdv-busca");
+        sugestoes.Clear();
+        clientesEncontrados.Clear();
+    }
+
+    private async Task NovaVenda()
+    {
+        cupom = null;
+        Limpar();
+        await Focar("pdv-busca");
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        try { await JS.InvokeVoidAsync("vino.atalhos.remover"); }
+        catch (Exception ex) when (ex is JSDisconnectedException or JSException or InvalidOperationException or OperationCanceledException) { }
+        referencia?.Dispose();
     }
 }

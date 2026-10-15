@@ -15,13 +15,15 @@
     <a class="atalho" href="pedidos"><span>⧉</span><strong>Pedidos online</strong><small>Reservas e compras da loja</small></a>
     @if (Sessao.PodeEstoque)
     {
-        <a class="atalho" href="movimentacoes"><span>⇄</span><strong>Movimentar estoque</strong><small>Entrada, saída, transferência</small></a>
+        <a class="atalho" href="movimentacoes"><span>⇄</span><strong>Entradas e saídas</strong><small>NF de compra, baixas, inventário</small></a>
+        <a class="atalho" href="ordens-separacao"><span>☑</span><strong>Ordens de separação</strong><small>Picking de pedidos e transferências</small></a>
     }
     <a class="atalho" href="estoque"><span>▤</span><strong>Consultar saldos</strong><small>Por loja e depósito</small></a>
     @if (Sessao.PodeFinanceiro)
     {
         <a class="atalho" href="financeiro"><span>$</span><strong>Financeiro</strong><small>Contas e alertas</small></a>
     }
+    <a class="atalho" href="relatorios"><span>▥</span><strong>Relatórios</strong><small>Vendas, kardex, estoque, DRE</small></a>
 </div>
 
 @if (painel is not null)

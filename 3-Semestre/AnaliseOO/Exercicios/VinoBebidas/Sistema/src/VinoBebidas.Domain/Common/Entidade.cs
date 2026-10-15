@@ -46,3 +46,12 @@ public static class Documentos
         return Digito(p1) == d[12] - '0' && Digito(p2) == d[13] - '0';
     }
 }
+
+/// <summary>Parâmetro de sistema (chave/valor). Guarda, entre outros, a versão do esquema do banco.</summary>
+public class ParametroSistema
+{
+    public const string ChaveVersaoEsquema = "VersaoEsquema";
+
+    public string Chave { get; set; } = string.Empty;
+    public string Valor { get; set; } = string.Empty;
+}

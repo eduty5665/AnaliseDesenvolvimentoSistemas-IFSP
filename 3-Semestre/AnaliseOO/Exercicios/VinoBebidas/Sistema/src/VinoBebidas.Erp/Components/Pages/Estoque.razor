@@ -1,9 +1,14 @@
 @page "/estoque"
 @inject ApiClient Api
 @inject Avisos Avisos
+@inject Sessao Sessao
 
 <div class="cabecalho-pagina">
     <h1>Saldos de estoque</h1>
+    <div class="acoes">
+        <a class="btn fantasma" href="relatorios">Relatórios e kardex</a>
+        @if (Sessao.PodeEstoque) { <a class="btn primario" href="movimentacoes">Lançar entrada / saída</a> }
+    </div>
 </div>
 
 <div class="filtros cartao">
@@ -25,7 +30,7 @@ else
 {
     <div class="kpis">
         <div class="kpi"><span>Unidades em estoque</span><strong>@Fmt.Num(saldos.Sum(s => s.Quantidade))</strong></div>
-        <div class="kpi"><span>Reservadas (pedidos online)</span><strong>@Fmt.Num(saldos.Sum(s => s.Reservado))</strong></div>
+        <div class="kpi"><span>Reservadas (pedidos e transferências)</span><strong>@Fmt.Num(saldos.Sum(s => s.Reservado))</strong></div>
         <div class="kpi"><span>Valor a custo</span><strong>@Fmt.Moeda(saldos.Sum(s => s.Quantidade * s.CustoUnitario))</strong></div>
         <div class="kpi"><span>Linhas abaixo do mínimo</span><strong class="negativo">@saldos.Count(s => s.AbaixoMinimo)</strong></div>
     </div>
@@ -54,13 +59,31 @@ else
         else
         {
             <table class="tabela">
-                <thead><tr><th>Produto</th><th>Depósito</th><th class="num">Físico</th><th class="num">Reservado</th><th class="num">Disponível</th><th class="num">Mínimo</th><th class="num">Valor custo</th></tr></thead>
+                <thead><tr><th>Produto</th><th>Depósito</th><th>Localização</th><th class="num">Físico</th><th class="num">Reservado</th><th class="num">Disponível</th><th class="num">Mínimo</th><th class="num">Valor custo</th></tr></thead>
                 <tbody>
                     @foreach (var s in saldos)
                     {
                         <tr>
                             <td><strong>@s.Produto</strong><div class="sub">@s.Sku · @s.Categoria</div></td>
                             <td>@s.Deposito</td>
+                            <td>
+                                @if (editando == (s.ProdutoId, s.DepositoId))
+                                {
+                                    <div class="linha">
+                                        <input class="mono local" maxlength="20" placeholder="A-01-2" @bind="novaLocalizacao" @onkeydown="@(e => e.Key == "Enter" ? SalvarLocalizacao(s) : Task.CompletedTask)" />
+                                        <button class="btn primario pequeno" @onclick="() => SalvarLocalizacao(s)">OK</button>
+                                        <button class="btn fantasma pequeno" @onclick="() => editando = null">✕</button>
+                                    </div>
+                                }
+                                else if (Sessao.PodeEstoque)
+                                {
+                                    <button class="link-botao mono" title="Alterar endereço de armazenagem" @onclick="() => Editar(s)">@(s.Localizacao ?? "definir")</button>
+                                }
+                                else
+                                {
+                                    <span class="mono">@(s.Localizacao ?? "—")</span>
+                                }
+                            </td>
                             <td class="num">@s.Quantidade</td>
                             <td class="num">@s.Reservado</td>
                             <td class="num @(s.AbaixoMinimo ? "negativo" : "")"><strong>@s.Disponivel</strong></td>
@@ -81,6 +104,28 @@ else
     private string busca = "";
     private bool abaixoMinimo;
     private bool agrupar = true;
+    private (int ProdutoId, int DepositoId)? editando;
+    private string novaLocalizacao = "";
+
+    private void Editar(SaldoDto s)
+    {
+        editando = (s.ProdutoId, s.DepositoId);
+        novaLocalizacao = s.Localizacao ?? "";
+    }
+
+    /// <summary>Endereço de armazenagem (corredor-prateleira-nível): ordena a rota de coleta na ordem de separação.</summary>
+    private async Task SalvarLocalizacao(SaldoDto s)
+    {
+        var valor = string.IsNullOrWhiteSpace(novaLocalizacao) ? null : novaLocalizacao.Trim().ToUpperInvariant();
+        try
+        {
+            await Api.PutSemRespostaAsync("api/estoque/localizacao", new LocalizacaoRequest(s.ProdutoId, s.DepositoId, valor));
+            var idx = saldos!.IndexOf(s);
+            saldos[idx] = s with { Localizacao = valor };
+            editando = null;
+        }
+        catch (ApiException ex) { Avisos.Erro(ex.Message); }
+    }
 
     private IEnumerable<DepositoDto> DepositosVisiveis => depositos.Where(d => depositoId is null || d.Id == depositoId);
 

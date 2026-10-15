@@ -83,6 +83,37 @@ public static class Fmt
     public static string DataHora(DateTime utc) => Local(utc).ToString("dd/MM/yyyy HH:mm", PtBr);
     public static string Data(DateOnly d) => d.ToString("dd/MM/yyyy", PtBr);
     public static string Data(DateOnly? d) => d is null ? "—" : Data(d.Value);
+    public static string Hora(DateTime utc) => Local(utc).ToString("HH:mm", PtBr);
+
+    public static string CpfCnpj(string? d) => d switch
+    {
+        { Length: 11 } => $"{d[..3]}.{d[3..6]}.{d[6..9]}-{d[9..]}",
+        { Length: 14 } => $"{d[..2]}.{d[2..5]}.{d[5..8]}/{d[8..12]}-{d[12..]}",
+        null or "" => "—",
+        _ => d
+    };
+
+    /// <summary>CSV com ponto e vírgula e decimais com vírgula (abre direto no Excel em português).</summary>
+    public static string Csv(IEnumerable<string> cabecalho, IEnumerable<IEnumerable<object?>> linhas)
+    {
+        static string Celula(object? v)
+        {
+            var t = v switch
+            {
+                null => "",
+                decimal d => d.ToString("0.##", PtBr),
+                DateOnly d => d.ToString("dd/MM/yyyy", PtBr),
+                DateTime d => Local(d).ToString("dd/MM/yyyy HH:mm", PtBr),
+                Enum e => Texto(e),
+                _ => v.ToString() ?? ""
+            };
+            return t.Contains(';') || t.Contains('"') || t.Contains('\n') ? $"\"{t.Replace("\"", "\"\"")}\"" : t;
+        }
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine(string.Join(';', cabecalho));
+        foreach (var l in linhas) sb.AppendLine(string.Join(';', l.Select(Celula)));
+        return sb.ToString();
+    }
     public static DateOnly Hoje => DateOnly.FromDateTime(Local(DateTime.UtcNow));
 
     public static string Texto(Enum valor) => valor switch
@@ -93,6 +124,26 @@ public static class Fmt
         TipoMovimentacao.Ajuste => "Ajuste (inventário)",
         TipoMovimentacao.Venda => "Venda",
         TipoMovimentacao.CancelamentoVenda => "Cancelamento de venda",
+        TipoMovimentacao.RecebimentoTransferencia => "Recebimento de transferência",
+        MotivoSaida.Quebra => "Quebra",
+        MotivoSaida.Avaria => "Avaria",
+        MotivoSaida.Vencimento => "Vencimento",
+        MotivoSaida.Degustacao => "Degustação",
+        MotivoSaida.Brinde => "Brinde",
+        MotivoSaida.UsoInterno => "Uso interno",
+        MotivoSaida.DevolucaoFornecedor => "Devolução ao fornecedor",
+        MotivoSaida.Outro => "Outro",
+        TipoOrdemSeparacao.PedidoOnline => "Pedido online",
+        TipoOrdemSeparacao.Transferencia => "Transferência",
+        StatusOrdemSeparacao.Aberta => "Aguardando separação",
+        StatusOrdemSeparacao.Separada => "Separada",
+        StatusOrdemSeparacao.Expedida => "Em trânsito",
+        StatusOrdemSeparacao.Concluida => "Concluída",
+        StatusOrdemSeparacao.Cancelada => "Cancelada",
+        StatusCaixa.Aberto => "Aberto",
+        StatusCaixa.Fechado => "Fechado",
+        TipoMovimentoCaixa.Sangria => "Sangria",
+        TipoMovimentoCaixa.Suprimento => "Suprimento",
         FormaPagamento.Dinheiro => "Dinheiro",
         FormaPagamento.Pix => "Pix",
         FormaPagamento.CartaoCredito => "Crédito",
@@ -154,9 +205,10 @@ public static class Fmt
 
     public static string ClasseStatus(Enum valor) => valor switch
     {
-        StatusPedido.Concluido or StatusVenda.Concluida or StatusLancamento.Pago or StatusDocumento.Analisado => "ok",
-        StatusPedido.Cancelado or StatusPedido.Expirado or StatusVenda.Cancelada or StatusLancamento.Cancelado or StatusDocumento.Bloqueado => "erro",
-        StatusPedido.ProntoParaRetirada or StatusPedido.EmRota or StatusDocumento.Disponivel => "info",
+        StatusPedido.Concluido or StatusVenda.Concluida or StatusLancamento.Pago or StatusDocumento.Analisado or StatusOrdemSeparacao.Concluida or StatusCaixa.Aberto => "ok",
+        StatusPedido.Cancelado or StatusPedido.Expirado or StatusVenda.Cancelada or StatusLancamento.Cancelado or StatusDocumento.Bloqueado or StatusOrdemSeparacao.Cancelada => "erro",
+        StatusPedido.ProntoParaRetirada or StatusPedido.EmRota or StatusDocumento.Disponivel or StatusOrdemSeparacao.Separada or StatusOrdemSeparacao.Expedida => "info",
+        StatusCaixa.Fechado => "neutro",
         _ => "alerta"
     };
 }
@@ -179,5 +231,19 @@ public class Avisos
         await Task.Delay(erro ? 6000 : 3500);
         Lista.Remove(a);
         Mudou?.Invoke();
+    }
+}
+
+/// <summary>Dados da empresa para cabeçalhos de cupom e documentos (carregados uma vez por sessão).</summary>
+public class DadosEmpresa(ApiClient api)
+{
+    private EmpresaDto? _empresa;
+
+    public async Task<EmpresaDto> ObterAsync()
+    {
+        if (_empresa is not null) return _empresa;
+        try { _empresa = await api.GetAsync<EmpresaDto>("api/empresa"); }
+        catch (ApiException) { return new EmpresaDto("Vino Bebidas", "Vino Bebidas", "", null, null, "Catanduva", null, null); }
+        return _empresa;
     }
 }

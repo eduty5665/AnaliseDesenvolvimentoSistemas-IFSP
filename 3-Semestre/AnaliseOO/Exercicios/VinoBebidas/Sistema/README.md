@@ -7,8 +7,8 @@ ampliado para um ERP completo de uma distribuidora de vinhos.
 ```
                    ┌──────────────────────────┐
   ERP / PDV  ────► │                          │
-  (Blazor .NET)    │   API central (.NET 10)  │ ───► Banco único (SQLite ou SQL Server)
-  Loja web   ────► │   ASP.NET Core + EF Core │
+  (Blazor .NET)    │   API central (.NET 10)  │ ───► Banco único (PostgreSQL no Supabase;
+  Loja web   ────► │   ASP.NET Core + EF Core │      SQLite local ou SQL Server como opção)
   (React)          │   SignalR /hubs/painel   │ ───► eventos ao vivo p/ o painel
   App mobile ────► │                          │
   (Expo/RN)        └──────────────────────────┘
@@ -25,7 +25,8 @@ falam com a mesma API, que é dona do banco. Uma venda no PDV aparece no painel 
 | Domínio | `src/VinoBebidas.Domain` | C# | Entidades e regras (estoque, venda, pedido, documento com máquina de estados) |
 | Contratos | `src/VinoBebidas.Contracts` | C# | DTOs compartilhados entre API e ERP |
 | Infraestrutura | `src/VinoBebidas.Infrastructure` | EF Core 10 | Banco, serviços, projeção de vendas (Holt-Winters), dados de demonstração |
-| ERP / PDV | `src/VinoBebidas.Erp` | Blazor (Interactive Server) | Frente de caixa, estoque, movimentações, pedidos, cadastros, financeiro, OCR, usuários |
+| ERP / PDV | `src/VinoBebidas.Erp` | Blazor (Interactive Server) | Frente de caixa com abertura/fechamento, entradas e saídas, ordens de separação, relatórios, pedidos, cadastros, financeiro, OCR, usuários |
+| Banco | `banco/supabase` | PostgreSQL 17 (Supabase) | Scripts do schema `vino` e do papel de acesso da API |
 | Loja + painel | `web` | React 19, Vite, TypeScript, Tailwind 4, TanStack Query, Recharts, SignalR | Catálogo de vinhos, conta, reserva/compra, entrega/retirada; `/admin` com BI ao vivo |
 | App catálogo | `mobile` | React Native + Expo (TypeScript) | Catálogo no celular para clientes e consultores, distribuído por QR code |
 
@@ -37,13 +38,14 @@ e o Expo gera o APK e a página de instalação com **QR code** sem precisar de 
 ## Requisitos para rodar
 
 - [.NET SDK 10](https://dotnet.microsoft.com/download) (o projeto usa `net10.0`)
-- [Node.js 22+](https://nodejs.org)
+- [Node.js 18+](https://nodejs.org) (recomendado 20/22+ para desenvolvimento mais recente)
 - Opcional: SQL Server / LocalDB (o padrão é SQLite, que não precisa instalar nada)
 - Para o app: celular com **Expo Go** (desenvolvimento) ou conta Expo para gerar o APK
 
 ## Como rodar (Windows)
 
-Jeito rápido: clique com o botão direito em `iniciar.ps1` → **Executar com o PowerShell**. Ele abre API, ERP e loja.
+Jeito rápido: dê dois cliques em **`Iniciar.cmd`**. Ele encerra a API/ERP que estiverem abertos, compila a versão atual,
+sobe API, ERP e loja e abre o navegador. Pode rodar de novo sempre que o código mudar. A saída fica em `logs\api.log` e `logs\erp.log`.
 
 Manual, em três terminais:
 
@@ -97,13 +99,78 @@ Funcionários também entram com o **CPF** no lugar do login (caso de uso *Login
 
 ## Banco de dados
 
-- Padrão: **SQLite** em `src/VinoBebidas.Api/vinobebidas.db` (criado automaticamente).
-- SQL Server: rode a API com `$env:ASPNETCORE_ENVIRONMENT="SqlServer"; dotnet run` (usa `appsettings.SqlServer.json`,
-  LocalDB por padrão) ou troque `Banco:Provedor` e a connection string no `appsettings.json`.
-- Recriar do zero: apague o `.db` ou use `"Banco": { "RecriarAoIniciar": true }` uma vez.
-- Migrations (recomendado quando o modelo estabilizar):
+### Supabase (PostgreSQL) — banco principal
+
+O projeto **VinoBebidas** no Supabase (região `sa-east-1`, São Paulo) já está criado, com as 24 tabelas no
+schema **`vino`** e os dados de demonstração carregados (~6 meses de vendas, kardex, caixas, ordens de separação,
+contas a pagar). A API se conecta com o papel **`vino_app`**, que só enxerga esse schema.
+
+- A conexão fica em `src/VinoBebidas.Api/appsettings.Local.json` (**fora do Git**, tem a senha do banco).
+  Modelo sem senha: `appsettings.Supabase.exemplo.json`.
+- Ao subir, a API testa `ConnectionStrings:VinoBebidas` e depois cada item de `Banco:ConexoesAlternativas`
+  (pooler IPv4 `aws-1`, pooler `aws-0`, conexão direta IPv6) e usa a primeira que responder. O console mostra
+  `Banco de dados: PostgreSQL (...)` e `GET /api/saude` informa o banco em uso.
+- Se o console disser que nenhuma respondeu: no painel do Supabase clique em **Connect** → *Session pooler* e
+  copie o **Host** para o `appsettings.Local.json`.
+- `Banco:SeFalharUsarSqlite: true` faz a API subir no SQLite local quando não há internet (útil na apresentação).
+  **Atenção:** nesse modo o que for gravado fica só na máquina — o console e o `/api/saude` avisam.
+- `Banco:RecriarSeIncompativel: true` (só para dados de demonstração): se as tabelas do Supabase não baterem com as
+  entidades desta versão, a API apaga as tabelas do schema `vino`, recria pelo EF Core e roda o seeder.
+- Por que o schema `vino` e não o `public`? O `public` é exposto pela Data API do Supabase; no `vino` os dados só
+  são acessados pela nossa API .NET. As tabelas têm RLS ligado sem políticas (ninguém além do dono acessa).
+- **O Supabase hospeda o banco, não a API .NET.** A API e o ERP continuam rodando no seu PC (ou em um serviço
+  como Azure App Service, Render ou Railway); todos passam a gravar no mesmo banco na nuvem.
+- Scripts: `banco/supabase/` (papel + schema, tabelas e consulta de conferência do kardex).
+
+### SQLite / SQL Server (opcionais)
+
+- Sem `appsettings.Local.json` a API usa **SQLite** em `src/VinoBebidas.Api/vinobebidas.db` (criado e populado sozinho).
+  Um `.db` criado pela versão anterior do sistema é copiado para `vinobebidas.v1-AAAAMMDD-HHMMSS.bak` e recriado.
+- SQL Server: `$env:ASPNETCORE_ENVIRONMENT="SqlServer"; dotnet run` (usa `appsettings.SqlServer.json`).
+- Recriar o SQLite do zero: apague o `.db` ou use `"Banco": { "RecriarAoIniciar": true }` uma vez.
+- Migrations (quando o modelo estabilizar):
   `dotnet tool install -g dotnet-ef` → `dotnet ef migrations add Inicial -p src/VinoBebidas.Infrastructure -s src/VinoBebidas.Api`
   → `"Banco": { "UsarMigrations": true }`.
+
+## Processos do ERP
+
+### Frente de caixa (PDV)
+
+1. **Abrir o caixa** informando a loja e o fundo de troco — sem caixa aberto a venda é recusada.
+2. Bipar ou digitar o produto (`3*código` lança 3 unidades). Atalhos: `F2` produto, `F4` cliente, `F6` desconto,
+   `F7` sangria, `F8` dinheiro, `F9` Pix, `F10` finalizar.
+3. Vendedor (comissão), CPF/CNPJ no cupom, cliente identificado.
+4. **Desconto com alçada**: caixa 5%, vendedor 10%, gerente 30%. Acima do limite pede login e senha de um supervisor,
+   que fica registrado na venda.
+5. Pagamento em várias formas: dinheiro (troco), débito, crédito parcelado com NSU, **Pix com QR code** (BR Code
+   "copia e cola" com CRC16) e conferência do recebimento.
+6. Bebida alcoólica exige confirmar a **maioridade** do cliente.
+7. Cupom não fiscal com tributos aproximados (Lei 12.741), impressão em 80 mm e reimpressão em Vendas.
+8. **Sangria / suprimento** e **fechamento** com contagem da gaveta, diferença (sobra/falta) e relatório de fechamento.
+
+### Ordem de separação
+
+- **Pedido online:** ao clicar em **Separar (emitir ordem)** na tela de Pedidos, o sistema emite a Ordem de Separação
+  (`OS000001`) com os itens na ordem do endereço de armazenagem e abre o documento para impressão. A ordem acompanha
+  o pedido (separada quando fica pronto, concluída na entrega, cancelada se o pedido cair).
+- **Transferência entre depósitos:** solicitar → reserva o estoque na origem e emite a ordem → **conferir separação**
+  (o que faltar libera a reserva) → **expedir** (baixa a origem, mercadoria em trânsito) → **receber no destino**
+  (entrada conferida, divergência registrada).
+- O endereço (corredor-prateleira-nível no CD, gôndola nas lojas) é editado em Estoque › Saldos.
+
+### Entradas e saídas
+
+- **Entrada por nota fiscal:** fornecedor, número/série, chave de acesso (44 dígitos), emissão, frete e outras
+  despesas **rateados no custo**, custo médio recalculado, duplicatas no contas a pagar; aceita **importar o XML da NF-e**
+  e recusa nota repetida.
+- **Saída avulsa** só com motivo: quebra, avaria, vencimento, degustação, brinde, uso interno, devolução ao fornecedor.
+- **Ajuste de inventário** pela quantidade contada. Todo lançamento gera comprovante numerado (`E`, `S`, `T`, `R`, `A`).
+
+### Relatórios (imprimir ou exportar CSV)
+
+Vendas por dia, produto (**curva ABC**), categoria, vendedor, operador, forma de pagamento, canal e loja ·
+posição de estoque valorizada · **kardex** do produto com saldo a cada lançamento · entradas e saídas ·
+fechamentos de caixa · fluxo de caixa realizado e previsto · **DRE gerencial**.
 
 ## Rastreabilidade com a documentação
 
@@ -122,9 +189,10 @@ Funcionários também entram com o **CPF** no lugar do login (caso de uso *Login
 
 ## Regras de negócio implementadas
 
-- Estoque por depósito (Loja Centro, Loja Shopping, CD) com **reserva**: pedido online reserva; PDV só vende o disponível.
-- Entrada de NF atualiza **custo médio** e pode gerar **conta a pagar**; transferência bloqueia se faltar saldo; ajuste por **contagem de inventário**.
-- Venda do PDV: baixa estoque, grava kardex, lança receita; cancelamento devolve estoque e estorna receita.
+- Estoque por depósito (Loja Centro, Loja Shopping, CD) com **reserva**: pedido online e ordem de transferência reservam; PDV só vende o disponível.
+- Entrada de NF atualiza **custo médio** (com frete rateado) e gera **contas a pagar** em parcelas; ajuste por **contagem de inventário**.
+- Venda do PDV: exige caixa aberto, baixa estoque, grava kardex, lança receita; cancelamento devolve estoque e estorna receita.
+- O kardex sempre fecha com o saldo: saldo de implantação + entradas − saídas = saldo atual, por produto e depósito.
 - Pedido online: reserva (3 dias, retirada) ou compra (retirada ou entrega; frete grátis acima de R$ 300); reservas vencidas expiram sozinhas.
 - Fluxo do pedido com transições válidas (confirmado → separação → pronto/em rota → concluído); ao concluir vira **venda do canal Online**.
 - **Maioridade**: cadastro e pedido exigem 18+ (bebida alcoólica); portão de idade na loja.
@@ -136,12 +204,17 @@ Funcionários também entram com o **CPF** no lugar do login (caso de uso *Login
 2. Gateway de pagamento real (Pix/cartão) no `PedidoService` — hoje o pagamento online é simulado.
 3. OCR real (Tesseract ou Azure AI Vision) implementando `IOcrService`.
 4. RF07/RF08 folha de pagamento (salário, horas extras, FGTS, 13º, férias) e RF11 integração bancária (CNAB/Open Finance).
-5. Emissão fiscal (NFC-e) no PDV e impressora térmica.
-6. RF10 relatórios personalizados com exportação para Excel/PDF.
+5. Emissão fiscal (NFC-e) e TEF integrado no PDV (hoje o cupom é não fiscal e o NSU é digitado).
+6. Publicar a API e o ERP em um serviço de hospedagem para acesso fora da rede local.
 
-## Observação sobre esta versão
+## Como esta versão foi verificada
 
-O código foi escrito e compilado com o .NET 10 SDK; a loja web foi compilada e verificada visualmente e o
-app mobile passou no typecheck e no empacotamento do Metro. No ambiente onde foi gerado não havia acesso ao
-NuGet, então a camada EF Core foi compilada contra uma cópia das assinaturas da API do EF — **rode
-`dotnet build` na sua máquina** para confirmar com os pacotes reais (a primeira execução baixa os pacotes).
+- **Supabase:** tabelas criadas e conferidas contra o modelo do EF Core (274 colunas, 35 chaves estrangeiras, 55 índices);
+  dados carregados e validados no próprio banco (kardex fecha com o saldo em todos os produtos e depósitos, nenhuma venda
+  com pagamento ou itens divergentes).
+- **Regras de negócio e API:** seeder e fluxos novos (caixa, venda com alçada, NF com frete, ordem de separação,
+  relatórios, pedido online) executados de ponta a ponta contra um banco em memória.
+- **Telas do ERP:** renderizadas com dados reais dessa API e conferidas visualmente; os cliques foram simulados.
+- **O que só dá para confirmar na sua máquina:** o ambiente onde o código foi gerado não acessa o NuGet nem o Supabase
+  por rede, então a compilação com os pacotes reais do EF Core/Npgsql e a conexão da API com o Supabase acontecem pela
+  primeira vez no seu `dotnet run`. Se aparecer erro, o console da API mostra o motivo.

@@ -48,7 +48,7 @@ public class ApiClient(IHttpClientFactory fabrica, Sessao sessao)
     public async Task<T?> GetOuNuloAsync<T>(string url, CancellationToken ct = default) where T : class
     {
         using var resp = await Cliente().GetAsync(url, ct);
-        if (resp.StatusCode == HttpStatusCode.NotFound) return null;
+        if (resp.StatusCode is HttpStatusCode.NotFound or HttpStatusCode.NoContent) return null;
         await GarantirSucesso(resp);
         return await resp.Content.ReadFromJsonAsync<T>(Json, ct);
     }
@@ -63,6 +63,11 @@ public class ApiClient(IHttpClientFactory fabrica, Sessao sessao)
     {
         using var resp = await Enviar(c => c.PutAsJsonAsync(url, corpo, Json, ct));
         return (await resp.Content.ReadFromJsonAsync<T>(Json, ct))!;
+    }
+
+    public async Task PutSemRespostaAsync(string url, object corpo, CancellationToken ct = default)
+    {
+        using var resp = await Enviar(c => c.PutAsJsonAsync(url, corpo, Json, ct));
     }
 
     public async Task<T> PostMultipartAsync<T>(string url, MultipartFormDataContent conteudo, CancellationToken ct = default)
