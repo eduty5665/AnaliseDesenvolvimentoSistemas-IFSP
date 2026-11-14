@@ -1,9 +1,19 @@
 # Tema 1 — Segurança em APIs REST e Microsserviços
 
-Material do seminário de Segurança da Informação (apresentação em 05/11/2026, 18 a 22 minutos).
+Material do seminário de Segurança da Informação, IFSP Câmpus Catanduva.
+Apresentação em 05/11/2026, de 18 a 22 minutos.
 Grupo: Guilherme, Eduardo, Lucas Marcelino e Ruan.
 
-Pacote gerado em 09/10/2026.
+Pacote atualizado em 27/10/2026.
+
+## O que mudou desde o pacote anterior
+
+- **Novo:** `documentos/Apresentacao-Slides-Tema1.pdf`, com os 36 slides da
+  apresentação, gerado a partir da versão atual do deck online.
+- O deck agora tem os três diagramas (slides 13, 18 e 25), a linha do tempo
+  (slide 5), os casos reais (slide 7), os resultados dos testes (slide 29) e a
+  tabela de vantagens x desvantagens (slide 32).
+- Os dois documentos foram exportados de novo a partir da versão online.
 
 ## O que tem aqui
 
@@ -11,58 +21,44 @@ Pacote gerado em 09/10/2026.
 Tema1-Seguranca-APIs-REST/
 ├── README.md
 ├── documentos/
-│   ├── Documento-de-Contexto-Tema1.pdf     58 páginas, base de estudo do grupo
-│   ├── Documento-de-Contexto-Tema1.docx    mesma coisa, editável no Word
-│   └── Roteiro-de-Apresentacao-Tema1.pdf   7 páginas, 13 slides em 20 minutos
+│   ├── Apresentacao-Slides-Tema1.pdf      36 slides, 16:9, para apresentar ou imprimir
+│   ├── Documento-de-Contexto-Tema1.pdf    58 páginas, base de estudo do grupo
+│   ├── Documento-de-Contexto-Tema1.docx   o mesmo documento, editável no Word
+│   └── Roteiro-de-Apresentacao-Tema1.pdf  7 páginas, roteiro de falas e ensaio
 ├── imagens/
-│   ├── 01-camadas-de-defesa.png            diagrama da seção 6.4
-│   ├── 02-preflight-cors.png               diagrama da seção 10.3
-│   └── 03-arquitetura-de-referencia.png    diagrama da seção 12.2
+│   ├── 01-camadas-de-defesa.png           slide 18 do deck
+│   ├── 02-preflight-cors.png              slide 25 do deck
+│   └── 03-arquitetura-de-referencia.png   slide 13 do deck
 └── codigo/
-    ├── app.js                              API de exemplo da seção 13
-    ├── teste.sh                            requisições da tabela da seção 13.8
-    └── package.json                        dependências
+    ├── app.js                             API de exemplo (seção 13 do documento)
+    ├── teste.sh                           requisições cujos resultados estão no slide 29
+    └── package.json                       dependências
 ```
 
-## Por onde começar
+## Estrutura da apresentação
 
-1. Ler o resumo executivo (seção 2) do Documento de Contexto.
-2. Abrir o Roteiro e definir quem é o integrante A, B, C e D.
-3. Montar os slides usando a coluna "Apoio" do roteiro, que aponta a seção do
-   Documento de Contexto de cada slide.
+| Parte | Slides | Quem apresenta |
+| --- | --- | --- |
+| Abertura e roteiro | 1 e 2 | Grupo |
+| 01 Introdução e conceituação | 3 a 10 | Guilherme |
+| 02 Funcionamento e arquitetura | 11 a 19 | Eduardo |
+| 03 Aplicação prática e código | 20 a 29 | Lucas e Ruan |
+| 04 Conclusão | 30 a 36 | Ruan e grupo |
 
-## Documentos
+O PDF dos slides não traz as notas do apresentador. Elas estão no deck online.
 
-| Arquivo | Para que serve |
-| --- | --- |
-| Documento de Contexto | História, conceitos, OWASP API Security Top 10, os cinco itens do escopo (tokens, rate limiting, CORS, payload, arquitetura), código comentado, vantagens x desvantagens, checklist, glossário e referências em ABNT |
-| Roteiro de Apresentação | Divisão em quatro blocos, o que mostrar e o que falar em cada slide, frases de passagem, marcas de tempo, checklist de ensaio e perguntas prováveis |
-
-O roteiro vai só em PDF. A versão editável é o documento online; para baixar em
-Word, abra o documento, clique no nome dele e escolha Exportar.
-
-A seção 16 do Documento de Contexto traz uma versão resumida e mais antiga do
-roteiro. Vale a do arquivo separado.
-
-## Imagens
-
-Os três diagramas estão em PNG com 1344 px de largura e fundo branco, prontos
-para colar nos slides.
-
-| Arquivo | Sugestão de slide |
-| --- | --- |
-| 01-camadas-de-defesa.png | Slide 6 — Defesa em camadas |
-| 02-preflight-cors.png | Slide 8 — Rate limiting e CORS |
-| 03-arquitetura-de-referencia.png | Slide 6 (alternativa) ou slide 12 |
+Atenção: o arquivo do roteiro ainda descreve a versão antiga, de 13 slides,
+com integrantes A a D. As falas por assunto continuam valendo, mas a numeração
+e a divisão de slides de referência são as da tabela acima.
 
 ## Código
 
-É a API de pedidos usada como exemplo na seção 13. Os arquivos são código-fonte:
-abrem em um editor (VS Code, por exemplo), não com duplo clique.
+É a API de pedidos usada como exemplo. Os arquivos são código-fonte: abrem em
+um editor (VS Code, por exemplo), não com duplo clique.
 
-Requisitos: Node.js 22 ou mais recente.
+Requisito: Node.js 22 ou mais recente.
 
-Instalar as dependências, dentro da pasta `codigo`:
+Dentro da pasta `codigo`:
 
 ```
 npm install
@@ -82,18 +78,20 @@ $env:PORTA = "3111"
 node app.js
 ```
 
-Com a API no ar, em outro terminal:
+Com a API no ar, em outro terminal (precisa de `bash` e `curl`; no Windows,
+use o Git Bash ou o WSL):
 
 ```
 bash teste.sh
 ```
 
-O `teste.sh` precisa de `bash` e `curl`. No Windows, rode pelo Git Bash ou pelo
-WSL. A saída esperada é a da tabela da seção 13.8.
+A saída esperada é a da tabela do slide 29 e da seção 13.8 do documento.
 
-O exemplo é didático e roda só na sua máquina: os dados ficam em memória, as
-senhas estão em texto puro e não há gateway. A seção 13.9 lista o que ele
-simplifica em relação a um sistema real.
+O exemplo é didático e roda só na sua máquina: dados em memória, senhas em
+texto puro, limite de taxa por IP e sem gateway.
+
+Os slides de código usam a biblioteca `jsonwebtoken`; a API de exemplo usa
+`jose`. As regras de validação do token são as mesmas nas duas.
 
 ## O que conferir antes de citar
 
@@ -101,5 +99,4 @@ A seção 18.3 do Documento de Contexto lista os limites da pesquisa. Em resumo:
 
 - Os números de 2026 vêm do comunicado de imprensa da Akamai, não do relatório completo.
 - Os detalhes do caso Dell são o relato do autor do ataque à imprensa.
-- As datas da linha do tempo anteriores a 2019 não foram reconferidas em fonte primária.
-- As obras da seção 18.2 devem ser abertas pelo grupo antes de entrarem nos slides.
+- As datas anteriores a 2019 não foram reconferidas em fonte primária.
