@@ -1,0 +1,269 @@
+/* =========================================================
+   MODAL PUBLICAR BLOG
+   CSS exclusivo
+   ========================================================= */
+
+.modalPublicacao {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Área principal do formulário */
+.modalPublicacao .formSection {
+    width: 100%;
+    margin: 0;
+}
+
+/* Seção */
+.modalPublicacao .secaoPublicacao {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+}
+
+/* Título da seção */
+.modalPublicacao .tituloSecaoPublicacao {
+    margin: 0;
+    padding-bottom: 10px;
+
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+
+    border-bottom: 1px solid #e5e5e5;
+}
+
+/* =========================================================
+   GRID PRINCIPAL
+   ========================================================= */
+
+.modalPublicacao .gridPublicacao {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+
+    width: 100%;
+    min-height: 360px;
+
+    gap: 20px;
+}
+
+/* =========================================================
+   COLUNA DE INFORMAÇÕES
+   ========================================================= */
+
+.modalPublicacao .informacoesPublicacao {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    min-width: 0;
+}
+
+/* Campo */
+.modalPublicacao .campoPublicacao {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* Label */
+.modalPublicacao .campoPublicacao label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #777;
+}
+
+/* Inputs */
+.modalPublicacao .campoPublicacao input,
+.modalPublicacao .campoPublicacao textarea {
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 11px 12px;
+
+    font-family: inherit;
+    font-size: 14px;
+    color: #333;
+
+    background-color: #fff;
+
+    border: 1px solid #d6d5d2;
+    border-radius: 8px;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+/* Altura do input */
+.modalPublicacao .campoPublicacao input {
+    height: 42px;
+}
+
+/* Textarea */
+.modalPublicacao .campoPublicacao textarea {
+    min-height: 130px;
+    resize: vertical;
+}
+
+/* Focus */
+.modalPublicacao .campoPublicacao input:focus,
+.modalPublicacao .campoPublicacao textarea:focus {
+    border-color: var(--cor-verde);
+
+    box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.08);
+}
+
+/* =========================================================
+   ÁREA DA FOTO
+   ========================================================= */
+
+.modalPublicacao .areaFotoPublicacao {
+    width: 100%;
+    min-width: 0;
+    min-height: 300px;
+}
+
+/* Card da foto */
+.modalPublicacao .cardFotoPublicacao {
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+    height: 300px;
+    min-height: 300px;
+
+    overflow: hidden;
+
+    background-color: #f8f9fa;
+
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+
+    box-sizing: border-box;
+}
+
+/* Título da foto */
+.modalPublicacao .tituloFotoPublicacao {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    z-index: 2;
+
+    margin: 0;
+    padding: 7px 11px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    color: #fff;
+
+    background-color: rgba(0, 0, 0, 0.55);
+
+    border-radius: 6px;
+
+    backdrop-filter: blur(4px);
+}
+
+/* Link da imagem */
+.modalPublicacao .linkFotoPublicacao {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    text-decoration: none;
+}
+
+/* Imagem */
+.modalPublicacao .fotoPublicacao {
+    display: block;
+
+    width: 100%;
+    height: 300px;
+    min-height: 300px;
+
+    object-fit: cover;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.25s ease,
+        opacity 0.25s ease;
+}
+
+/* Efeito ao passar o mouse */
+.modalPublicacao .linkFotoPublicacao:hover .fotoPublicacao {
+    transform: scale(1.02);
+    opacity: 0.92;
+}
+
+/* =========================================================
+   FOTO INDISPONÍVEL
+   ========================================================= */
+
+.modalPublicacao .fotoIndisponivel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    height: 100%;
+    min-height: 30px;
+
+    color: #888;
+    font-size: 13px;
+
+    background-color: #f8f9fa;
+
+    border-radius: 10px;
+}
+
+/* =========================================================
+   RESPONSIVIDADE
+   ========================================================= */
+
+@media (max-width: 800px) {
+    .modalPublicacao .gridPublicacao {
+        grid-template-columns: 1fr;
+    }
+
+    .modalPublicacao .areaFotoPublicacao {
+        min-height: 300px;
+    }
+
+    .modalPublicacao .cardFotoPublicacao {
+        min-height: 300px;
+    }
+
+    .modalPublicacao .fotoPublicacao {
+        min-height: 300px;
+    }
+
+    .modalPublicacao .fotoIndisponivel {
+        min-height: 300px;
+    }
+}
+
+@media (max-width: 500px) {
+    .modalPublicacao .gridPublicacao {
+        gap: 14px;
+    }
+
+    .modalPublicacao .areaFotoPublicacao,
+    .modalPublicacao .cardFotoPublicacao {
+        min-height: 240px;
+    }
+
+    .modalPublicacao .fotoPublicacao,
+    .modalPublicacao .fotoIndisponivel {
+        min-height: 240px;
+    }
+}

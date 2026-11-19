@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    android:padding="24dp">
+
+    <TextView
+        android:id="@+id/txtTituloSelecao"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/ui_tipo_de_perfil"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/layoutBotoes"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_constraintVertical_bias="0.5" />
+
+    <LinearLayout
+        android:id="@+id/layoutBotoes"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/cardCampos"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtTituloSelecao">
+
+        <Button
+            android:id="@+id/btnSelecionarAluno"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:text="@string/ui_aluno"
+            android:textColor="#FFFFFF"
+            app:strokeColor="#FFFFFF" />
+
+        <Button
+            android:id="@+id/btnSelecionarPersonal"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:text="@string/ui_personal"
+            android:textColor="#FFFFFF"
+            app:strokeColor="#FFFFFF" />
+    </LinearLayout>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardCampos"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        app:cardBackgroundColor="#2C2C2C"
+        app:cardCornerRadius="16dp"
+        app:layout_constrainedHeight="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layoutBotoes">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <!-- Campos para Aluno - Parte 1 -->
+                <LinearLayout
+                    android:id="@+id/layoutCamposAlunoParte1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="visible">
+
+                    <EditText
+                        android:id="@+id/editNomeAluno"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="#FFFFFF"
+                        android:hint="@string/ui_nome_completo"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#AAAAAA" />
+
+                    <EditText
+                        android:id="@+id/editCpfAluno"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:backgroundTint="#FFFFFF"
+                        android:hint="@string/ui_cpf"
+                        android:inputType="number"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#AAAAAA" />
+
+                    <EditText
+                        android:id="@+id/editTelefoneAluno"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:backgroundTint="#FFFFFF"
+                        android:hint="@string/ui_telefone"
+                        android:inputType="phone"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#AAAAAA" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/ui_sexo"
+                        android:textColor="#AAAAAA" />
+
+                    <RadioGroup
+                        android:id="@+id/radioGroupSexoAluno"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <RadioButton
+                            android:id="@+id/radioMasculinoAluno"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:text="@string/ui_masculino"
+                            android:textColor="#FFFFFF"
+                            android:buttonTint="#FFFFFF" />
+
+                        <RadioButton
+                            android:id="@+id/radioFemininoAluno"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:text="@string/ui_feminino"
+                            android:textColor="#FFFFFF"
+                            android:buttonTint="#FFFFFF" />
+                    </RadioGroup>
+
+                    <Button
+                        android:id="@+id/btnProximaEtapaAluno"
+                        android:layout_width="match_parent"
+                        android:layout_height="55dp"
+                        android:layout_marginTop="32dp"
+                        android:backgroundTint="@color/black"
+                        android:text="@string/ui_proxima_etapa_2"
+                        android:textColor="#FFFFFF" />
+                </LinearLayout>
+
+                <!-- Campos para Aluno - Parte 2 -->
+                <LinearLayout
+                    android:id="@+id/layoutCamposAlunoParte2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <EditText
+                        android:id="@+id/editDoencaAluno"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="#FFFFFF"
+                        android:hint="@string/ui_doenca"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#AAAAAA" />
+
+                    <EditText
+                        android:id="@+id/editLesaoAluno"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:backgroundTint="#FFFFFF"
+                        android:hint="@string/ui_lesao"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#AAAAAA" />
+
+                    <EditText
+                        android:id="@+id/editIdadeAluno"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:backgroundTint="#FFFFFF"
+                        android:hint="@string/ui_idade"
+                        android:inputType="number"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#AAAAAA" />
+
+                    <EditText
+                        android:id="@+id/editPesoAluno"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:backgroundTint="#FFFFFF"
+                        android:hint="@string/ui_peso_kg"
+                        android:inputType="numberDecimal"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#AAAAAA" />
+
+                    <EditText
+                        android:id="@+id/editAlturaAluno"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:backgroundTint="#FFFFFF"
+                        android:hint="@string/ui_altura_cm"
+                        android:inputType="number"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#AAAAAA" />
+
+                    <EditText
+                        android:id="@+id/editTreinosPlanejadosSemanaAluno"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:backgroundTint="#FFFFFF"
+                        android:hint="@string/ui_dias_de_treino_por_semana"
+                        android:inputType="number"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#AAAAAA" />
+
+                    <Button
+                        android:id="@+id/btnFinalizarAluno"
+                        android:layout_width="match_parent"
+                        android:layout_height="55dp"
+                        android:layout_marginTop="32dp"
+                        android:backgroundTint="@color/black"
+                        android:text="@string/ui_finalizar_cadastro"
+                        android:textColor="#FFFFFF" />
+
+                    <Button
+                        android:id="@+id/btnVoltarAluno"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/ui_voltar"
+                        android:textColor="#FFFFFF" />
+                </LinearLayout>
+
+                <!-- Campos para Personal -->
+                <LinearLayout
+                    android:id="@+id/layoutCamposPersonal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <EditText
+                        android:id="@+id/editNomePersonal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="#FFFFFF"
+                        android:hint="@string/ui_nome_completo"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#AAAAAA" />
+
+                    <EditText
+                        android:id="@+id/editCpfPersonal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:backgroundTint="#FFFFFF"
+                        android:hint="@string/ui_cpf"
+                        android:inputType="number"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#AAAAAA" />
+
+                    <EditText
+                        android:id="@+id/editTelefonePersonal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:backgroundTint="#FFFFFF"
+                        android:hint="@string/ui_telefone"
+                        android:inputType="phone"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#AAAAAA" />
+
+                    <EditText
+                        android:id="@+id/editCrmPersonal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:backgroundTint="#FFFFFF"
+                        android:hint="@string/ui_crm"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#AAAAAA" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/ui_sexo"
+                        android:textColor="#AAAAAA" />
+
+                    <RadioGroup
+                        android:id="@+id/radioGroupSexoPersonal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <RadioButton
+                            android:id="@+id/radioMasculinoPersonal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:text="@string/ui_masculino"
+                            android:textColor="#FFFFFF"
+                            android:buttonTint="#FFFFFF" />
+
+                        <RadioButton
+                            android:id="@+id/radioFemininoPersonal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:text="@string/ui_feminino"
+                            android:textColor="#FFFFFF"
+                            android:buttonTint="#FFFFFF" />
+                    </RadioGroup>
+
+                    <Button
+                        android:id="@+id/btnFinalizarPersonal"
+                        android:layout_width="match_parent"
+                        android:layout_height="55dp"
+                        android:layout_marginTop="32dp"
+                        android:backgroundTint="@color/black"
+                        android:text="@string/ui_finalizar_cadastro"
+                        android:textColor="#FFFFFF" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

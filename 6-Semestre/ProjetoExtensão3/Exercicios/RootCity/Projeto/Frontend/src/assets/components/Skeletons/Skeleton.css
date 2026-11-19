@@ -1,0 +1,240 @@
+/* Animação suave de pulso */
+@keyframes skeletonPulse {
+    0% {
+        background-color: #e2e8f0;
+    }
+    50% {
+        background-color: #c1c2c4;
+    }
+    100% {
+        background-color: #e2e8f0;
+    }
+}
+
+.skeletonBox {
+    animation: skeletonPulse 1.5s ease-in-out infinite;
+    border-radius: 6px;
+}
+
+/* Skeleton do Card de Árvore */
+.skeletonCard {
+    background-color: #fff;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.skeletonImagem {
+    width: 100%;
+    height: 180px;
+}
+
+.skeletonContent {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.skeletonTitulo {
+    width: 60%;
+    height: 24px;
+}
+
+.skeletonTextoLongo {
+    width: 100%;
+    height: 14px;
+}
+
+.skeletonTextoCurto {
+    width: 80%;
+    height: 14px;
+}
+
+.skeletonBotoes {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.skeletonBotao {
+    width: 80px;
+    height: 32px;
+}
+
+/* Skeleton de Tabela */
+.skeletonTableContainer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px 0;
+}
+
+.skeletonTableRow {
+    width: 100%;
+    height: 48px;
+}
+
+/* Skeleton de carregamento de página */
+.paginaSkeletonContainer {
+  width: 100%;
+  max-width: 1200px;
+  margin: 120px auto 40px auto;
+  padding: 0 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.paginaSkeletonBlock {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  background: linear-gradient(100deg, #e9e7df 20%, #f8f6ef 42%, #e9e7df 64%);
+  background-size: 220% 100%;
+  animation: paginaSkeletonShimmer 1.6s ease-in-out infinite;
+}
+
+.paginaSkeletonHeader {
+  min-height: 100px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid #d6d5d2;
+  border-radius: 12px;
+  background: var(--cor-card);
+}
+
+.paginaSkeletonIcon {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  border-radius: 12px;
+}
+
+.paginaSkeletonHeading {
+  width: min(420px, 70%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.paginaSkeletonTitle {
+  width: 52%;
+  height: 22px;
+}
+
+.paginaSkeletonSubtitle {
+  width: 100%;
+  height: 13px;
+}
+
+.paginaSkeletonAbas {
+  width: 100%;
+  min-height: 56px;
+  padding: 7px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #d6d5d2;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.paginaSkeletonTab {
+  height: 40px;
+  flex: 1;
+  border-radius: 8px;
+}
+
+.paginaSkeletonTab:first-child {
+  background: linear-gradient(100deg, #739d1e 20%, #9dbd5b 42%, #739d1e 64%);
+  background-size: 220% 100%;
+}
+
+.paginaSkeletonTab5 {
+  display: none;
+}
+
+.paginaSkeletonConteudo {
+  min-height: 400px;
+  padding: 26px;
+  border: 1px solid #d6d5d2;
+  border-radius: 12px;
+  background: var(--cor-card);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.paginaSkeletonSectionTitle {
+  width: min(320px, 65%);
+  height: 20px;
+  margin-bottom: 12px;
+}
+
+.paginaSkeletonSectionSubtitle {
+  width: min(480px, 80%);
+  height: 13px;
+  margin-bottom: 28px;
+}
+
+.paginaSkeletonRows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.paginaSkeletonRow {
+  width: 100%;
+  height: 44px;
+}
+
+.paginaSkeletonRow:nth-child(even) {
+  width: 92%;
+}
+
+@keyframes paginaSkeletonShimmer {
+  to {
+    background-position-x: -220%;
+  }
+}
+
+@media (max-width: 768px) {
+  .paginaSkeletonContainer {
+    margin-top: 70px;
+    padding: 0 12px 20px;
+    gap: 14px;
+  }
+
+  .paginaSkeletonHeader {
+    min-height: 86px;
+    padding: 16px;
+  }
+
+  .paginaSkeletonAbas {
+    overflow: hidden;
+  }
+
+  .paginaSkeletonTab {
+    min-width: 54px;
+  }
+
+  .paginaSkeletonTab4,
+  .paginaSkeletonTab5 {
+    display: none;
+  }
+
+  .paginaSkeletonConteudo {
+    min-height: 340px;
+    padding: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .paginaSkeletonBlock {
+    animation: none;
+  }
+}

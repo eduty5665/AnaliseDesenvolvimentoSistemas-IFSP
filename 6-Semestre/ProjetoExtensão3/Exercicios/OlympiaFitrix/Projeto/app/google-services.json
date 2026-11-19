@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "960624125646",
+    "project_id": "olympiafitrix",
+    "storage_bucket": "olympiafitrix.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:960624125646:android:5216727b4a37ece08c129f",
+        "android_client_info": {
+          "package_name": "br.edu.ifsp.olympiafitrix"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOdD8J-xjghlxkdQ4UjuA0Vn9Q5qJjJzo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

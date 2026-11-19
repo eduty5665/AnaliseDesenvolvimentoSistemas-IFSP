@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#1A1A1A"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:id="@+id/txtTituloDialogExercicio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/ui_adicionar_exercicio"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:hint="@string/ui_nome_do_exercicio"
+        android:textColorHint="#AAAAAA"
+        app:boxStrokeColor="@color/gold"
+        app:hintTextColor="@color/gold">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editNomeExercicio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:hint="@string/ui_descricao_observacao"
+        android:textColorHint="#AAAAAA"
+        app:boxStrokeColor="@color/gold"
+        app:hintTextColor="@color/gold">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editDescricaoExercicio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal">
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:hint="@string/ui_series"
+            android:textColorHint="#AAAAAA"
+            app:boxStrokeColor="@color/gold"
+            app:hintTextColor="@color/gold">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editSeriesExercicio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:textColor="#FFFFFF" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="4dp"
+            android:hint="@string/ui_reps"
+            android:textColorHint="#AAAAAA"
+            app:boxStrokeColor="@color/gold"
+            app:hintTextColor="@color/gold">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editRepeticaoExercicio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:hint="@string/ui_peso_kg"
+            android:textColorHint="#AAAAAA"
+            app:boxStrokeColor="@color/gold"
+            app:hintTextColor="@color/gold">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editPesoExercicio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF" />
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnSalvarExercicio"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginTop="32dp"
+        android:backgroundTint="@color/gold"
+        android:text="@string/ui_salvar"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        app:cornerRadius="12dp" />
+
+</LinearLayout>

@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">OlympiaFitrix</string>
+    <string name="personal_name_format">Personal: %1$s</string>
+    <string name="language_portuguese">Português</string>
+    <string name="language_english">English</string>
+    <string name="language_selector_description">Selecionar idioma</string>
+</resources>

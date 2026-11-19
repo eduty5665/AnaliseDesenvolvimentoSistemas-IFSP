@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menuTreino"
+        android:icon="@drawable/ic_treino"
+        android:title="@string/ui_treino_3" />
+
+    <item
+        android:id="@+id/menuGrafico"
+        android:icon="@drawable/ic_grafico"
+        android:title="@string/ui_ranking" />
+
+    <item
+        android:id="@+id/menuRelogio"
+        android:icon="@drawable/ic_relogio"
+        android:title="@string/ui_historico" />
+
+    <item
+        android:id="@+id/menuPersonal"
+        android:icon="@drawable/ic_personal"
+        android:title="@string/ui_alunos" />
+
+    <item
+        android:id="@+id/menuUsuario"
+        android:icon="@drawable/ic_usuario"
+        android:title="@string/ui_perfil" />
+
+
+</menu>

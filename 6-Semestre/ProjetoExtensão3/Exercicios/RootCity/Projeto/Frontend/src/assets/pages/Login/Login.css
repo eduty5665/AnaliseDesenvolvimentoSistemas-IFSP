@@ -1,0 +1,369 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
+@import '/src/index.css';
+
+* {
+  box-sizing: border-box;
+}
+
+.loginPage {
+  font-family: 'Montserrat', sans-serif;
+  background: var(--cor-fundo);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  min-height: 100vh;
+}
+
+.loginContainer {
+  background: #fff;
+
+  border-radius: 10px;
+
+  box-shadow:
+    0 14px 28px rgba(0, 0, 0, 0.2),
+    0 10px 10px rgba(0, 0, 0, 0.2);
+
+  position: relative;
+  overflow: hidden;
+
+  width: 768px;
+  max-width: 100%;
+  min-height: 480px;
+  margin-top: 40px;
+}
+
+.loginContainer h1 {
+  font-weight: bold;
+  margin: 0;
+}
+
+.loginContainer p {
+  font-size: 14px;
+  font-weight: 100;
+
+  line-height: 20px;
+  letter-spacing: 0.5px;
+
+  margin: 20px 0 30px;
+}
+
+.loginContainer span {
+  font-size: 12px;
+}
+
+.loginContainer a {
+  color: #333;
+  font-size: 14px;
+
+  text-decoration: none;
+  margin: 15px 0;
+}
+
+.formContainer {
+  position: absolute;
+
+  top: 0;
+  height: 100%;
+
+  transition: all 0.6s ease-in-out;
+}
+
+.formContainer form {
+  background: var(--cor-card);
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 0 50px;
+
+  height: 100%;
+
+  justify-content: center;
+  align-items: center;
+
+  text-align: center;
+}
+
+.signInContainer {
+  left: 0;
+
+  width: 50%;
+
+  z-index: 2;
+}
+
+.signUpContainer {
+  left: 0;
+
+  width: 50%;
+
+  z-index: 1;
+
+  opacity: 0;
+}
+
+.formContainer input {
+  background: #fdfdfd;
+
+  border: none;
+
+  border-radius: 8px;
+
+  padding: 12px 15px;
+
+  margin: 8px 0;
+
+  width: 100%;
+
+  font-family: inherit;
+}
+
+.formContainer input:focus {
+  outline: 2px solid var(--cor-verde);
+  border-radius: 8px;
+}
+
+.loginContainer .btnDefault {
+  border-radius: 20px;
+
+  border: 1px solid #557a16;
+
+  background: var(--cor-verde);
+
+  color: #fff;
+
+  font-size: 12px;
+
+  font-weight: bold;
+
+  padding: 12px 45px;
+
+  letter-spacing: 1px;
+
+  text-transform: uppercase;
+
+  transition: transform 1s ease-in;
+
+  cursor: pointer;
+
+  font-family: inherit;
+}
+
+.loginContainer button:active {
+  transform: scale(0.95);
+}
+
+.loginContainer button:focus {
+  outline: none;
+}
+
+.loginContainer button.ghost {
+  background: transparent;
+
+  border-color: #fff;
+}
+
+.loginContainer button.btnSecondary{
+  margin-top: 10px;
+  border: none;
+  font-weight: 500;
+  padding: 5px 10px;
+  border: 1px solid var(--cor-verde);
+  color: var(--cor-verde);
+  border-radius: 15px;
+}
+
+.loginContainer button:hover {
+  scale: 1.05;
+  transition: 0.5s;
+}
+
+.overlayContainer {
+  position: absolute;
+
+  top: 0;
+  left: 50%;
+
+  width: 50%;
+  height: 100%;
+
+  overflow: hidden;
+
+  transition: transform 0.6s ease-in-out;
+
+  z-index: 100;
+}
+
+.overlay {
+  background: var(--cor-verde);
+
+  background:
+    linear-gradient(
+      to right,
+      #7bbb1b,
+      var(--cor-verde)
+    ) no-repeat 0 0 / cover;
+
+  color: #fff;
+
+  position: relative;
+
+  left: -100%;
+
+  height: 100%;
+  width: 200%;
+
+  transform: translateX(0);
+
+  transition: transform 0.6s ease-in-out;
+}
+
+.overlay video {
+  position: absolute;
+  opacity: 90%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+
+.overlayPanel {
+  position: absolute;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0 20px;
+  height: 100%;
+  width: 50%;
+  text-align: center;
+  transform: translateX(0);
+  transition: transform 0.6s ease-in-out;
+  z-index: 2;
+}
+
+.overlay h1,
+.overlay p,
+.overlay button {
+  position: relative;
+  z-index: 3;
+}
+
+.overlayRight {
+  right: 0;
+  transform: translateX(0);
+}
+
+.overlayLeft {
+  transform: translateX(-20%);
+}
+
+.loginContainer.rightPanelActive .signInContainer {
+  transform: translateX(100%);
+}
+
+.loginContainer.rightPanelActive .overlayContainer {
+  transform: translateX(-100%);
+}
+
+.loginContainer.rightPanelActive .signUpContainer {
+  transform: translateX(100%);
+  opacity: 1;
+  z-index: 5;
+}
+
+.loginContainer.rightPanelActive .overlay {
+  transform: translateX(50%);
+}
+
+.loginContainer.rightPanelActive .overlayLeft {
+  transform: translateX(0);
+}
+
+.loginContainer.rightPanelActive .overlayRight {
+  transform: translateX(20%);
+}
+
+.loginFooter {
+  margin-top: 25px;
+
+  text-align: center;
+
+  color: var(--cor-cinza);
+}
+
+.footerIcons {
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+
+  gap: 12px;
+
+  margin-top: 10px;
+}
+
+.footerIcons a {
+  color: var(--cor-verde);
+
+  font-size: 20px;
+
+  transition: transform 0.2s ease;
+}
+
+.footerIcons a:hover {
+  transform: translateY(-3px);
+}
+
+@media (max-width: 768px) {
+  .loginContainer {
+    width: 95%;
+    min-height: 500px;
+  }
+
+  .formContainer form {
+    padding: 0 25px;
+  }
+
+  .overlayPanel {
+    padding: 0 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .loginContainer {
+    min-height: 500px;
+  }
+
+  .overlayContainer {
+    display: none;
+  }
+
+  .signInContainer {
+    width: 100%;
+  }
+
+  .signUpContainer {
+    width: 100%;
+  }
+
+  .loginContainer.rightPanelActive .signInContainer {
+    transform: translateX(-100%);
+  }
+
+  .loginContainer.rightPanelActive .signUpContainer {
+    transform: translateX(0);
+  }
+}
+
+@media (min-width: 600px){
+  .loginContainer button.btnSecondary{
+    display: none;
+  }
+}

@@ -1,0 +1,320 @@
+.statusHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.statusHeader h2 {
+    margin: 0 0 10px;
+    color: var(--cor-fundo-escuro);
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.statusHeader p {
+    margin: 0;
+    color: var(--cor-cinza);
+    font-size: 14px;
+}
+
+
+/* ================================
+   BADGE DE STATUS
+================================ */
+
+.statusBadge {
+    padding: 7px 13px;
+    border-radius: 20px;
+
+    background: rgba(115, 157, 30, 0.15);
+    color: #557516;
+
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+
+/* Status pendente */
+
+.statusBadge.status-pendente {
+    background: #fff4d6;
+    color: #9a6b00;
+}
+
+
+/* Status aprovado */
+
+.statusBadge.status-aprovado {
+    background: rgba(115, 157, 30, 0.15);
+    color: #557516;
+}
+
+
+/* Status agendado */
+
+.statusBadge.status-agendado {
+    background: #e5efff;
+    color: #3568a8;
+}
+
+
+/* Status concluído */
+
+.statusBadge.status-concluido {
+    background: #dcf5e2;
+    color: #27733d;
+}
+
+
+/* Status recusado */
+
+.statusBadge.status-recusado {
+    background: #fbe7e7;
+    color: #a33c3c;
+}
+
+
+/* ================================
+   TIMELINE
+================================ */
+
+.timeline {
+    position: relative;
+}
+
+.timelineItem {
+    position: relative;
+    display: flex;
+    gap: 14px;
+    padding-bottom: 27px;
+}
+
+
+/* Linha entre os itens */
+
+.timelineItem:not(:last-child)::after {
+    content: "";
+
+    position: absolute;
+
+    left: 16px;
+    top: 32px;
+
+    width: 2px;
+    height: calc(100% - 25px);
+
+    background: #d8ddd8;
+}
+
+
+/* Linha verde quando a etapa foi concluída */
+
+.timelineItem.concluida:not(:last-child)::after {
+    background: var(--cor-verde);
+}
+
+
+/* ================================
+   ÍCONE
+================================ */
+
+.timelineIcon {
+    position: relative;
+    z-index: 2;
+
+    width: 33px;
+    height: 33px;
+
+    flex-shrink: 0;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
+
+    background: #e8ebe8;
+    color: #6d756e;
+
+    font-size: 13px;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+/* Etapa concluída */
+
+.timelineItem.concluida .timelineIcon {
+    background: var(--cor-verde);
+    color: #fff;
+}
+
+
+/* Etapa atual */
+
+.timelineItem.atual .timelineIcon {
+    background: #d4a317;
+    color: #fff;
+
+    box-shadow: 0 0 0 4px rgba(212, 163, 23, 0.15);
+}
+
+
+/* Etapa pendente */
+
+.timelineItem.pendente .timelineIcon {
+    background: #e8ebe8;
+    color: #9ba29c;
+}
+
+
+/* Etapa recusada */
+
+.timelineItem.recusada .timelineIcon {
+    background: #b54444;
+    color: #fff;
+}
+
+
+/* ================================
+   CONTEÚDO DA TIMELINE
+================================ */
+
+.timelineContent {
+    flex: 1;
+    padding-top: 1px;
+}
+
+.timelineContent h3 {
+    margin: 0 0 5px;
+
+    color: var(--cor-fundo-escuro);
+
+    font-size: 14px;
+    font-weight: 600;
+
+    transition: color 0.2s ease;
+}
+
+.timelineContent p,
+.timelineContent span {
+    color: var(--cor-cinza);
+    font-size: 12px;
+}
+
+.timelineContent p {
+    margin: 0 0 5px;
+    line-height: 1.5;
+}
+
+
+/* Título da etapa atual */
+
+.timelineItem.atual .timelineContent h3 {
+    color: #b17f00;
+}
+
+
+/* Título da etapa recusada */
+
+.timelineItem.recusada .timelineContent h3 {
+    color: #a33c3c;
+}
+
+
+/* Etapa pendente fica um pouco mais apagada */
+
+.timelineItem.pendente .timelineContent {
+    opacity: 0.65;
+}
+
+
+/* ================================
+   BOX DE CONCLUSÃO
+================================ */
+
+.conclusaoBox {
+    min-height: 110px;
+
+    padding: 17px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    border: 1px solid #d6d5d2;
+    border-radius: 9px;
+
+    background: var(--cor-fundo);
+}
+
+.conclusaoBox strong {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: var(--cor-verde);
+
+    font-size: 13px;
+}
+
+.conclusaoBox p {
+    max-width: 230px;
+
+    margin: 0;
+
+    color: var(--cor-cinza);
+
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.conclusaoIcon {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    padding-right: 5px;
+
+    color: var(--cor-verde);
+
+    opacity: 0.45;
+
+    font-size: 35px;
+}
+
+.conclusaoIcon svg:last-child {
+    font-size: 30px;
+}
+
+
+/* ================================
+   RESPONSIVO
+================================ */
+
+@media (max-width: 650px) {
+
+    .statusHeader {
+        flex-direction: column;
+    }
+
+    .statusBadge {
+        align-self: flex-start;
+    }
+
+    .conclusaoBox {
+        align-items: flex-start;
+    }
+
+    .conclusaoIcon {
+        font-size: 28px;
+    }
+}

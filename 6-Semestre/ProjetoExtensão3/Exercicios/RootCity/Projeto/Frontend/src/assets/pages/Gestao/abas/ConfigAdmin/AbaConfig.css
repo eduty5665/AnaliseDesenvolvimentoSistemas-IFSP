@@ -1,0 +1,20 @@
+.btnStatusCidade{
+    width: 100px;
+}
+
+.btnStatusCidade:hover{
+    transform: translateY(-1px);
+}
+
+.checkboxEntrega {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.checkboxEntrega input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}

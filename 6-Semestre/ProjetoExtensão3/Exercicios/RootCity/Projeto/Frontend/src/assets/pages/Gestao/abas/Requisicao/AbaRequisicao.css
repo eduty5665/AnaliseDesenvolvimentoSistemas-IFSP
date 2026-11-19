@@ -1,0 +1,254 @@
+@import "../../../../../index.css";
+
+.abaRequisicaoConteudo {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ==========================================================
+   BARRA DE FILTROS
+========================================================== */
+.barraFiltros {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    background-color: var(--cor-fundo);
+    border: 1px solid #d6d5d2;
+    border-radius: 10px;
+    padding: 14px 18px;
+}
+
+.barraFiltros input[type=text] {
+    flex: 1;
+    min-width: 240px;
+    height: 42px;
+    padding: 0 14px;
+}
+
+.barraFiltros input {
+    background-color: #ffffff;
+    border: 1px solid #d6d5d2;
+    border-radius: 8px;
+    color: var(--cor-fundo-escuro);
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.barraFiltros input::placeholder {
+    color: #9a9488;
+}
+
+.barraFiltros input:focus {
+    border-color: var(--cor-verde);
+    box-shadow: 0 0 0 3px rgba(115, 157, 30, 0.15);
+}
+
+.barraFiltros select {
+    min-width: 180px;
+    height: 42px;
+    padding: 0 14px;
+    background-color: #ffffff;
+    border: 1px solid #d6d5d2;
+    border-radius: 8px;
+    color: var(--cor-fundo-escuro);
+    font-size: 14px;
+    font-weight: 500;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.barraFiltros .dataInicial, .barraFiltros .dataFinal {
+    padding: 8px;
+    margin-bottom: 20px;
+    width: 140px;
+}
+
+.barraFiltros select:focus {
+    border-color: var(--cor-verde);
+    box-shadow: 0 0 0 3px rgba(115, 157, 30, 0.15);
+}
+
+.btnLimparFiltros {
+    height: 42px;
+    padding: 0 16px;
+    background: transparent;
+    border: 1px solid #d6d5d2;
+    border-radius: 8px;
+    color: var(--cor-fundo-escuro);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btnLimparFiltros:hover {
+    background-color: rgba(200, 50, 50, 0.08);
+    border-color: #a33c3c;
+    color: #a33c3c;
+}
+
+/* ==========================================================
+   TABELA DE Requisições
+========================================================== */
+.listaResultado {
+    width: 100%;
+    overflow-x: auto;
+    background-color: var(--cor-fundo);
+    border: 1px solid #d6d5d2;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.tableRequisicao {
+    width: 100%;
+    margin-bottom: 0 !important;
+    border-collapse: collapse;
+    background-color: transparent;
+}
+
+/* Cabeçalho da Tabela */
+.tableRequisicao thead {
+    background-color: var(--cor-fundo-escuro);
+    border-bottom: 2px solid #524a3c;
+}
+
+.tableRequisicao th {
+    padding: 14px 18px;
+    color: var(--cor-cinza);
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    border: none;
+}
+
+/* Linhas e Células */
+.tableRequisicao tbody tr {
+    background-color: var(--cor-fundo);
+    border-bottom: 1px solid #dcd7ce;
+    transition: background-color 0.2s ease;
+}
+
+.tableRequisicao tbody tr:nth-child(even) {
+    background-color: rgba(243, 238, 228, 0.6);
+}
+
+.tableRequisicao tbody tr:hover {
+    background-color: rgba(115, 157, 30, 0.08);
+}
+
+.tableRequisicao tbody tr:last-child {
+    border-bottom: none;
+}
+
+.tableRequisicao td {
+    padding: 14px 18px;
+    color: var(--cor-fundo-escuro);
+    font-size: 14px;
+    vertical-align: middle;
+    border: none;
+}
+
+.tableRequisicao td strong {
+    color: #1a1611;
+    font-weight: 700;
+}
+
+/* Tag de Tipo */
+.tipoTag {
+    background: rgba(97, 88, 72, 0.1);
+    color: var(--cor-fundo-escuro);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* Tags de Status */
+.statusTag {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.statusTag.solicitado {
+    background-color: rgba(218, 165, 32, 0.15);
+    color: #8c6b00;
+    border: 1px solid rgba(218, 165, 32, 0.35);
+}
+
+.statusTag.aprovado {
+    background-color: rgba(115, 157, 30, 0.15);
+    color: #57b8bb;
+    border: 1px solid rgb(97, 214, 230);
+}
+
+.statusTag.recusado {
+    background-color: rgba(200, 50, 50, 0.12);
+    color: #a33c3c;
+    border: 1px solid rgba(200, 50, 50, 0.3);
+}
+
+.statusTag.concluido {
+    background-color: rgba(115, 157, 30, 0.22);
+    color: #3f590c;
+    border: 1px solid var(--cor-verde);
+}
+
+.statusTag.agendado_plantio {
+    background-color: rgba(97, 88, 72, 0.15);
+    color: var(--cor-fundo-escuro);
+    border: 1px solid #d6d5d2;
+}
+
+.statusTag.aguardando_retirada {
+    background-color: rgba(115, 157, 30, 0.1);
+    color: #557516;
+    border: 1px solid rgba(115, 157, 30, 0.3);
+}
+
+/* Botão Verificar */
+.btnVerificar {
+    background-color: var(--cor-verde);
+    color: #ffffff;
+    border: none;
+    padding: 7px 16px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btnVerificar:hover {
+    background-color: #5f8218;
+    box-shadow: 0 2px 8px rgba(115, 157, 30, 0.35);
+    transform: translateY(-1px);
+}
+
+.btnVerificar:active {
+    transform: translateY(0);
+}
+
+/* Mensagem Vazia */
+.mensagemVazio {
+    text-align: center;
+    padding: 36px 20px !important;
+    color: var(--cor-cinza);
+    font-size: 14px;
+    font-weight: 500;
+}

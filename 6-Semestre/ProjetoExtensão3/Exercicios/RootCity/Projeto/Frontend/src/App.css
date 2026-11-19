@@ -1,0 +1,50 @@
+@import './index.css';
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.imgLogo{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--cor-fundo);
+  border-radius: 8px;
+  width: 300px;
+}
+
+.imgLogo img{
+  width: 230px;
+}
+
+.internalPage {
+  min-height: 70vh;
+  padding: 160px 24px 72px;
+  background-color: var(--cor-fundo);
+  color: var(--cor-cinza);
+  text-align: center;
+}
+
+.internalPage h1 {
+  color: var(--cor-fundo-escuro);
+  margin-bottom: 16px;
+}
+
+.internalPage p {
+  max-width: 620px;
+  margin: 0 auto;
+  font-size: 1.1rem;
+}
+
+.appLayout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Ocupa no mínimo 100% da altura da tela */
+}
+.appMainContent {
+  flex: 1; /* Preenche todo o espaço que sobra, empurrando o Footer para baixo */
+  display: flex;
+  flex-direction: column;
+}

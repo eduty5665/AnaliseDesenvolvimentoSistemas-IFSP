@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#2C2C2C"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/imgFotoDialogRanking"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:contentDescription="@string/profile_photo"
+        android:scaleType="centerCrop"
+        android:src="@drawable/guerreiro"
+        app:shapeAppearanceOverlay="@style/CircleImage" />
+
+    <TextView
+        android:id="@+id/txtNomeDialogRanking"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/txtScoreDialogRanking"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:textColor="@color/gold"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+</LinearLayout>

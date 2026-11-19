@@ -1,0 +1,193 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  CIDADAO
+  FUNCIONARIO
+  ADMIN_LOCAL
+  GLOBAL
+}
+
+enum StatusRequisicao {
+  SOLICITADO
+  APROVADO
+  RECUSADO
+  AGUARDANDO_RETIRADA
+  AGENDADO_PLANTIO
+  CONCLUIDO
+}
+
+enum TipoAtendimento {
+  RETIRADA_LOCAL
+  PLANTIO_AGENDADO
+}
+
+model Usuario {
+  id       String  @id @db.Uuid
+  nome     String
+  email    String  @unique
+  telefone String?
+
+  role Role @default(CIDADAO)
+
+  cidadeId String? @db.Uuid
+  cidade   Cidade? @relation(fields: [cidadeId], references: [id])
+
+  ativo Boolean @default(true)
+
+  requisicoes Requisicao[]
+  historicos  HistoricoRequisicao[]
+
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  @@index([cidadeId])
+}
+
+model Cidade {
+  id   String @id @default(uuid()) @db.Uuid
+  nome String
+  uf   String
+
+  usuarios    Usuario[]
+  requisicoes Requisicao[]
+  arvores     Arvore[]
+  enderecos   Endereco[]
+
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+  ativa        Boolean
+  permiteEntrega Boolean @default(false) 
+}
+
+model Arvore {
+  id String @id @default(uuid()) @db.Uuid
+
+  cidadeId String? @db.Uuid
+  cidade   Cidade? @relation(fields: [cidadeId], references: [id])
+
+  nomePopular String
+  descricao   String?
+  imagemUrl   String?
+
+  quantidade Int     @default(0)
+  ativa      Boolean @default(true)
+
+  requisicoes Requisicao[]
+
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  @@index([cidadeId])
+}
+
+model Requisicao {
+  id String @id @default(uuid()) @db.Uuid
+
+  criadoPorId String? @db.Uuid
+  criadoPor   Usuario? @relation(fields: [criadoPorId], references: [id])
+
+  nomeBeneficiario     String?
+  telefoneBeneficiario String?
+  emailBeneficiario    String?
+
+  cidadeId String @db.Uuid
+  cidade   Cidade @relation(fields: [cidadeId], references: [id])
+
+  arvoreId String @db.Uuid
+  arvore   Arvore @relation(fields: [arvoreId], references: [id])
+
+  status StatusRequisicao @default(SOLICITADO)
+  observacaoStatus String?
+
+  dataInicial DateTime?
+  dataFinal DateTime?
+
+  tipoAtendimento TipoAtendimento
+
+  rua             String
+  numero          String
+  bairro          String
+  cidadeEndereco  String
+  cep             String
+  estado          String
+  pontoReferencia String?
+
+  fotoLocalUrl             String?
+  comprovanteResidenciaUrl String?
+  fotoPlantioUrl           String?
+
+  enderecoId String?   @db.Uuid
+  endereco   Endereco? @relation(fields: [enderecoId], references: [id])
+
+  historico HistoricoRequisicao[]
+  publicacao Publicacao[]
+
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  @@index([cidadeId, criadoEm])
+  @@index([criadoPorId])
+  @@index([status])
+  @@index([arvoreId])
+}
+
+model Endereco {
+  id String @id @default(uuid()) @db.Uuid
+
+  rua             String
+  numero          String
+  bairro          String
+  cep             String?
+  pontoReferencia String?
+
+  cidadeId String @db.Uuid
+  cidade   Cidade @relation(fields: [cidadeId], references: [id])
+
+  ativo Boolean @default(true)
+
+  requisicoes Requisicao[]
+
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+}
+
+model HistoricoRequisicao {
+  id String @id @default(uuid()) @db.Uuid
+
+  requisicaoId String     @db.Uuid
+  requisicao   Requisicao @relation(fields: [requisicaoId], references: [id])
+
+  usuarioId String  @db.Uuid
+  usuario   Usuario @relation(fields: [usuarioId], references: [id])
+
+  statusAnterior StatusRequisicao?
+  statusNovo     StatusRequisicao
+
+  observacao String?
+
+  criadoEm DateTime @default(now())
+}
+
+model Publicacao {
+  id String @id @default(uuid()) @db.Uuid
+
+  requisicaoId String     @unique @db.Uuid
+  requisicao   Requisicao @relation(fields: [requisicaoId], references: [id])
+
+  titulo    String?
+  descricao String?
+
+  criadoEm DateTime @default(now())
+}

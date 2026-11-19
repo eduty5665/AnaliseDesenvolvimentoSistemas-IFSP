@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">OlympiaFitrix</string>
+    <string name="personal_name_format">Trainer: %1$s</string>
+    <string name="language_portuguese">Português</string>
+    <string name="language_english">English</string>
+    <string name="language_selector_description">Select language</string>
+</resources>

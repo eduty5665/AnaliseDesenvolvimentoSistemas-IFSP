@@ -1,0 +1,93 @@
+@import '../../../index.css';
+
+.cardInfo {
+  background-color: var(--cor-card);
+  width: 280px;
+  min-height: 350px;
+  border: 1px solid rgba(0, 0, 0, 0.199);
+
+  animation: floating var(--duration) ease-in-out infinite;
+  animation-delay: var(--delay);
+
+  will-change: transform;
+}
+
+.icon {
+  background-color: #E6E0D3;
+  color: var(--cor-verde);
+  font-size: 25px;
+}
+
+.number,
+.cardText {
+  color: var(--cor-cinza);
+  font-family: 'Times New Roman', Times, serif;
+}
+
+/* =========================
+   FLUTUAÇÃO VERTICAL
+========================= */
+
+@keyframes floating {
+
+  0% {
+    transform: translateY(0);
+  }
+
+  25% {
+    transform: translateY(var(--y1));
+  }
+
+  50% {
+    transform: translateY(var(--y2));
+  }
+
+  75% {
+    transform: translateY(var(--y3));
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+
+/* =========================
+   MOVIMENTOS DIFERENTES
+========================= */
+
+.cardInfo:nth-child(1) {
+  --duration: 5s;
+  --delay: 0s;
+
+  --y1: -8px;
+  --y2: -15px;
+  --y3: -5px;
+}
+
+.cardInfo:nth-child(2) {
+  --duration: 7s;
+  --delay: -2s;
+
+  --y1: -5px;
+  --y2: -12px;
+  --y3: -7px;
+}
+
+.cardInfo:nth-child(3) {
+  --duration: 6s;
+  --delay: -4s;
+
+  --y1: -12px;
+  --y2: -6px;
+  --y3: -15px;
+}
+
+.cardInfo:nth-child(4) {
+  --duration: 8s;
+  --delay: -1s;
+
+  --y1: -6px;
+  --y2: -14px;
+  --y3: -9px;
+}
